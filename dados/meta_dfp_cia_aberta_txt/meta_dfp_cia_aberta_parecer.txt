@@ -1,0 +1,66 @@
+-----------------------
+Campo: CNPJ_CIA
+-----------------------
+   Descrição : CNPJ da companhia
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 18
+
+-----------------------
+Campo: DENOM_CIA
+-----------------------
+   Descrição : Nome empresarial da companhia
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 100
+
+-----------------------
+Campo: DT_REFER
+-----------------------
+   Descrição : Data de referência do documento
+   Domínio   : AAAA-MM-DD
+   Tipo Dados: date
+   Tamanho   : 10
+
+-----------------------
+Campo: NUM_ITEM_PARECER_DECL
+-----------------------
+   Descrição : Número da linha do texto do Parecer/Declaração
+   Domínio   : Numérico
+   Tipo Dados: smallint
+   Precisão  : 5
+   Scale     : 0
+
+-----------------------
+Campo: TP_PARECER_DECL
+-----------------------
+   Descrição : Tipo do Parecer/Declaração
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 101
+
+-----------------------
+Campo: TP_RELAT_AUD
+-----------------------
+   Descrição : Tipo Relatório do Auditor Independente
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 19
+
+-----------------------
+Campo: TXT_PARECER_DECL
+-----------------------
+   Descrição : Texto do Parecer/Declaração
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 8000
+
+-----------------------
+Campo: VERSAO
+-----------------------
+   Descrição : Versão do documento
+   Domínio   : Numérico
+   Tipo Dados: smallint
+   Precisão  : 5
+   Scale     : 0
+

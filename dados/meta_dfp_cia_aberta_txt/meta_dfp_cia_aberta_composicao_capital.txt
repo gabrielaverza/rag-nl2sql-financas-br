@@ -1,0 +1,87 @@
+-----------------------
+Campo: CNPJ_CIA
+-----------------------
+   Descrição : CNPJ da companhia
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 18
+
+-----------------------
+Campo: DENOM_CIA
+-----------------------
+   Descrição : Nome empresarial da companhia
+   Domínio   : Alfanumérico
+   Tipo Dados: varchar
+   Tamanho   : 100
+
+-----------------------
+Campo: DT_REFER
+-----------------------
+   Descrição : Data de referência do documento
+   Domínio   : AAAA-MM-DD
+   Tipo Dados: date
+   Tamanho   : 10
+
+-----------------------
+Campo: VERSAO
+-----------------------
+   Descrição : Versão do documento
+   Domínio   : Numérico
+   Tipo Dados: smallint
+   Precisão  : 5
+   Scale     : 0
+
+-----------------------
+Campo: QT_ACAO_ORDIN_TESOURO
+-----------------------
+   Descrição : 
+   Domínio   : 
+   Tipo Dados: bigint
+   Precisão  : 19
+   Scale     : 0
+
+-----------------------
+Campo: QT_ACAO_TOTAL_TESOURO
+-----------------------
+   Descrição : 
+   Domínio   : 
+   Tipo Dados: bigint
+   Precisão  : 19
+   Scale     : 0
+
+-----------------------
+Campo: QT_ACAO_TOTAL_CAP_INTEGR
+-----------------------
+   Descrição : 
+   Domínio   : 
+   Tipo Dados: bigint
+   Precisão  : 19
+   Scale     : 0
+
+-----------------------
+Campo: QT_ACAO_PREF_TESOURO
+-----------------------
+   Descrição : 
+   Domínio   : 
+   Tipo Dados: bigint
+   Precisão  : 19
+   Scale     : 0
+
+-----------------------
+Campo: QT_ACAO_PREF_CAP_INTEGR
+-----------------------
+   Descrição : 
+   Domínio   : 
+   Tipo Dados: bigint
+   Precisão  : 19
+   Scale     : 0
+
+-----------------------
+Campo: QT_ACAO_ORDIN_CAP_INTEGR
+-----------------------
+   Descrição : 
+   Domínio   : 
+   Tipo Dados: bigint
+   Precisão  : 19
+   Scale     : 0
+
