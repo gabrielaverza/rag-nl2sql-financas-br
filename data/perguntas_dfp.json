@@ -1,0 +1,254 @@
+[
+  {
+    "id": "c01",
+    "pergunta": "O que representa o valor adicionado, segundo o CPC 09?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Valor adicionado representa a riqueza criada pela empresa"
+    ]
+  },
+  {
+    "id": "c02",
+    "pergunta": "Como o método indireto calcula o fluxo de caixa das atividades operacionais?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "De acordo com o método indireto, o fluxo de caixa líquido advindo das atividades operacionais é determinado ajustando o lucro líquido"
+    ]
+  },
+  {
+    "id": "c03",
+    "pergunta": "O que são equivalentes de caixa, segundo o CPC 03?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Equivalentes de caixa são aplicações financeiras de curto prazo, de alta liquidez"
+    ]
+  },
+  {
+    "id": "c04",
+    "pergunta": "O que compõe o conjunto completo de demonstrações contábeis, segundo o CPC 26?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "O conjunto completo de demonstrações contábeis inclui"
+    ]
+  },
+  {
+    "id": "c05",
+    "pergunta": "O que é o Formulário de Demonstrações Financeiras Padronizadas (DFP)?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "formulário de demonstrações financeiras padronizadas – DFP"
+    ]
+  },
+  {
+    "id": "c06",
+    "pergunta": "Quais grupos compõem a distribuição do valor adicionado na DVA?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "DISTRIBUIÇÃO DO VALOR ADICIONADO"
+    ]
+  },
+  {
+    "id": "c07",
+    "pergunta": "O que um administrador deve apresentar ao tomar posse de um cargo em uma companhia aberta?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Ao tomar posse de cargo em companhia aberta, o administrador deve apresentar"
+    ]
+  },
+  {
+    "id": "q01",
+    "pergunta": "Qual foi a receita líquida consolidada da Ambev em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DRE_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q02",
+    "pergunta": "Qual foi o lucro líquido consolidado da Ambev em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DRE_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q03",
+    "pergunta": "Qual foi o ativo total consolidado da Alpargatas em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["BPA_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'ALPARGATAS S.A.') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q04",
+    "pergunta": "Qual foi o ativo total individual (não consolidado) da Alpargatas em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["BPA_ind", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPA_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'ALPARGATAS S.A.') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q05",
+    "pergunta": "Qual foi o patrimônio líquido consolidado da Ambev em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["BPP_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q06",
+    "pergunta": "Qual foi o caixa líquido gerado pelas atividades operacionais da Ambev em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DFC_MI_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q07",
+    "pergunta": "Quanto a Ambev distribuiu para pessoal, segundo a Demonstração de Valor Adicionado de 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DVA_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '7.08.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q08",
+    "pergunta": "Qual foi a receita líquida consolidada da JBS em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DRE_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'JBS S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q09",
+    "pergunta": "Qual foi a receita líquida consolidada da Petrobras em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DRE_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'PETROLEO BRASILEIRO S.A. PETROBRAS') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q10",
+    "pergunta": "Qual foi o ativo total consolidado da Vale em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["BPA_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'VALE S.A.') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q11",
+    "pergunta": "Entre Ambev e JBS, qual teve maior receita líquida consolidada em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DRE_con", "companhias"],
+    "sql_referencia": "SELECT c.DENOM_CIA, d.VL_CONTA FROM DRE_con d JOIN companhias c ON c.CD_CVM = d.CD_CVM WHERE c.DENOM_CIA IN ('AMBEV S.A.', 'JBS S.A.') AND d.CD_CONTA = '3.01' AND d.ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "q12",
+    "pergunta": "Quantas companhias reportaram prejuízo líquido consolidado em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["DRE_con"],
+    "sql_referencia": "SELECT COUNT(*) FROM DRE_con WHERE CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO' AND VL_CONTA < 0",
+    "evidencia": []
+  },
+  {
+    "id": "q13",
+    "pergunta": "Quais são as 5 companhias com maior ativo total consolidado em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["BPA_con", "companhias"],
+    "sql_referencia": "SELECT c.DENOM_CIA, CASE WHEN b.ESCALA_MOEDA = 'MIL' THEN b.VL_CONTA * 1000 ELSE b.VL_CONTA END AS ativo_reais FROM BPA_con b JOIN companhias c ON c.CD_CVM = b.CD_CVM WHERE b.CD_CONTA = '1' AND b.ORDEM_EXERC = 'ÚLTIMO' ORDER BY ativo_reais DESC LIMIT 5",
+    "evidencia": []
+  },
+  {
+    "id": "q14",
+    "pergunta": "Quantas companhias há na base carregada?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": ["companhias"],
+    "sql_referencia": "SELECT COUNT(*) FROM companhias",
+    "evidencia": []
+  },
+  {
+    "id": "h01",
+    "pergunta": "Qual foi o caixa líquido das atividades operacionais da Ambev em 2025, e como o método indireto chega a esse valor?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["DFC_MI_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "De acordo com o método indireto, o fluxo de caixa líquido advindo das atividades operacionais é determinado ajustando o lucro líquido"
+    ]
+  },
+  {
+    "id": "h02",
+    "pergunta": "Quanto a Ambev distribuiu para pessoal na DVA de 2025, e o que representa o valor adicionado que está sendo distribuído?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["DVA_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '7.08.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Valor adicionado representa a riqueza criada pela empresa"
+    ]
+  },
+  {
+    "id": "h03",
+    "pergunta": "Qual foi o ativo total consolidado da Alpargatas em 2025, e o balanço patrimonial é um dos quais documentos do conjunto completo de demonstrações contábeis?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["BPA_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'ALPARGATAS S.A.') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "O conjunto completo de demonstrações contábeis inclui"
+    ]
+  },
+  {
+    "id": "h04",
+    "pergunta": "Quantas companhias reportaram prejuízo líquido em 2025, e que informações periódicas uma companhia aberta deve divulgar segundo a Resolução CVM 80?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["DRE_con"],
+    "sql_referencia": "SELECT COUNT(*) FROM DRE_con WHERE CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO' AND VL_CONTA < 0",
+    "evidencia": [
+      "formulário de demonstrações financeiras padronizadas – DFP"
+    ]
+  },
+  {
+    "id": "h05",
+    "pergunta": "Qual foi o caixa e equivalentes de caixa da Ambev no balanço de 2025, e o que são equivalentes de caixa segundo o CPC 03?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["BPA_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Equivalentes de caixa são aplicações financeiras de curto prazo, de alta liquidez"
+    ]
+  },
+  {
+    "id": "h06",
+    "pergunta": "Qual foi o patrimônio líquido consolidado da Ambev em 2025, e a demonstração das mutações do patrimônio líquido faz parte de qual conjunto de demonstrações?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["BPP_con", "companhias"],
+    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AMBEV S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "demonstração das mutações do patrimônio líquido do período"
+    ]
+  },
+  {
+    "id": "h07",
+    "pergunta": "Entre Ambev e JBS, qual teve maior receita líquida em 2025, e quais grupos compõem a distribuição do valor adicionado que essas companhias também divulgam?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": ["DRE_con", "companhias"],
+    "sql_referencia": "SELECT c.DENOM_CIA, d.VL_CONTA FROM DRE_con d JOIN companhias c ON c.CD_CVM = d.CD_CVM WHERE c.DENOM_CIA IN ('AMBEV S.A.', 'JBS S.A.') AND d.CD_CONTA = '3.01' AND d.ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "DISTRIBUIÇÃO DO VALOR ADICIONADO"
+    ]
+  }
+]

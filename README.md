@@ -16,14 +16,16 @@ rag-nl2sql-financas-br/
 ├── dados/
 │   ├── dfp_cia_aberta_2025/         # CSVs oficiais da CVM (658 companhias, exercicio 2025)
 │   ├── meta_dfp_cia_aberta_txt/     # dicionario de dados oficial da CVM
-│   └── normativos/
-│       ├── cvm/resol080consolid.pdf # Resolucao CVM 80/2022 consolidada
-│       └── cpc/                     # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
+│   ├── normativos/
+│   │   ├── cvm/resol080consolid.pdf # Resolucao CVM 80/2022 consolidada
+│   │   └── cpc/                     # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
+│   └── perguntas_dfp.json           # 28 perguntas de teste (7 conceituais, 14 quantitativas, 7 hibridas)
 ├── data/
 │   └── dfp.db                       # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
 ├── embeddings/
 │   ├── esquema.json                 # documentacao do esquema, uma entrada por tabela
-│   └── index_esquema.json           # indice vetorial de esquema
+│   ├── index_esquema.json           # indice vetorial de esquema
+│   └── index_glossario.json         # indice vetorial conceitual
 ├── pipeline/
 │   ├── carregar_dfp.py              # CSVs da CVM -> data/dfp.db
 │   ├── gerar_indice_esquema.py      # data/dfp.db -> esquema.json -> index_esquema.json
@@ -120,3 +122,24 @@ Duas limitações da primeira versão, já corrigidas:
   `"27"`, `". 31"`), sem contexto próprio. Corrigido descartando, depois da divisão em trechos,
   qualquer trecho cujo conteúdo (sem pontuação e espaços nas bordas) seja só dígitos com até 4
   caracteres.
+
+## Conjunto de perguntas de teste (`data/perguntas_dfp.json`)
+
+28 perguntas (7 conceituais, 14 quantitativas, 7 híbridas), no mesmo formato do
+`perguntas_teste.json` do `tcc-prototype` (`id`, `pergunta`, `tipo`, `tabelas_esperadas`,
+`sql_referencia`, `evidencia`). Serve de base para Recall@k/MRR (recuperação), faithfulness/answer
+relevance (caminho conceitual) e EX/EM (caminhos quantitativo e híbrido) na Etapa 4.
+
+- **Conceituais:** evidência conferida verbatim contra `index_glossario.json` (CPC 03: método
+  indireto, equivalentes de caixa; CPC 09: valor adicionado, distribuição; CPC 26: conjunto de
+  demonstrações; Resolução CVM 80: DFP, posse de administrador).
+- **Quantitativas e híbridas:** todos os 21 SQLs de referência executados e conferidos contra
+  `data/dfp.db` (resultado não vazio). Empresas usadas: Ambev, Alpargatas, JBS, Petrobras, Vale.
+
+**Achado relevante para a Etapa 3 (gerador de SQL):** comparar valores financeiros brutos entre
+companhias sem normalizar `ESCALA_MOEDA` produz um ranking errado. Das 658 companhias do BPA
+consolidado, 420 reportam em `MIL` e 9 em `UNIDADE`; sem normalizar, a Vivara Participações
+aparecia em 1º lugar num ranking de ativo total, com um valor de ~R$ 4,7 trilhões (na verdade
+~R$ 4,7 bilhões, por estar em `UNIDADE`). A pergunta de ranking usa
+`CASE WHEN ESCALA_MOEDA='MIL' THEN VL_CONTA*1000 ELSE VL_CONTA END` no SQL de referência — requisito
+concreto a passar para o prompt do gerador de SQL na próxima etapa.
