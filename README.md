@@ -92,6 +92,25 @@ problemas. Resumos conferidos manualmente: todos mencionam o nome completo da de
 
 ## Normativos (`index_glossario.json`)
 
-Ainda não gerado sobre os PDFs reais. `pipeline/gerar_indice_glossario.py` hoje varre um único
-diretório plano; com `normativos/cvm/` e `normativos/cpc/` como subpastas, precisa rodar uma vez por
-subpasta ou ganhar varredura recursiva antes do próximo passo.
+Gerado sobre os 4 PDFs reais (Resolução CVM 80 consolidada e CPC 03, 09 e 26 vigentes), com três
+adaptações sobre a versão do `tcc-prototype` (feita para o documento fictício, sem cabeçalho/rodapé):
+
+1. **Varredura recursiva** de `dados/normativos/` (`glob(..., "**/*.pdf", recursive=True)`), para
+   pegar as subpastas `cvm/` e `cpc/` numa só passada.
+2. **Remoção de cabeçalho/rodapé repetido.** Documentos reais repetem um bloco em quase toda
+   página (endereço da CVM no topo da Resolução 80; um código do pronunciamento no rodapé de cada
+   CPC, ex.: `CPC_09R1`). Detecção genérica por frequência: um bloco (texto normalizado) que aparece
+   em mais de 50% das páginas do documento é cabeçalho/rodapé, não conteúdo, e é descartado antes de
+   montar os parágrafos. Também descarta blocos que são só um número isolado (número de página).
+3. **`local_files_only=True`** ao carregar o MiniLM (mesma proteção que `busca.py` já tinha, mas que
+   faltava nos scripts offline — uma queda de rede real interrompeu a primeira tentativa de rodar
+   este script sobre os PDFs reais).
+
+Resultado: 1.641 trechos (165 do CPC 03, 208 do CPC 09, 426 do CPC 26, 842 da Resolução 80), todos
+dentro do limite de 120 tokens. Confirmado que nenhum trecho ficou com resíduo do cabeçalho/rodapé
+detectado. **Limitação encontrada e não corrigida:** cerca de 7 trechos (0,4% do total) são
+fragmentos degenerados de tabela (ex.: um trecho com só `"27"` ou `". 31"`), produzidos pelo
+`RecursiveCharacterTextSplitter` ao cortar uma tabela por tamanho de token; e uma variante rara do
+rodapé com espaço em vez de `_` (`"CPC 09(R1)"`, 3 ocorrências) não bateu no limiar de frequência de
+50% e sobrou como trecho próprio. Nenhum dos dois foi corrigido agora; construir um divisor de
+trechos consciente de tabelas é um esforço maior para um ganho pequeno neste volume.

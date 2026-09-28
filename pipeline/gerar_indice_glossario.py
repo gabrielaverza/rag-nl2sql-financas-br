@@ -1,10 +1,10 @@
 """
-Pipeline offline: gera o índice conceitual (index_glossario.json)
-a partir dos PDFs de data/normativos_ficticios/. Extrai o texto de cada PDF,
-divide em trechos (chunks) e gera um embedding por trecho com
-paraphrase-multilingual-MiniLM-L12-v2.
+Pipeline offline: gera o índice conceitual (index_glossario.json) a partir
+dos PDFs normativos reais em dados/normativos/ (varredura recursiva, inclui
+as subpastas cvm/ e cpc/). Extrai o texto de cada PDF, divide em trechos
+(chunks) e gera um embedding por trecho com paraphrase-multilingual-MiniLM-L12-v2.
 
-Executar de dentro de tcc-prototype/: python pipeline/gerar_indice_glossario.py
+Executar de dentro de rag-nl2sql-financas-br/: python pipeline/gerar_indice_glossario.py
 """
 
 import glob
@@ -12,14 +12,21 @@ import json
 import os
 import re
 import unicodedata
+from collections import Counter
 
 import pymupdf
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 
-PASTA_DOCUMENTOS = "data/normativos_ficticios"
+PASTA_DOCUMENTOS = "dados/normativos"
 CAMINHO_SAIDA = "embeddings/index_glossario.json"
 MODELO_EMBEDDING = "paraphrase-multilingual-MiniLM-L12-v2"
+
+# Um bloco (cabecalho/rodape) que se repete em mais dessa fracao das paginas
+# e descartado antes de montar os paragrafos. Documentos ficticios (poucas
+# paginas, sem cabecalho/rodape) nao sao afetados; documentos reais da CVM e
+# do CPC repetem um endereco ou um codigo do pronunciamento em toda pagina.
+LIMIAR_REPETICAO = 0.5
 
 # O MiniLM só lê até 128 tokens por texto (o resto é ignorado). Dois desses
 # tokens são reservados pelo modelo (início e fim), então o trecho deve ter
@@ -39,24 +46,49 @@ def _continua_paragrafo(anterior: str, atual: str) -> bool:
     return not terminou_frase and (atual[0].islower() or atual[0] in "(,")
 
 
+def _texto_normalizado(bloco) -> str:
+    texto, tipo_bloco = bloco[4], bloco[6]
+    if tipo_bloco != 0:  # 0 = texto; outros tipos são imagens
+        return ""
+    # NFKC desfaz ligaturas (ex.: "ﬁ" vira "fi"), que atrapalhariam a busca.
+    texto = unicodedata.normalize("NFKC", texto)
+    texto = re.sub(r"\s+", " ", texto).strip()
+    # Numero de pagina isolado (bloco solto so com digitos): nao e conteudo.
+    if texto.isdigit():
+        return ""
+    return texto
+
+
+def detectar_blocos_repetidos(documento: pymupdf.Document) -> set[str]:
+    # Documentos reais (normativos da CVM e do CPC) repetem um cabecalho ou
+    # rodape (endereco da CVM, codigo do pronunciamento) em quase toda pagina,
+    # ao contrario do documento ficticio usado para validar o pipeline. Conta
+    # quantas paginas cada bloco (ja normalizado) aparece; acima do limiar,
+    # e cabecalho/rodape, nao conteudo, e e descartado antes de montar os
+    # paragrafos. A capa costuma ter uma variante do cabecalho com quebras de
+    # linha diferentes, que nao bate exatamente e por isso nao e pega aqui;
+    # isso e aceitavel porque a capa e uma pagina so.
+    contagem = Counter()
+    for pagina in documento:
+        blocos_da_pagina = {_texto_normalizado(b) for b in pagina.get_text("blocks", sort=True)}
+        contagem.update(b for b in blocos_da_pagina if b)
+    minimo = max(2, int(len(documento) * LIMIAR_REPETICAO))
+    return {texto for texto, n in contagem.items() if n >= minimo}
+
+
 def extrair_texto_pdf(caminho_pdf: str) -> str:
     # Lê o PDF por blocos. Cada bloco é um parágrafo, e os parágrafos são
     # unidos com uma linha em branco. O pymupdf, por padrão, não devolve
     # essa linha em branco, e o divisor de texto precisa dela para respeitar
     # os limites de parágrafo.
     documento = pymupdf.open(caminho_pdf)
+    blocos_repetidos = detectar_blocos_repetidos(documento)
     paragrafos = []
     for pagina in documento:
         primeiro_bloco_da_pagina = True
         for bloco in pagina.get_text("blocks", sort=True):
-            texto, tipo_bloco = bloco[4], bloco[6]
-            if tipo_bloco != 0:  # 0 = texto; outros tipos são imagens
-                continue
-            # NFKC desfaz ligaturas (ex.: "ﬁ" vira "fi"), que atrapalhariam a busca.
-            texto = unicodedata.normalize("NFKC", texto)
-            # Junta as linhas quebradas do parágrafo em uma linha só.
-            texto = re.sub(r"\s+", " ", texto).strip()
-            if not texto:
+            texto = _texto_normalizado(bloco)
+            if not texto or texto in blocos_repetidos:
                 continue
             # Se o parágrafo foi cortado pela quebra de página, recoloca as duas
             # metades juntas, para que a definição não seja dividida no meio.
@@ -99,11 +131,14 @@ def montar_registros(nome_arquivo: str, trechos: list[str], modelo_embedding: Se
 
 
 def main():
-    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING)
+    # local_files_only evita depender da rede para confirmar a versao do
+    # modelo a cada carga (uma queda de rede ja derrubou uma avaliacao antes,
+    # ver pipeline/online/busca.py); o modelo ja fica em cache apos o 1o uso.
+    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
     divisor = criar_divisor(modelo_embedding)
     limite_modelo = modelo_embedding.max_seq_length - 2
 
-    caminhos_pdf = sorted(glob.glob(os.path.join(PASTA_DOCUMENTOS, "*.pdf")))
+    caminhos_pdf = sorted(glob.glob(os.path.join(PASTA_DOCUMENTOS, "**", "*.pdf"), recursive=True))
     if not caminhos_pdf:
         raise FileNotFoundError(f"Nenhum PDF encontrado em {PASTA_DOCUMENTOS}")
 

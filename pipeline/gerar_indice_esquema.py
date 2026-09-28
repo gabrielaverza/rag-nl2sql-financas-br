@@ -457,7 +457,10 @@ def main():
     caminho_indice = CAMINHO_INDICE.replace(".json", f"{sufixo}.json")
 
     # Carrega o modelo de embeddings uma única vez (é lento de carregar).
-    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING)
+    # local_files_only evita depender da rede para confirmar a versao do
+    # modelo a cada carga (uma queda de rede ja derrubou uma avaliacao antes,
+    # ver pipeline/online/busca.py); o modelo ja fica em cache apos o 1o uso.
+    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
     esquema, registros = [], []
 
     for tabela in tabelas:
