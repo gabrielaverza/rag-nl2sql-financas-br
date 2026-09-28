@@ -59,6 +59,17 @@ def _texto_normalizado(bloco) -> str:
     return texto
 
 
+# Blocos curtos (cabecalho/rodape tipicamente tem menos que isso) sao
+# agrupados por assinatura (sem pontuacao/espacos) alem do texto exato, para
+# pegar variantes do mesmo rodape usadas em partes diferentes do documento
+# (achado: um CPC muda de "CPC_09R1" para "CPC 09(R1)" a partir da metade).
+TAMANHO_MAX_BLOCO_CURTO = 30
+
+
+def _assinatura(texto: str) -> str:
+    return re.sub(r"[^0-9A-Za-zÀ-ÿ]", "", texto).upper()
+
+
 def detectar_blocos_repetidos(documento: pymupdf.Document) -> set[str]:
     # Documentos reais (normativos da CVM e do CPC) repetem um cabecalho ou
     # rodape (endereco da CVM, codigo do pronunciamento) em quase toda pagina,
@@ -73,7 +84,26 @@ def detectar_blocos_repetidos(documento: pymupdf.Document) -> set[str]:
         blocos_da_pagina = {_texto_normalizado(b) for b in pagina.get_text("blocks", sort=True)}
         contagem.update(b for b in blocos_da_pagina if b)
     minimo = max(2, int(len(documento) * LIMIAR_REPETICAO))
-    return {texto for texto, n in contagem.items() if n >= minimo}
+
+    repetidos = {texto for texto, n in contagem.items() if n >= minimo}
+
+    # Segunda passada, so para blocos curtos: soma a contagem de variantes com
+    # a mesma assinatura (ex.: "CPC_09R1" e "CPC 09(R1)"). Se a soma bater o
+    # limiar, todas as variantes daquela assinatura viram cabecalho/rodape,
+    # mesmo que nenhuma sozinha tivesse chegado la.
+    contagem_por_assinatura = Counter()
+    variantes_por_assinatura: dict[str, set[str]] = {}
+    for texto, n in contagem.items():
+        if len(texto) > TAMANHO_MAX_BLOCO_CURTO:
+            continue
+        assinatura = _assinatura(texto)
+        contagem_por_assinatura[assinatura] += n
+        variantes_por_assinatura.setdefault(assinatura, set()).add(texto)
+    for assinatura, total in contagem_por_assinatura.items():
+        if total >= minimo:
+            repetidos |= variantes_por_assinatura[assinatura]
+
+    return repetidos
 
 
 def extrair_texto_pdf(caminho_pdf: str) -> str:
@@ -115,6 +145,15 @@ def criar_divisor(modelo_embedding: SentenceTransformer) -> RecursiveCharacterTe
     )
 
 
+def eh_fragmento_degenerado(trecho: str) -> bool:
+    # O divisor de trechos as vezes corta uma tabela exatamente num limite de
+    # token e sobra um trecho so com um numero (ex.: "27", ". 31") de uma
+    # celula da tabela, sem contexto proprio. Sem valor para recuperacao;
+    # descartado antes de gerar o embedding.
+    nucleo = trecho.strip(" .\n")
+    return nucleo.isdigit() and len(nucleo) <= 4
+
+
 def montar_registros(nome_arquivo: str, trechos: list[str], modelo_embedding: SentenceTransformer) -> list[dict]:
     # Gera um embedding para cada trecho e monta o registro no formato do índice.
     nome_base = os.path.splitext(nome_arquivo)[0]
@@ -147,6 +186,11 @@ def main():
         nome_arquivo = os.path.basename(caminho_pdf)
         texto = extrair_texto_pdf(caminho_pdf)
         trechos = divisor.split_text(texto)
+
+        antes = len(trechos)
+        trechos = [t for t in trechos if not eh_fragmento_degenerado(t)]
+        if len(trechos) < antes:
+            print(f"    ({antes - len(trechos)} fragmento(s) degenerado(s) descartado(s))")
 
         # Confere se algum trecho passou do limite de leitura do modelo.
         tamanhos = [len(modelo_embedding.tokenizer.tokenize(t)) for t in trechos]

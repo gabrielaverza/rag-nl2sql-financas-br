@@ -106,11 +106,17 @@ adaptações sobre a versão do `tcc-prototype` (feita para o documento fictíci
    faltava nos scripts offline — uma queda de rede real interrompeu a primeira tentativa de rodar
    este script sobre os PDFs reais).
 
-Resultado: 1.641 trechos (165 do CPC 03, 208 do CPC 09, 426 do CPC 26, 842 da Resolução 80), todos
-dentro do limite de 120 tokens. Confirmado que nenhum trecho ficou com resíduo do cabeçalho/rodapé
-detectado. **Limitação encontrada e não corrigida:** cerca de 7 trechos (0,4% do total) são
-fragmentos degenerados de tabela (ex.: um trecho com só `"27"` ou `". 31"`), produzidos pelo
-`RecursiveCharacterTextSplitter` ao cortar uma tabela por tamanho de token; e uma variante rara do
-rodapé com espaço em vez de `_` (`"CPC 09(R1)"`, 3 ocorrências) não bateu no limiar de frequência de
-50% e sobrou como trecho próprio. Nenhum dos dois foi corrigido agora; construir um divisor de
-trechos consciente de tabelas é um esforço maior para um ganho pequeno neste volume.
+Resultado: 1.634 trechos (163 do CPC 03, 202 do CPC 09, 425 do CPC 26, 842 da Resolução 80), todos
+dentro do limite de 120 tokens, sem resíduo de cabeçalho/rodapé.
+
+Duas limitações da primeira versão, já corrigidas:
+- **Variante de rodapé não detectada.** O CPC 09 muda de convenção de rodapé na metade do
+  documento (`CPC_09R1` nas páginas 1 a 14, `CPC 09(R1)` nas páginas 15 a 24); sozinha, nenhuma das
+  duas passava do limiar de 50% das páginas. Corrigido agrupando blocos curtos (até 30 caracteres)
+  por uma assinatura sem pontuação/espaços (`CPC09R1` para as duas variantes), somando as
+  contagens antes de comparar com o limiar.
+- **Fragmentos degenerados de tabela.** O `RecursiveCharacterTextSplitter` às vezes corta uma
+  tabela exatamente num limite de token e sobra um trecho só com um número de uma célula (ex.:
+  `"27"`, `". 31"`), sem contexto próprio. Corrigido descartando, depois da divisão em trechos,
+  qualquer trecho cujo conteúdo (sem pontuação e espaços nas bordas) seja só dígitos com até 4
+  caracteres.
