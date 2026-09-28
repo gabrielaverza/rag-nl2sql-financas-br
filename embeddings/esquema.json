@@ -1,0 +1,4903 @@
+[
+  {
+    "tabela": "BPA_con",
+    "resumo": "A tabela 'BPA_con' armazena dados do Balanço Patrimonial Ativo, versão consolidada, publicados pela CVM no Brasil.",
+    "proposito": "A tabela é usada para armazenar e acessar informações financeiras consolidadas de empresas do grupo, incluindo valores de contas patrimoniais.",
+    "entidades": [
+      "Empresa",
+      "Contas Patrimoniais",
+      "Exercício Financeiro",
+      "Moeda",
+      "Escala Monetária"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data de término do exercício financeiro.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro.",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores da conta.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala monetária aplicada aos valores da conta.",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta patrimonial.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta patrimonial.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta patrimonial.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta patrimonial, indicando se é fixa ou variável.",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "1",
+        "descricao": "Ativo Total"
+      },
+      {
+        "codigo": "1.01",
+        "descricao": "Ativo Circulante"
+      },
+      {
+        "codigo": "1.01.01",
+        "descricao": "Caixa e Equivalentes de Caixa"
+      },
+      {
+        "codigo": "1.01.02",
+        "descricao": "Aplicações Financeiras"
+      },
+      {
+        "codigo": "1.01.02.01",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através do Resultado"
+      },
+      {
+        "codigo": "1.01.02.01.01",
+        "descricao": "Títulos para Negociação"
+      },
+      {
+        "codigo": "1.01.02.01.02",
+        "descricao": "Títulos Designados a Valor Justo"
+      },
+      {
+        "codigo": "1.01.02.02",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "1.01.02.03",
+        "descricao": "Aplicações Financeiras Avaliadas ao Custo Amortizado"
+      },
+      {
+        "codigo": "1.01.03",
+        "descricao": "Contas a Receber"
+      },
+      {
+        "codigo": "1.01.03.01",
+        "descricao": "Clientes"
+      },
+      {
+        "codigo": "1.01.03.02",
+        "descricao": "Outras Contas a Receber"
+      },
+      {
+        "codigo": "1.01.03.03",
+        "descricao": "Previdência Complementar (com risco atuarial)"
+      },
+      {
+        "codigo": "1.01.03.04",
+        "descricao": "Outras Operações"
+      },
+      {
+        "codigo": "1.01.04",
+        "descricao": "Estoques"
+      },
+      {
+        "codigo": "1.01.05",
+        "descricao": "Ativos Biológicos"
+      },
+      {
+        "codigo": "1.01.06",
+        "descricao": "Tributos a Recuperar"
+      },
+      {
+        "codigo": "1.01.06.01",
+        "descricao": "Tributos Correntes a Recuperar"
+      },
+      {
+        "codigo": "1.01.07",
+        "descricao": "Despesas Antecipadas"
+      },
+      {
+        "codigo": "1.01.08",
+        "descricao": "Outros Ativos Circulantes"
+      },
+      {
+        "codigo": "1.01.08.01",
+        "descricao": "Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "1.01.08.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.01.08.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.01.09",
+        "descricao": "Outros Ativos Circulantes"
+      },
+      {
+        "codigo": "1.01.09.01",
+        "descricao": "Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "1.01.09.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.01.09.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.02",
+        "descricao": "Ativo Não Circulante"
+      },
+      {
+        "codigo": "1.02.01",
+        "descricao": "Ativo Realizável a Longo Prazo"
+      },
+      {
+        "codigo": "1.02.01.01",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através do Resultado"
+      },
+      {
+        "codigo": "1.02.01.01.01",
+        "descricao": "Títulos Designados a Valor Justo"
+      },
+      {
+        "codigo": "1.02.01.02",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "1.02.01.03",
+        "descricao": "Aplicações Financeiras Avaliadas ao Custo Amortizado"
+      },
+      {
+        "codigo": "1.02.01.04",
+        "descricao": "Contas a Receber"
+      },
+      {
+        "codigo": "1.02.01.05",
+        "descricao": "Estoques"
+      },
+      {
+        "codigo": "1.02.01.06",
+        "descricao": "Ativos Biológicos"
+      },
+      {
+        "codigo": "1.02.01.07",
+        "descricao": "Tributos Diferidos"
+      },
+      {
+        "codigo": "1.02.01.08",
+        "descricao": "Despesas Antecipadas"
+      },
+      {
+        "codigo": "1.02.01.09",
+        "descricao": "Créditos com Partes Relacionadas"
+      },
+      {
+        "codigo": "1.02.01.09.01",
+        "descricao": "Créditos com Coligadas"
+      },
+      {
+        "codigo": "1.02.01.10",
+        "descricao": "Outros Ativos Não Circulantes"
+      },
+      {
+        "codigo": "1.02.01.10.01",
+        "descricao": "Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "1.02.01.10.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.02.01.11.01",
+        "descricao": "Ativos de Contratos de Seguros"
+      },
+      {
+        "codigo": "1.02.01.11.02",
+        "descricao": "Ativos de Contratos de Resseguros"
+      },
+      {
+        "codigo": "1.02.02",
+        "descricao": "Investimentos"
+      },
+      {
+        "codigo": "1.02.02.01",
+        "descricao": "Participações Societárias"
+      },
+      {
+        "codigo": "1.02.02.01.01",
+        "descricao": "Participações em Coligadas"
+      },
+      {
+        "codigo": "1.02.02.01.02",
+        "descricao": "Participações em Coligadas no Exterior"
+      },
+      {
+        "codigo": "1.02.02.01.03",
+        "descricao": "Participações em Controladas no País"
+      },
+      {
+        "codigo": "1.02.02.01.04",
+        "descricao": "Participações em Controladas em Conjunto"
+      },
+      {
+        "codigo": "1.02.02.01.05",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.02.02.01.06",
+        "descricao": "Participações em Controladas em Conjunto no Exterior"
+      },
+      {
+        "codigo": "1.02.02.01.07",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.02.02.02",
+        "descricao": "Propriedades para Investimento"
+      },
+      {
+        "codigo": "1.02.03",
+        "descricao": "Imobilizado"
+      },
+      {
+        "codigo": "1.02.03.01",
+        "descricao": "Imobilizado em Operação"
+      },
+      {
+        "codigo": "1.02.03.02",
+        "descricao": "Direito de Uso em Arrendamento"
+      },
+      {
+        "codigo": "1.02.03.03",
+        "descricao": "Imobilizado em Andamento"
+      },
+      {
+        "codigo": "1.02.04",
+        "descricao": "Intangível"
+      },
+      {
+        "codigo": "1.02.04.01",
+        "descricao": "Intangíveis"
+      },
+      {
+        "codigo": "1.02.04.01.01",
+        "descricao": "Contrato de Concessão"
+      },
+      {
+        "codigo": "1.02.04.02",
+        "descricao": "Goodwill"
+      },
+      {
+        "codigo": "1.02.04.03",
+        "descricao": "Títulos e Valores Mobiliários"
+      },
+      {
+        "codigo": "1.02.04.04",
+        "descricao": "Operações de Crédito"
+      },
+      {
+        "codigo": "1.02.04.05",
+        "descricao": "Provisão para Perdas Esperadas Associadas ao Risco de Crédito"
+      },
+      {
+        "codigo": "1.02.04.06",
+        "descricao": "Operações de Arrendamento"
+      },
+      {
+        "codigo": "1.02.04.07",
+        "descricao": "Provisão para Perdas Esperadas Associadas ao Risco de Crédito de Operações de Arrendamento"
+      },
+      {
+        "codigo": "1.02.04.08",
+        "descricao": "Outros Ativos Financeiros"
+      },
+      {
+        "codigo": "1.03",
+        "descricao": "Tributos"
+      },
+      {
+        "codigo": "1.03.01",
+        "descricao": "Imposto de Renda e Contribuição Social - Correntes"
+      },
+      {
+        "codigo": "1.03.02",
+        "descricao": "Imposto de Renda e Contribuição Social - Diferidos"
+      },
+      {
+        "codigo": "1.03.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.04",
+        "descricao": "Outros Ativos"
+      },
+      {
+        "codigo": "1.04.01",
+        "descricao": "Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "1.04.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.04.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.05",
+        "descricao": "Investimentos"
+      },
+      {
+        "codigo": "1.05.01",
+        "descricao": "Participações em Coligadas"
+      },
+      {
+        "codigo": "1.05.02",
+        "descricao": "Participações em Controladas em Conjunto"
+      },
+      {
+        "codigo": "1.05.03",
+        "descricao": "Propriedades para Investimento"
+      },
+      {
+        "codigo": "1.05.04",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.06",
+        "descricao": "Imobilizado"
+      },
+      {
+        "codigo": "1.06.01",
+        "descricao": "Imobilizado de Uso"
+      },
+      {
+        "codigo": "1.06.02",
+        "descricao": "Direito de Uso de Arrendamento"
+      },
+      {
+        "codigo": "1.06.03",
+        "descricao": "Depreciação Acumulada"
+      },
+      {
+        "codigo": "1.07",
+        "descricao": "Intangível"
+      },
+      {
+        "codigo": "1.07.01",
+        "descricao": "Intangíveis"
+      },
+      {
+        "codigo": "1.07.02",
+        "descricao": "Goodwill"
+      },
+      {
+        "codigo": "1.07.03",
+        "descricao": "Amortização Acumulada"
+      }
+    ]
+  },
+  {
+    "tabela": "BPA_ind",
+    "resumo": "A tabela 'BPA_ind' armazena dados do Balanço Patrimonial Ativo, versão individual, da CVM, incluindo informações sobre ativos e valores financeiros de empresas.",
+    "proposito": "A tabela é usada para fornecer detalhes específicos sobre o patrimônio líquido e ativos de empresas, conforme publicado pela CVM.",
+    "entidades": [
+      "Empresa",
+      "Ativo",
+      "Patrimônio Líquido",
+      "Valor Financeiro",
+      "Companhia",
+      "Demonstração Financeira"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código de Valores Mobiliários da empresa",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data de fim do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira (fixa)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "1",
+        "descricao": "Ativo Total"
+      },
+      {
+        "codigo": "1.01",
+        "descricao": "Ativo Circulante"
+      },
+      {
+        "codigo": "1.01.01",
+        "descricao": "Caixa e Equivalentes de Caixa"
+      },
+      {
+        "codigo": "1.01.02",
+        "descricao": "Aplicações Financeiras"
+      },
+      {
+        "codigo": "1.01.02.01",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através do Resultado"
+      },
+      {
+        "codigo": "1.01.02.01.01",
+        "descricao": "Títulos para Negociação"
+      },
+      {
+        "codigo": "1.01.02.01.02",
+        "descricao": "Títulos Designados a Valor Justo"
+      },
+      {
+        "codigo": "1.01.02.02",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "1.01.02.03",
+        "descricao": "Aplicações Financeiras Avaliadas ao Custo Amortizado"
+      },
+      {
+        "codigo": "1.01.03",
+        "descricao": "Contas a Receber"
+      },
+      {
+        "codigo": "1.01.03.01",
+        "descricao": "Clientes"
+      },
+      {
+        "codigo": "1.01.03.02",
+        "descricao": "Outras Contas a Receber"
+      },
+      {
+        "codigo": "1.01.03.03",
+        "descricao": "Previdência Complementar (com risco atuarial)"
+      },
+      {
+        "codigo": "1.01.03.04",
+        "descricao": "Outras Operações"
+      },
+      {
+        "codigo": "1.01.04",
+        "descricao": "Estoques"
+      },
+      {
+        "codigo": "1.01.05",
+        "descricao": "Ativos Biológicos"
+      },
+      {
+        "codigo": "1.01.06",
+        "descricao": "Tributos a Recuperar"
+      },
+      {
+        "codigo": "1.01.06.01",
+        "descricao": "Tributos Correntes a Recuperar"
+      },
+      {
+        "codigo": "1.01.07",
+        "descricao": "Despesas Antecipadas"
+      },
+      {
+        "codigo": "1.01.08",
+        "descricao": "Outros Ativos Circulantes"
+      },
+      {
+        "codigo": "1.01.08.01",
+        "descricao": "Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "1.01.08.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.01.08.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.01.09",
+        "descricao": "Outros Valores e Bens"
+      },
+      {
+        "codigo": "1.01.09.01",
+        "descricao": "Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "1.01.09.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.01.09.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.02",
+        "descricao": "Ativo Não Circulante"
+      },
+      {
+        "codigo": "1.02.01",
+        "descricao": "Ativo Realizável a Longo Prazo"
+      },
+      {
+        "codigo": "1.02.01.01",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através do Resultado"
+      },
+      {
+        "codigo": "1.02.01.01.01",
+        "descricao": "Títulos Designados a Valor Justo"
+      },
+      {
+        "codigo": "1.02.01.02",
+        "descricao": "Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "1.02.01.03",
+        "descricao": "Aplicações Financeiras Avaliadas ao Custo Amortizado"
+      },
+      {
+        "codigo": "1.02.01.04",
+        "descricao": "Contas a Receber"
+      },
+      {
+        "codigo": "1.02.01.05",
+        "descricao": "Estoques"
+      },
+      {
+        "codigo": "1.02.01.06",
+        "descricao": "Ativos Biológicos"
+      },
+      {
+        "codigo": "1.02.01.07",
+        "descricao": "Tributos Diferidos"
+      },
+      {
+        "codigo": "1.02.01.08",
+        "descricao": "Despesas Antecipadas"
+      },
+      {
+        "codigo": "1.02.01.09",
+        "descricao": "Créditos com Partes Relacionadas"
+      },
+      {
+        "codigo": "1.02.01.09.01",
+        "descricao": "Créditos com Coligadas"
+      },
+      {
+        "codigo": "1.02.01.09.02",
+        "descricao": "Créditos com Controladas"
+      },
+      {
+        "codigo": "1.02.01.10",
+        "descricao": "Outros Ativos Não Circulantes"
+      },
+      {
+        "codigo": "1.02.01.10.01",
+        "descricao": "Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "1.02.01.10.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.02.01.11.01",
+        "descricao": "Ativos de Contratos de Seguros"
+      },
+      {
+        "codigo": "1.02.01.11.02",
+        "descricao": "Ativos de Contratos de Resseguros"
+      },
+      {
+        "codigo": "1.02.02",
+        "descricao": "Investimentos"
+      },
+      {
+        "codigo": "1.02.02.01",
+        "descricao": "Participações Societárias"
+      },
+      {
+        "codigo": "1.02.02.01.01",
+        "descricao": "Participações em Coligadas"
+      },
+      {
+        "codigo": "1.02.02.01.02",
+        "descricao": "Participações em Controladas"
+      },
+      {
+        "codigo": "1.02.02.01.03",
+        "descricao": "Participações em Controladas em Conjunto"
+      },
+      {
+        "codigo": "1.02.02.01.04",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.02.02.01.05",
+        "descricao": "Participações em Controladas em Conjunto no País"
+      },
+      {
+        "codigo": "1.02.02.01.06",
+        "descricao": "Participações em Controladas em Conjunto no Exterior"
+      },
+      {
+        "codigo": "1.02.02.01.07",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.02.02.02",
+        "descricao": "Propriedades para Investimento"
+      },
+      {
+        "codigo": "1.02.03",
+        "descricao": "Imobilizado"
+      },
+      {
+        "codigo": "1.02.03.01",
+        "descricao": "Imobilizado em Operação"
+      },
+      {
+        "codigo": "1.02.03.02",
+        "descricao": "Direito de Uso em Arrendamento"
+      },
+      {
+        "codigo": "1.02.03.03",
+        "descricao": "Imobilizado em Andamento"
+      },
+      {
+        "codigo": "1.02.04",
+        "descricao": "Intangível"
+      },
+      {
+        "codigo": "1.02.04.01",
+        "descricao": "Intangíveis"
+      },
+      {
+        "codigo": "1.02.04.01.01",
+        "descricao": "Contrato de Concessão"
+      },
+      {
+        "codigo": "1.02.04.02",
+        "descricao": "Aplicações no Mercado Aberto"
+      },
+      {
+        "codigo": "1.02.04.03",
+        "descricao": "Títulos e Valores Mobiliários"
+      },
+      {
+        "codigo": "1.02.04.04",
+        "descricao": "Operações de Crédito"
+      },
+      {
+        "codigo": "1.02.04.05",
+        "descricao": "Provisão para Perdas Esperadas Associadas ao Risco de Crédito"
+      },
+      {
+        "codigo": "1.02.04.06",
+        "descricao": "Operações de Arrendamento"
+      },
+      {
+        "codigo": "1.02.04.07",
+        "descricao": "Provisão para Perdas Esperadas Associadas ao Risco de Crédito de Operações de Arrendamento"
+      },
+      {
+        "codigo": "1.02.04.08",
+        "descricao": "Outros Ativos Financeiros"
+      },
+      {
+        "codigo": "1.02.05",
+        "descricao": "Operações de Crédito"
+      },
+      {
+        "codigo": "1.02.06",
+        "descricao": "Operações de Arrendamento Mercantil"
+      },
+      {
+        "codigo": "1.02.07",
+        "descricao": "Outros Créditos"
+      },
+      {
+        "codigo": "1.02.08",
+        "descricao": "Outros Valores e Bens"
+      },
+      {
+        "codigo": "1.03",
+        "descricao": "Tributos"
+      },
+      {
+        "codigo": "1.03.01",
+        "descricao": "Imposto de Renda e Contribuição Social - Correntes"
+      },
+      {
+        "codigo": "1.03.01.01",
+        "descricao": "Dependências no Exterior"
+      },
+      {
+        "codigo": "1.03.01.02",
+        "descricao": "Participações em Controladas"
+      },
+      {
+        "codigo": "1.03.01.03",
+        "descricao": "Participações em Coligadas e Equiparadas"
+      },
+      {
+        "codigo": "1.03.01.04",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.03.01.05",
+        "descricao": "Provisão para Perdas"
+      },
+      {
+        "codigo": "1.03.02",
+        "descricao": "Imposto de Renda e Contribuição Social - Diferidos"
+      },
+      {
+        "codigo": "1.03.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.03.04",
+        "descricao": "Intangível"
+      },
+      {
+        "codigo": "1.03.05",
+        "descricao": "Diferido"
+      },
+      {
+        "codigo": "1.04",
+        "descricao": "Outros Ativos"
+      },
+      {
+        "codigo": "1.04.01",
+        "descricao": "Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "1.04.02",
+        "descricao": "Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "1.04.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "1.05",
+        "descricao": "Investimentos"
+      },
+      {
+        "codigo": "1.05.01",
+        "descricao": "Participações em Coligadas"
+      },
+      {
+        "codigo": "1.05.02",
+        "descricao": "Participações em Controladas em Conjunto"
+      },
+      {
+        "codigo": "1.05.03",
+        "descricao": "Participações em Controladas"
+      },
+      {
+        "codigo": "1.05.04",
+        "descricao": "Propriedades para Investimento"
+      },
+      {
+        "codigo": "1.05.05",
+        "descricao": "Outros Investimentos"
+      },
+      {
+        "codigo": "1.06",
+        "descricao": "Imobilizado"
+      },
+      {
+        "codigo": "1.06.01",
+        "descricao": "Imobilizado de Uso"
+      },
+      {
+        "codigo": "1.06.02",
+        "descricao": "Direito de Uso de Arrendamento"
+      },
+      {
+        "codigo": "1.06.03",
+        "descricao": "Depreciação Acumulada"
+      },
+      {
+        "codigo": "1.07",
+        "descricao": "Intangível"
+      },
+      {
+        "codigo": "1.07.01",
+        "descricao": "Intangíveis"
+      },
+      {
+        "codigo": "1.07.02",
+        "descricao": "Goodwill"
+      },
+      {
+        "codigo": "1.07.03",
+        "descricao": "Amortização Acumulada"
+      }
+    ]
+  },
+  {
+    "tabela": "BPP_con",
+    "resumo": "A tabela 'BPP_con' armazena dados do Balanço Patrimonial Passivo, versão consolidada, publicado pela CVM no Brasil.",
+    "proposito": "A tabela é usada para fornecer informações detalhadas sobre o patrimônio passivo das empresas do grupo, incluindo valores em diferentes moedas e escalas.",
+    "entidades": [
+      "Empresa",
+      "Patrimônio Passivo",
+      "Demonstração Financeira",
+      "Companhia",
+      "Valor Financeiro"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data de fim do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda em que o valor da conta é expresso",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta contábil (fixa ou variável)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "2",
+        "descricao": "Passivo Total"
+      },
+      {
+        "codigo": "2.01",
+        "descricao": "Passivo Circulante"
+      },
+      {
+        "codigo": "2.01.01",
+        "descricao": "Obrigações Sociais e Trabalhistas"
+      },
+      {
+        "codigo": "2.01.01.01",
+        "descricao": "Obrigações Sociais"
+      },
+      {
+        "codigo": "2.01.01.02",
+        "descricao": "Obrigações Trabalhistas"
+      },
+      {
+        "codigo": "2.01.02",
+        "descricao": "Fornecedores"
+      },
+      {
+        "codigo": "2.01.02.01",
+        "descricao": "Fornecedores Nacionais"
+      },
+      {
+        "codigo": "2.01.02.02",
+        "descricao": "Fornecedores Estrangeiros"
+      },
+      {
+        "codigo": "2.01.02.03",
+        "descricao": "Previdência Complementar (com risco atuarial)"
+      },
+      {
+        "codigo": "2.01.02.04",
+        "descricao": "Outras Operações"
+      },
+      {
+        "codigo": "2.01.03",
+        "descricao": "Obrigações Fiscais"
+      },
+      {
+        "codigo": "2.01.03.01",
+        "descricao": "Obrigações Fiscais Federais"
+      },
+      {
+        "codigo": "2.01.03.01.01",
+        "descricao": "Imposto de Renda e Contribuição Social a Pagar"
+      },
+      {
+        "codigo": "2.01.03.02",
+        "descricao": "Obrigações Fiscais Estaduais"
+      },
+      {
+        "codigo": "2.01.03.03",
+        "descricao": "Obrigações Fiscais Municipais"
+      },
+      {
+        "codigo": "2.01.04",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.01.04.01",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.01.04.01.01",
+        "descricao": "Em Moeda Nacional"
+      },
+      {
+        "codigo": "2.01.04.01.02",
+        "descricao": "Em Moeda Estrangeira"
+      },
+      {
+        "codigo": "2.01.04.02",
+        "descricao": "Debêntures"
+      },
+      {
+        "codigo": "2.01.04.03",
+        "descricao": "Financiamento por Arrendamento"
+      },
+      {
+        "codigo": "2.01.05",
+        "descricao": "Outras Obrigações"
+      },
+      {
+        "codigo": "2.01.05.01",
+        "descricao": "Passivos com Partes Relacionadas"
+      },
+      {
+        "codigo": "2.01.05.01.01",
+        "descricao": "Débitos com Coligadas"
+      },
+      {
+        "codigo": "2.01.05.01.03",
+        "descricao": "Débitos com Controladores"
+      },
+      {
+        "codigo": "2.01.05.01.04",
+        "descricao": "Débitos com Outras Partes Relacionadas"
+      },
+      {
+        "codigo": "2.01.05.02",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "2.01.05.02.01",
+        "descricao": "Dividendos e JCP a Pagar"
+      },
+      {
+        "codigo": "2.01.05.02.02",
+        "descricao": "Dividendo Mínimo Obrigatório a Pagar"
+      },
+      {
+        "codigo": "2.01.05.02.03",
+        "descricao": "Obrigações por Pagamentos Baseados em Ações"
+      },
+      {
+        "codigo": "2.01.06",
+        "descricao": "Provisões"
+      },
+      {
+        "codigo": "2.01.06.01",
+        "descricao": "Provisões Fiscais Previdenciárias Trabalhistas e Cíveis"
+      },
+      {
+        "codigo": "2.01.06.01.01",
+        "descricao": "Provisões Fiscais"
+      },
+      {
+        "codigo": "2.01.06.01.02",
+        "descricao": "Provisões Previdenciárias e Trabalhistas"
+      },
+      {
+        "codigo": "2.01.06.01.03",
+        "descricao": "Provisões para Benefícios a Empregados"
+      },
+      {
+        "codigo": "2.01.06.01.04",
+        "descricao": "Provisões Cíveis"
+      },
+      {
+        "codigo": "2.01.06.02",
+        "descricao": "Outras Provisões"
+      },
+      {
+        "codigo": "2.01.06.02.01",
+        "descricao": "Provisões para Garantias"
+      },
+      {
+        "codigo": "2.01.06.02.02",
+        "descricao": "Provisões para Reestruturação"
+      },
+      {
+        "codigo": "2.01.06.02.03",
+        "descricao": "Provisões para Passivos Ambientais e de Desativação"
+      },
+      {
+        "codigo": "2.01.07",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda e Descontinuados"
+      },
+      {
+        "codigo": "2.01.07.01",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "2.01.07.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.02",
+        "descricao": "Passivo Não Circulante"
+      },
+      {
+        "codigo": "2.02.01",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.02.01.01",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.02.01.01.01",
+        "descricao": "Em Moeda Nacional"
+      },
+      {
+        "codigo": "2.02.01.01.02",
+        "descricao": "Em Moeda Estrangeira"
+      },
+      {
+        "codigo": "2.02.01.02",
+        "descricao": "Debêntures"
+      },
+      {
+        "codigo": "2.02.01.02.01",
+        "descricao": "Passivos de Contratos de Seguros"
+      },
+      {
+        "codigo": "2.02.01.02.02",
+        "descricao": "Passivos de Contratos de Resseguros"
+      },
+      {
+        "codigo": "2.02.01.02.03",
+        "descricao": "Previdência Complementar (com risco atuarial)"
+      },
+      {
+        "codigo": "2.02.01.02.04",
+        "descricao": "Outras Operações"
+      },
+      {
+        "codigo": "2.02.01.03",
+        "descricao": "Financiamento por Arrendamento"
+      },
+      {
+        "codigo": "2.02.01.06.01",
+        "descricao": "Passivos sobre Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "2.02.01.06.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.02.01.07.01",
+        "descricao": "Lucros a Apropriar"
+      },
+      {
+        "codigo": "2.02.01.07.02",
+        "descricao": "Receitas a Apropriar"
+      },
+      {
+        "codigo": "2.02.01.07.03",
+        "descricao": "Subvenções de Investimento a Apropriar"
+      },
+      {
+        "codigo": "2.02.02",
+        "descricao": "Outras Obrigações"
+      },
+      {
+        "codigo": "2.02.02.01",
+        "descricao": "Passivos com Partes Relacionadas"
+      },
+      {
+        "codigo": "2.02.02.01.01",
+        "descricao": "Débitos com Coligadas"
+      },
+      {
+        "codigo": "2.02.02.01.03",
+        "descricao": "Débitos com Controladores"
+      },
+      {
+        "codigo": "2.02.02.01.04",
+        "descricao": "Débitos com Outras Partes Relacionadas"
+      },
+      {
+        "codigo": "2.02.02.02",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "2.02.02.02.01",
+        "descricao": "Obrigações por Pagamentos Baseados em Ações"
+      },
+      {
+        "codigo": "2.02.02.02.02",
+        "descricao": "Adiantamento para Futuro Aumento de Capital"
+      },
+      {
+        "codigo": "2.02.03",
+        "descricao": "Tributos Diferidos"
+      },
+      {
+        "codigo": "2.02.03.01",
+        "descricao": "Imposto de Renda e Contribuição Social Diferidos"
+      },
+      {
+        "codigo": "2.02.04",
+        "descricao": "Provisões"
+      },
+      {
+        "codigo": "2.02.04.01",
+        "descricao": "Provisões Fiscais Previdenciárias Trabalhistas e Cíveis"
+      },
+      {
+        "codigo": "2.02.04.01.01",
+        "descricao": "Provisões Fiscais"
+      },
+      {
+        "codigo": "2.02.04.01.02",
+        "descricao": "Provisões Previdenciárias e Trabalhistas"
+      },
+      {
+        "codigo": "2.02.04.01.03",
+        "descricao": "Provisões para Benefícios a Empregados"
+      },
+      {
+        "codigo": "2.02.04.01.04",
+        "descricao": "Provisões Cíveis"
+      },
+      {
+        "codigo": "2.02.04.02",
+        "descricao": "Outras Provisões"
+      },
+      {
+        "codigo": "2.02.04.02.01",
+        "descricao": "Provisões para Garantias"
+      },
+      {
+        "codigo": "2.02.04.02.02",
+        "descricao": "Provisões para Reestruturação"
+      },
+      {
+        "codigo": "2.02.04.02.03",
+        "descricao": "Provisões para Passivos Ambientais e de Desativação"
+      },
+      {
+        "codigo": "2.02.05",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda e Descontinuados"
+      },
+      {
+        "codigo": "2.02.05.01",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "2.02.05.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.02.06",
+        "descricao": "Lucros e Receitas a Apropriar"
+      },
+      {
+        "codigo": "2.02.06.01",
+        "descricao": "Lucros a Apropriar"
+      },
+      {
+        "codigo": "2.02.06.02",
+        "descricao": "Receitas a Apropriar"
+      },
+      {
+        "codigo": "2.02.06.03",
+        "descricao": "Subvenções de Investimento a Apropriar"
+      },
+      {
+        "codigo": "2.03",
+        "descricao": "Patrimônio Líquido Consolidado"
+      },
+      {
+        "codigo": "2.03.01",
+        "descricao": "Capital Social Realizado"
+      },
+      {
+        "codigo": "2.03.02",
+        "descricao": "Reservas de Capital"
+      },
+      {
+        "codigo": "2.03.02.01",
+        "descricao": "Ágio na Emissão de Ações"
+      },
+      {
+        "codigo": "2.03.02.02",
+        "descricao": "Reserva Especial de Ágio na Incorporação"
+      },
+      {
+        "codigo": "2.03.02.03",
+        "descricao": "Alienação de Bônus de Subscrição"
+      },
+      {
+        "codigo": "2.03.02.04",
+        "descricao": "Opções Outorgadas"
+      },
+      {
+        "codigo": "2.03.02.05",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.03.02.06",
+        "descricao": "Adiantamento para Futuro Aumento de Capital"
+      },
+      {
+        "codigo": "2.03.03",
+        "descricao": "Reservas de Reavaliação"
+      },
+      {
+        "codigo": "2.03.03.01",
+        "descricao": "Ativos Próprios"
+      },
+      {
+        "codigo": "2.03.03.02",
+        "descricao": "Controladas/Coligadas"
+      },
+      {
+        "codigo": "2.03.04",
+        "descricao": "Reservas de Lucros"
+      },
+      {
+        "codigo": "2.03.04.01",
+        "descricao": "Reserva Legal"
+      },
+      {
+        "codigo": "2.03.04.02",
+        "descricao": "Reserva Estatutária"
+      },
+      {
+        "codigo": "2.03.04.03",
+        "descricao": "Reserva para Contingências"
+      },
+      {
+        "codigo": "2.03.04.04",
+        "descricao": "Reserva de Lucros a Realizar"
+      },
+      {
+        "codigo": "2.03.04.05",
+        "descricao": "Reserva de Retenção de Lucros"
+      },
+      {
+        "codigo": "2.03.04.06",
+        "descricao": "Reserva Especial para Dividendos Não Distribuídos"
+      },
+      {
+        "codigo": "2.03.04.07",
+        "descricao": "Reserva de Incentivos Fiscais"
+      },
+      {
+        "codigo": "2.03.04.08",
+        "descricao": "Dividendo Adicional Proposto"
+      },
+      {
+        "codigo": "2.03.04.09",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.03.05",
+        "descricao": "Lucros/Prejuízos Acumulados"
+      },
+      {
+        "codigo": "2.03.06",
+        "descricao": "Ajustes de Avaliação Patrimonial"
+      },
+      {
+        "codigo": "2.03.07",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "2.03.08",
+        "descricao": "Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "2.03.09",
+        "descricao": "Participação dos Acionistas Não Controladores"
+      },
+      {
+        "codigo": "2.04",
+        "descricao": "Passivos Fiscais"
+      },
+      {
+        "codigo": "2.05",
+        "descricao": "Outros Passivos"
+      },
+      {
+        "codigo": "2.06",
+        "descricao": "Passivos sobre Ativos Não Correntes a Venda e Descontinuados"
+      },
+      {
+        "codigo": "2.06.01",
+        "descricao": "Passivos sobre Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "2.06.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.07",
+        "descricao": "Patrimônio Líquido Consolidado"
+      },
+      {
+        "codigo": "2.07.01",
+        "descricao": "Patrimônio Líquido Atribuído ao Controlador"
+      },
+      {
+        "codigo": "2.07.01.01",
+        "descricao": "Capital Social Realizado"
+      },
+      {
+        "codigo": "2.07.01.02",
+        "descricao": "Reservas de Capital"
+      },
+      {
+        "codigo": "2.07.01.02.01",
+        "descricao": "Ágio na Emissão de Ações"
+      },
+      {
+        "codigo": "2.07.01.02.02",
+        "descricao": "Reserva Especial de Ágio na Incorporação"
+      },
+      {
+        "codigo": "2.07.01.02.03",
+        "descricao": "Alienação de Bônus de Subscrição"
+      },
+      {
+        "codigo": "2.07.01.02.04",
+        "descricao": "Opções Outorgadas"
+      },
+      {
+        "codigo": "2.07.01.02.05",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.07.01.03",
+        "descricao": "Reservas de Reavaliação"
+      },
+      {
+        "codigo": "2.07.01.04",
+        "descricao": "Reservas de Lucros"
+      },
+      {
+        "codigo": "2.07.01.04.01",
+        "descricao": "Reserva Legal"
+      },
+      {
+        "codigo": "2.07.01.04.02",
+        "descricao": "Reserva Estatutária"
+      },
+      {
+        "codigo": "2.07.01.04.03",
+        "descricao": "Reserva para Contingências"
+      },
+      {
+        "codigo": "2.07.01.04.04",
+        "descricao": "Reserva de Lucros a Realizar"
+      },
+      {
+        "codigo": "2.07.01.04.05",
+        "descricao": "Reserva de Retenção de Lucros"
+      },
+      {
+        "codigo": "2.07.01.04.06",
+        "descricao": "Reserva Especial para Dividendos Não Distribuídos"
+      },
+      {
+        "codigo": "2.07.01.04.07",
+        "descricao": "Reserva de Incentivos Fiscais"
+      },
+      {
+        "codigo": "2.07.01.04.08",
+        "descricao": "Dividendo Adicional Proposto"
+      },
+      {
+        "codigo": "2.07.01.04.09",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.07.01.05",
+        "descricao": "Lucros/Prejuízos Acumulados"
+      },
+      {
+        "codigo": "2.07.01.06",
+        "descricao": "Ajustes de Avaliação Patrimonial"
+      },
+      {
+        "codigo": "2.07.01.07",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "2.07.01.08",
+        "descricao": "Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "2.07.02",
+        "descricao": "Patrimônio Líquido Atribuído aos Não Controladores"
+      },
+      {
+        "codigo": "2.08",
+        "descricao": "Patrimônio Líquido Consolidado"
+      },
+      {
+        "codigo": "2.08.01",
+        "descricao": "Capital Social Realizado"
+      },
+      {
+        "codigo": "2.08.02",
+        "descricao": "Reservas de Capital"
+      },
+      {
+        "codigo": "2.08.02.01",
+        "descricao": "Ágio na Emissão de Ações"
+      },
+      {
+        "codigo": "2.08.02.02",
+        "descricao": "Reserva Especial de Ágio na Incorporação"
+      },
+      {
+        "codigo": "2.08.02.03",
+        "descricao": "Alienação de Bônus de Subscrição"
+      },
+      {
+        "codigo": "2.08.02.04",
+        "descricao": "Opções Outorgadas"
+      },
+      {
+        "codigo": "2.08.02.05",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.08.03",
+        "descricao": "Reservas de Reavaliação"
+      },
+      {
+        "codigo": "2.08.04",
+        "descricao": "Reservas de Lucros"
+      },
+      {
+        "codigo": "2.08.04.01",
+        "descricao": "Reserva Legal"
+      },
+      {
+        "codigo": "2.08.04.02",
+        "descricao": "Reserva Estatutária"
+      },
+      {
+        "codigo": "2.08.04.03",
+        "descricao": "Reserva para Contingências"
+      },
+      {
+        "codigo": "2.08.04.04",
+        "descricao": "Reserva de Lucros a Realizar"
+      },
+      {
+        "codigo": "2.08.04.05",
+        "descricao": "Reserva de Retenção de Lucros"
+      },
+      {
+        "codigo": "2.08.04.06",
+        "descricao": "Reserva Especial para Dividendos Não Distribuídos"
+      },
+      {
+        "codigo": "2.08.04.07",
+        "descricao": "Reserva de Incentivos Fiscais"
+      },
+      {
+        "codigo": "2.08.04.08",
+        "descricao": "Dividendo Adicional Proposto"
+      },
+      {
+        "codigo": "2.08.04.09",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.08.05",
+        "descricao": "Lucros/Prejuízos Acumulados"
+      },
+      {
+        "codigo": "2.08.06",
+        "descricao": "Ajustes de Avaliação Patrimonial"
+      },
+      {
+        "codigo": "2.08.07",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "2.08.08",
+        "descricao": "Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "2.08.09",
+        "descricao": "Participação dos Acionistas Não Controladores"
+      }
+    ]
+  },
+  {
+    "tabela": "BPP_ind",
+    "resumo": "A tabela 'BPP_ind' armazena dados do Balanço Patrimonial Passivo, versão individual, da CVM, incluindo informações sobre contas financeiras de empresas.",
+    "proposito": "A tabela é usada para fornecer detalhes específicos sobre o patrimônio passivo das empresas conforme demonstrado na CVM.",
+    "entidades": [
+      "Empresa",
+      "Contas Financeiras",
+      "Patrimônio Passivo",
+      "Companhias",
+      "Demonstrações Financeiras"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data de término do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores da conta",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira (fixa ou variável)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "2",
+        "descricao": "Passivo Total"
+      },
+      {
+        "codigo": "2.01",
+        "descricao": "Passivo Circulante"
+      },
+      {
+        "codigo": "2.01.01",
+        "descricao": "Obrigações Sociais e Trabalhistas"
+      },
+      {
+        "codigo": "2.01.01.01",
+        "descricao": "Obrigações Sociais"
+      },
+      {
+        "codigo": "2.01.01.02",
+        "descricao": "Obrigações Trabalhistas"
+      },
+      {
+        "codigo": "2.01.02",
+        "descricao": "Fornecedores"
+      },
+      {
+        "codigo": "2.01.02.01",
+        "descricao": "Fornecedores Nacionais"
+      },
+      {
+        "codigo": "2.01.02.02",
+        "descricao": "Fornecedores Estrangeiros"
+      },
+      {
+        "codigo": "2.01.02.03",
+        "descricao": "Previdência Complementar (com risco atuarial)"
+      },
+      {
+        "codigo": "2.01.02.04",
+        "descricao": "Outras Operações"
+      },
+      {
+        "codigo": "2.01.03",
+        "descricao": "Obrigações Fiscais"
+      },
+      {
+        "codigo": "2.01.03.01",
+        "descricao": "Obrigações Fiscais Federais"
+      },
+      {
+        "codigo": "2.01.03.01.01",
+        "descricao": "Imposto de Renda e Contribuição Social a Pagar"
+      },
+      {
+        "codigo": "2.01.03.02",
+        "descricao": "Obrigações Fiscais Estaduais"
+      },
+      {
+        "codigo": "2.01.03.03",
+        "descricao": "Obrigações Fiscais Municipais"
+      },
+      {
+        "codigo": "2.01.04",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.01.04.01",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.01.04.01.01",
+        "descricao": "Em Moeda Nacional"
+      },
+      {
+        "codigo": "2.01.04.01.02",
+        "descricao": "Em Moeda Estrangeira"
+      },
+      {
+        "codigo": "2.01.04.02",
+        "descricao": "Debêntures"
+      },
+      {
+        "codigo": "2.01.04.03",
+        "descricao": "Financiamento por Arrendamento"
+      },
+      {
+        "codigo": "2.01.05",
+        "descricao": "Outras Obrigações"
+      },
+      {
+        "codigo": "2.01.05.01",
+        "descricao": "Passivos com Partes Relacionadas"
+      },
+      {
+        "codigo": "2.01.05.01.01",
+        "descricao": "Débitos com Coligadas"
+      },
+      {
+        "codigo": "2.01.05.01.02",
+        "descricao": "Débitos com Controladas"
+      },
+      {
+        "codigo": "2.01.05.01.03",
+        "descricao": "Débitos com Controladores"
+      },
+      {
+        "codigo": "2.01.05.01.04",
+        "descricao": "Débitos com Outras Partes Relacionadas"
+      },
+      {
+        "codigo": "2.01.05.02",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "2.01.05.02.01",
+        "descricao": "Dividendos e JCP a Pagar"
+      },
+      {
+        "codigo": "2.01.05.02.02",
+        "descricao": "Dividendo Mínimo Obrigatório a Pagar"
+      },
+      {
+        "codigo": "2.01.05.02.03",
+        "descricao": "Obrigações por Pagamentos Baseados em Ações"
+      },
+      {
+        "codigo": "2.01.06",
+        "descricao": "Provisões"
+      },
+      {
+        "codigo": "2.01.06.01",
+        "descricao": "Provisões Fiscais Previdenciárias Trabalhistas e Cíveis"
+      },
+      {
+        "codigo": "2.01.06.01.01",
+        "descricao": "Provisões Fiscais"
+      },
+      {
+        "codigo": "2.01.06.01.02",
+        "descricao": "Provisões Previdenciárias e Trabalhistas"
+      },
+      {
+        "codigo": "2.01.06.01.03",
+        "descricao": "Provisões para Benefícios a Empregados"
+      },
+      {
+        "codigo": "2.01.06.01.04",
+        "descricao": "Provisões Cíveis"
+      },
+      {
+        "codigo": "2.01.06.02",
+        "descricao": "Outras Provisões"
+      },
+      {
+        "codigo": "2.01.06.02.01",
+        "descricao": "Provisões para Garantias"
+      },
+      {
+        "codigo": "2.01.06.02.02",
+        "descricao": "Provisões para Reestruturação"
+      },
+      {
+        "codigo": "2.01.06.02.03",
+        "descricao": "Provisões para Passivos Ambientais e de Desativação"
+      },
+      {
+        "codigo": "2.01.07",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda e Descontinuados"
+      },
+      {
+        "codigo": "2.01.07.01",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "2.01.07.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.01.08",
+        "descricao": "Obrigações por Repasse do Exterior"
+      },
+      {
+        "codigo": "2.01.09",
+        "descricao": "Outras Obrigações"
+      },
+      {
+        "codigo": "2.02",
+        "descricao": "Passivo Não Circulante"
+      },
+      {
+        "codigo": "2.02.01",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.02.01.01",
+        "descricao": "Empréstimos e Financiamentos"
+      },
+      {
+        "codigo": "2.02.01.01.01",
+        "descricao": "Em Moeda Nacional"
+      },
+      {
+        "codigo": "2.02.01.01.02",
+        "descricao": "Em Moeda Estrangeira"
+      },
+      {
+        "codigo": "2.02.01.02",
+        "descricao": "Debêntures"
+      },
+      {
+        "codigo": "2.02.01.02.01",
+        "descricao": "Passivos de Contratos de Seguros"
+      },
+      {
+        "codigo": "2.02.01.02.02",
+        "descricao": "Passivos de Contratos de Resseguros"
+      },
+      {
+        "codigo": "2.02.01.02.03",
+        "descricao": "Previdência Complementar (com risco atuarial)"
+      },
+      {
+        "codigo": "2.02.01.02.04",
+        "descricao": "Outras Operações"
+      },
+      {
+        "codigo": "2.02.01.03",
+        "descricao": "Financiamento por Arrendamento"
+      },
+      {
+        "codigo": "2.02.01.06.01",
+        "descricao": "Passivos sobre Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "2.02.01.06.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.02.01.07.01",
+        "descricao": "Lucros a Apropriar"
+      },
+      {
+        "codigo": "2.02.01.07.02",
+        "descricao": "Receitas a Apropriar"
+      },
+      {
+        "codigo": "2.02.01.07.03",
+        "descricao": "Subvenções de Investimento a Apropriar"
+      },
+      {
+        "codigo": "2.02.02",
+        "descricao": "Outras Obrigações"
+      },
+      {
+        "codigo": "2.02.02.01",
+        "descricao": "Passivos com Partes Relacionadas"
+      },
+      {
+        "codigo": "2.02.02.01.01",
+        "descricao": "Débitos com Coligadas"
+      },
+      {
+        "codigo": "2.02.02.01.02",
+        "descricao": "Débitos com Controladas"
+      },
+      {
+        "codigo": "2.02.02.01.03",
+        "descricao": "Débitos com Controladores"
+      },
+      {
+        "codigo": "2.02.02.01.04",
+        "descricao": "Débitos com Outras Partes Relacionadas"
+      },
+      {
+        "codigo": "2.02.02.02",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "2.02.02.02.01",
+        "descricao": "Obrigações por Pagamentos Baseados em Ações"
+      },
+      {
+        "codigo": "2.02.02.02.02",
+        "descricao": "Adiantamento para Futuro Aumento de Capital"
+      },
+      {
+        "codigo": "2.02.03",
+        "descricao": "Tributos Diferidos"
+      },
+      {
+        "codigo": "2.02.03.01",
+        "descricao": "Imposto de Renda e Contribuição Social Diferidos"
+      },
+      {
+        "codigo": "2.02.04",
+        "descricao": "Provisões"
+      },
+      {
+        "codigo": "2.02.04.01",
+        "descricao": "Provisões Fiscais Previdenciárias Trabalhistas e Cíveis"
+      },
+      {
+        "codigo": "2.02.04.01.01",
+        "descricao": "Provisões Fiscais"
+      },
+      {
+        "codigo": "2.02.04.01.02",
+        "descricao": "Provisões Previdenciárias e Trabalhistas"
+      },
+      {
+        "codigo": "2.02.04.01.03",
+        "descricao": "Provisões para Benefícios a Empregados"
+      },
+      {
+        "codigo": "2.02.04.01.04",
+        "descricao": "Provisões Cíveis"
+      },
+      {
+        "codigo": "2.02.04.02",
+        "descricao": "Outras Provisões"
+      },
+      {
+        "codigo": "2.02.04.02.01",
+        "descricao": "Provisões para Garantias"
+      },
+      {
+        "codigo": "2.02.04.02.02",
+        "descricao": "Provisões para Reestruturação"
+      },
+      {
+        "codigo": "2.02.04.02.03",
+        "descricao": "Provisões para Passivos Ambientais e de Desativação"
+      },
+      {
+        "codigo": "2.02.05",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda e Descontinuados"
+      },
+      {
+        "codigo": "2.02.05.01",
+        "descricao": "Passivos sobre Ativos Não-Correntes a Venda"
+      },
+      {
+        "codigo": "2.02.05.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.02.06",
+        "descricao": "Lucros e Receitas a Apropriar"
+      },
+      {
+        "codigo": "2.02.06.01",
+        "descricao": "Lucros a Apropriar"
+      },
+      {
+        "codigo": "2.02.06.02",
+        "descricao": "Receitas a Apropriar"
+      },
+      {
+        "codigo": "2.02.06.03",
+        "descricao": "Subvenções de Investimento a Apropriar"
+      },
+      {
+        "codigo": "2.02.07",
+        "descricao": "Obrigações por Repasse do País"
+      },
+      {
+        "codigo": "2.02.08",
+        "descricao": "Obrigações por Repasse do Exterior"
+      },
+      {
+        "codigo": "2.02.09",
+        "descricao": "Outras Obrigações"
+      },
+      {
+        "codigo": "2.03",
+        "descricao": "Patrimônio Líquido"
+      },
+      {
+        "codigo": "2.03.01",
+        "descricao": "Capital Social Realizado"
+      },
+      {
+        "codigo": "2.03.02",
+        "descricao": "Reservas de Capital"
+      },
+      {
+        "codigo": "2.03.02.01",
+        "descricao": "Ágio na Emissão de Ações"
+      },
+      {
+        "codigo": "2.03.02.02",
+        "descricao": "Reserva Especial de Ágio na Incorporação"
+      },
+      {
+        "codigo": "2.03.02.03",
+        "descricao": "Alienação de Bônus de Subscrição"
+      },
+      {
+        "codigo": "2.03.02.04",
+        "descricao": "Opções Outorgadas"
+      },
+      {
+        "codigo": "2.03.02.05",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.03.02.06",
+        "descricao": "Adiantamento para Futuro Aumento de Capital"
+      },
+      {
+        "codigo": "2.03.03",
+        "descricao": "Reservas de Reavaliação"
+      },
+      {
+        "codigo": "2.03.03.01",
+        "descricao": "Ativos Próprios"
+      },
+      {
+        "codigo": "2.03.03.02",
+        "descricao": "Controladas/Coligadas"
+      },
+      {
+        "codigo": "2.03.04",
+        "descricao": "Reservas de Lucros"
+      },
+      {
+        "codigo": "2.03.04.01",
+        "descricao": "Reserva Legal"
+      },
+      {
+        "codigo": "2.03.04.02",
+        "descricao": "Reserva Estatutária"
+      },
+      {
+        "codigo": "2.03.04.03",
+        "descricao": "Reserva para Contingências"
+      },
+      {
+        "codigo": "2.03.04.04",
+        "descricao": "Reserva de Lucros a Realizar"
+      },
+      {
+        "codigo": "2.03.04.05",
+        "descricao": "Reserva de Retenção de Lucros"
+      },
+      {
+        "codigo": "2.03.04.06",
+        "descricao": "Reserva Especial para Dividendos Não Distribuídos"
+      },
+      {
+        "codigo": "2.03.04.07",
+        "descricao": "Reserva de Incentivos Fiscais"
+      },
+      {
+        "codigo": "2.03.04.08",
+        "descricao": "Dividendo Adicional Proposto"
+      },
+      {
+        "codigo": "2.03.04.09",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.03.05",
+        "descricao": "Lucros/Prejuízos Acumulados"
+      },
+      {
+        "codigo": "2.03.06",
+        "descricao": "Ajustes de Avaliação Patrimonial"
+      },
+      {
+        "codigo": "2.03.07",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "2.03.08",
+        "descricao": "Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "2.04",
+        "descricao": "Passivos Fiscais"
+      },
+      {
+        "codigo": "2.05",
+        "descricao": "Outros Passivos"
+      },
+      {
+        "codigo": "2.05.01",
+        "descricao": "Capital Social Realizado"
+      },
+      {
+        "codigo": "2.05.02",
+        "descricao": "Reservas de Capital"
+      },
+      {
+        "codigo": "2.05.03",
+        "descricao": "Reservas de Reavaliação"
+      },
+      {
+        "codigo": "2.05.03.01",
+        "descricao": "Ativos Próprios"
+      },
+      {
+        "codigo": "2.05.03.02",
+        "descricao": "Controladas/Coligadas e Equiparadas"
+      },
+      {
+        "codigo": "2.05.04",
+        "descricao": "Reservas de Lucro"
+      },
+      {
+        "codigo": "2.05.04.01",
+        "descricao": "Legal"
+      },
+      {
+        "codigo": "2.05.04.02",
+        "descricao": "Estatutária"
+      },
+      {
+        "codigo": "2.05.04.03",
+        "descricao": "Para Contingências"
+      },
+      {
+        "codigo": "2.05.04.04",
+        "descricao": "De Lucros a Realizar"
+      },
+      {
+        "codigo": "2.05.04.05",
+        "descricao": "Retenção de Lucros"
+      },
+      {
+        "codigo": "2.05.04.06",
+        "descricao": "Especial p/ Dividendos Não Distribuídos"
+      },
+      {
+        "codigo": "2.05.04.07",
+        "descricao": "Outras Reservas de Lucro"
+      },
+      {
+        "codigo": "2.05.05",
+        "descricao": "Ajustes de Avaliação Patrimonial"
+      },
+      {
+        "codigo": "2.05.05.01",
+        "descricao": "Ajustes de Títulos e Valores Mobiliários"
+      },
+      {
+        "codigo": "2.05.05.02",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "2.05.05.03",
+        "descricao": "Ajustes de Combinação de Negócios"
+      },
+      {
+        "codigo": "2.05.06",
+        "descricao": "Lucros/Prejuízos Acumulados"
+      },
+      {
+        "codigo": "2.06",
+        "descricao": "Passivos sobre Ativos Não Correntes a Venda e Descontinuados"
+      },
+      {
+        "codigo": "2.06.01",
+        "descricao": "Passivos sobre Ativos Não Correntes a Venda"
+      },
+      {
+        "codigo": "2.06.02",
+        "descricao": "Passivos sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "2.07",
+        "descricao": "Patrimônio Líquido"
+      },
+      {
+        "codigo": "2.07.01",
+        "descricao": "Capital Social Realizado"
+      },
+      {
+        "codigo": "2.07.02",
+        "descricao": "Reservas de Capital"
+      },
+      {
+        "codigo": "2.07.02.01",
+        "descricao": "Ágio na Emissão de Ações"
+      },
+      {
+        "codigo": "2.07.02.02",
+        "descricao": "Reserva Especial de Ágio na Incorporação"
+      },
+      {
+        "codigo": "2.07.02.03",
+        "descricao": "Alienação de Bônus de Subscrição"
+      },
+      {
+        "codigo": "2.07.02.04",
+        "descricao": "Opções Outorgadas"
+      },
+      {
+        "codigo": "2.07.02.05",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.07.03",
+        "descricao": "Reservas de Reavaliação"
+      },
+      {
+        "codigo": "2.07.04",
+        "descricao": "Reservas de Lucros"
+      },
+      {
+        "codigo": "2.07.04.01",
+        "descricao": "Reserva Legal"
+      },
+      {
+        "codigo": "2.07.04.02",
+        "descricao": "Reserva Estatutária"
+      },
+      {
+        "codigo": "2.07.04.03",
+        "descricao": "Reserva para Contingências"
+      },
+      {
+        "codigo": "2.07.04.04",
+        "descricao": "Reserva de Lucros a Realizar"
+      },
+      {
+        "codigo": "2.07.04.05",
+        "descricao": "Reserva de Retenção de Lucros"
+      },
+      {
+        "codigo": "2.07.04.06",
+        "descricao": "Reserva Especial para Dividendos Não Distribuídos"
+      },
+      {
+        "codigo": "2.07.04.07",
+        "descricao": "Reserva de Incentivos Fiscais"
+      },
+      {
+        "codigo": "2.07.04.08",
+        "descricao": "Dividendo Adicional Proposto"
+      },
+      {
+        "codigo": "2.07.04.09",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "2.07.05",
+        "descricao": "Lucros/Prejuízos Acumulados"
+      },
+      {
+        "codigo": "2.07.06",
+        "descricao": "Ajustes de Avaliação Patrimonial"
+      },
+      {
+        "codigo": "2.07.07",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "2.07.08",
+        "descricao": "Outros Resultados Abrangentes"
+      }
+    ]
+  },
+  {
+    "tabela": "DFC_MI_con",
+    "resumo": "A tabela 'DFC_MI_con' armazena dados da Demonstração de Fluxo de Caixa, método indireto, versão consolidada, publicada pela CVM no Brasil.",
+    "proposito": "A tabela é usada para registrar informações financeiras relacionadas ao fluxo de caixa de várias empresas do grupo, conforme exigido pelo Formulário de Demonstrações Financeiras Padronizadas (DFP).",
+    "entidades": [
+      "Companhias",
+      "Demonstração de Fluxo de Caixa",
+      "Método Indireto",
+      "Versão Consolidada",
+      "Formulário de Demonstrações Financeiras Padronizadas (DFP)",
+      "CVM (Comissão de Valores Mobiliários)"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da companhia conforme registrado pela CVM.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do exercício financeiro.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do exercício financeiro.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro.",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada nos valores financeiros.",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta financeira.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira, indicando se é fixa ou variável.",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "6.01",
+        "descricao": "Caixa Líquido Atividades Operacionais"
+      },
+      {
+        "codigo": "6.01.01",
+        "descricao": "Caixa Gerado nas Operações"
+      },
+      {
+        "codigo": "6.01.01.01",
+        "descricao": "Lucro ou Prejuízo Líquido antes dos Tributos sobre o Lucro"
+      },
+      {
+        "codigo": "6.01.01.02",
+        "descricao": "Ajustes ao Lucro ou Prejuízo"
+      },
+      {
+        "codigo": "6.01.02",
+        "descricao": "Variações nos Ativos e Passivos"
+      },
+      {
+        "codigo": "6.01.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "6.02",
+        "descricao": "Caixa Líquido Atividades de Investimento"
+      },
+      {
+        "codigo": "6.03",
+        "descricao": "Caixa Líquido Atividades de Financiamento"
+      },
+      {
+        "codigo": "6.04",
+        "descricao": "Variação Cambial s/ Caixa e Equivalentes"
+      },
+      {
+        "codigo": "6.05",
+        "descricao": "Aumento (Redução) de Caixa e Equivalentes"
+      },
+      {
+        "codigo": "6.05.01",
+        "descricao": "Saldo Inicial de Caixa e Equivalentes"
+      },
+      {
+        "codigo": "6.05.02",
+        "descricao": "Saldo Final de Caixa e Equivalentes"
+      }
+    ]
+  },
+  {
+    "tabela": "DFC_MI_ind",
+    "resumo": "A tabela 'DFC_MI_ind' armazena dados da Demonstração de Fluxo de Caixa, método indireto, versão individual, conforme publicada pela CVM no Brasil.",
+    "proposito": "A tabela é usada para registrar informações financeiras detalhadas de empresas individuais, incluindo receitas, despesas e fluxo de caixa.",
+    "entidades": [
+      "Empresa",
+      "Demonstração Financeira",
+      "Fluxo de Caixa",
+      "Conta Financeira",
+      "Valor Financeiro"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor financeiro da conta",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira (fixa ou variável)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "6.01",
+        "descricao": "Caixa Líquido Atividades Operacionais"
+      },
+      {
+        "codigo": "6.01.01",
+        "descricao": "Caixa Gerado nas Operações"
+      },
+      {
+        "codigo": "6.01.01.01",
+        "descricao": "Lucro ou Prejuízo Líquido antes dos Tributos sobre o Lucro"
+      },
+      {
+        "codigo": "6.01.01.02",
+        "descricao": "Ajustes ao Lucro ou Prejuízo"
+      },
+      {
+        "codigo": "6.01.02",
+        "descricao": "Variações nos Ativos e Passivos"
+      },
+      {
+        "codigo": "6.01.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "6.02",
+        "descricao": "Caixa Líquido Atividades de Investimento"
+      },
+      {
+        "codigo": "6.03",
+        "descricao": "Caixa Líquido Atividades de Financiamento"
+      },
+      {
+        "codigo": "6.04",
+        "descricao": "Variação Cambial s/ Caixa e Equivalentes"
+      },
+      {
+        "codigo": "6.05",
+        "descricao": "Aumento (Redução) de Caixa e Equivalentes"
+      },
+      {
+        "codigo": "6.05.01",
+        "descricao": "Saldo Inicial de Caixa e Equivalentes"
+      },
+      {
+        "codigo": "6.05.02",
+        "descricao": "Saldo Final de Caixa e Equivalentes"
+      }
+    ]
+  },
+  {
+    "tabela": "DMPL_con",
+    "resumo": "A tabela 'DMPL_con' armazena dados da demonstração das mutações do patrimônio líquido consolidada, publicada pela CVM no Brasil.",
+    "proposito": "A tabela é usada para fornecer informações detalhadas sobre as mutações do patrimônio líquido de várias empresas do grupo, conforme exigido pelo Formulário de Demonstrações Financeiras Padronizadas (DFP).",
+    "entidades": [
+      "Empresa",
+      "Demonstração Financeira",
+      "Patrimônio Líquido",
+      "Mutações",
+      "Contas Contábeis",
+      "Valores Financeiros"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do exercício financeiro.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do exercício financeiro.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro.",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada.",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "COLUNA_DF",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Coluna da demonstração financeira.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta contábil.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta contábil.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor financeiro da conta.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta contábil (fixa ou variável).",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "5.01",
+        "descricao": "Saldos Iniciais"
+      },
+      {
+        "codigo": "5.02",
+        "descricao": "Ajustes de Exercícios Anteriores"
+      },
+      {
+        "codigo": "5.03",
+        "descricao": "Saldos Iniciais Ajustados"
+      },
+      {
+        "codigo": "5.04",
+        "descricao": "Transações de Capital com os Sócios"
+      },
+      {
+        "codigo": "5.04.01",
+        "descricao": "Aumentos de Capital"
+      },
+      {
+        "codigo": "5.04.02",
+        "descricao": "Gastos com Emissão de Ações"
+      },
+      {
+        "codigo": "5.04.03",
+        "descricao": "Opções Outorgadas Reconhecidas"
+      },
+      {
+        "codigo": "5.04.04",
+        "descricao": "Ações em Tesouraria Adquiridas"
+      },
+      {
+        "codigo": "5.04.05",
+        "descricao": "Ações em Tesouraria Vendidas"
+      },
+      {
+        "codigo": "5.04.06",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "5.04.07",
+        "descricao": "Juros sobre Capital Próprio"
+      },
+      {
+        "codigo": "5.05",
+        "descricao": "Resultado Abrangente Total"
+      },
+      {
+        "codigo": "5.05.01",
+        "descricao": "Lucro Líquido do Período"
+      },
+      {
+        "codigo": "5.05.02",
+        "descricao": "Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "5.05.02.01",
+        "descricao": "Ajustes de Instrumentos Financeiros"
+      },
+      {
+        "codigo": "5.05.02.02",
+        "descricao": "Tributos s/ Ajustes Instrumentos Financeiros"
+      },
+      {
+        "codigo": "5.05.02.03",
+        "descricao": "Equiv. Patrim. s/Result. Abrang. Coligadas"
+      },
+      {
+        "codigo": "5.05.02.04",
+        "descricao": "Ajustes de Conversão do Período"
+      },
+      {
+        "codigo": "5.05.02.05",
+        "descricao": "Tributos s/ Ajustes de Conversão do Período"
+      },
+      {
+        "codigo": "5.05.03",
+        "descricao": "Reclassificações para o Resultado"
+      },
+      {
+        "codigo": "5.05.03.01",
+        "descricao": "Ajustes de Instrumentos Financeiros"
+      },
+      {
+        "codigo": "5.06",
+        "descricao": "Mutações Internas do Patrimônio Líquido"
+      },
+      {
+        "codigo": "5.06.01",
+        "descricao": "Constituição de Reservas"
+      },
+      {
+        "codigo": "5.06.02",
+        "descricao": "Realização da Reserva Reavaliação"
+      },
+      {
+        "codigo": "5.06.03",
+        "descricao": "Tributos sobre a Realização da Reserva de Reavaliação"
+      },
+      {
+        "codigo": "5.07",
+        "descricao": "Saldos Finais"
+      }
+    ]
+  },
+  {
+    "tabela": "DMPL_ind",
+    "resumo": "A tabela 'DMPL_ind' armazena dados da Demonstração das Mutações do Patrimônio Líquido, versão individual, publicada pela CVM no Brasil.",
+    "proposito": "A tabela é usada para fornecer informações detalhadas sobre as mutações do patrimônio líquido de uma empresa em um determinado período.",
+    "entidades": [
+      "Empresa",
+      "Patrimônio Líquido",
+      "Demonstração Financeira",
+      "Mutações",
+      "Período Fiscal",
+      "Moeda"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do período fiscal",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do período fiscal",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores da demonstração",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "COLUNA_DF",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Coluna da demonstração financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta contábil fixa",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "5.01",
+        "descricao": "Saldos Iniciais"
+      },
+      {
+        "codigo": "5.02",
+        "descricao": "Ajustes de Exercícios Anteriores"
+      },
+      {
+        "codigo": "5.03",
+        "descricao": "Saldos Iniciais Ajustados"
+      },
+      {
+        "codigo": "5.04",
+        "descricao": "Transações de Capital com os Sócios"
+      },
+      {
+        "codigo": "5.04.01",
+        "descricao": "Aumentos de Capital"
+      },
+      {
+        "codigo": "5.04.02",
+        "descricao": "Gastos com Emissão de Ações"
+      },
+      {
+        "codigo": "5.04.03",
+        "descricao": "Opções Outorgadas Reconhecidas"
+      },
+      {
+        "codigo": "5.04.04",
+        "descricao": "Ações em Tesouraria Adquiridas"
+      },
+      {
+        "codigo": "5.04.05",
+        "descricao": "Ações em Tesouraria Vendidas"
+      },
+      {
+        "codigo": "5.04.06",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "5.04.07",
+        "descricao": "Juros sobre Capital Próprio"
+      },
+      {
+        "codigo": "5.05",
+        "descricao": "Resultado Abrangente Total"
+      },
+      {
+        "codigo": "5.05.01",
+        "descricao": "Lucro Líquido do Período"
+      },
+      {
+        "codigo": "5.05.02",
+        "descricao": "Outros Resultados Abrangentes"
+      },
+      {
+        "codigo": "5.05.02.01",
+        "descricao": "Ajustes de Instrumentos Financeiros"
+      },
+      {
+        "codigo": "5.05.02.02",
+        "descricao": "Tributos s/ Ajustes Instrumentos Financeiros"
+      },
+      {
+        "codigo": "5.05.02.03",
+        "descricao": "Equiv. Patrim. s/Result. Abrang. Controladas e Coligadas"
+      },
+      {
+        "codigo": "5.05.02.04",
+        "descricao": "Ajustes de Conversão do Período"
+      },
+      {
+        "codigo": "5.05.02.05",
+        "descricao": "Tributos s/ Ajustes de Conversão do Período"
+      },
+      {
+        "codigo": "5.05.03",
+        "descricao": "Reclassificações para o Resultado"
+      },
+      {
+        "codigo": "5.05.03.01",
+        "descricao": "Ajustes de Instrumentos Financeiros"
+      },
+      {
+        "codigo": "5.06",
+        "descricao": "Mutações Internas do Patrimônio Líquido"
+      },
+      {
+        "codigo": "5.06.01",
+        "descricao": "Constituição de Reservas"
+      },
+      {
+        "codigo": "5.06.02",
+        "descricao": "Realização da Reserva Reavaliação"
+      },
+      {
+        "codigo": "5.06.03",
+        "descricao": "Tributos sobre a Realização da Reserva de Reavaliação"
+      },
+      {
+        "codigo": "5.07",
+        "descricao": "Saldos Finais"
+      },
+      {
+        "codigo": "5.07.01",
+        "descricao": "Ajustes de Títulos e Valores Mobiliários"
+      },
+      {
+        "codigo": "5.07.02",
+        "descricao": "Ajustes Acumulados de Conversão"
+      },
+      {
+        "codigo": "5.07.03",
+        "descricao": "Ajustes de Combinação de Negócios"
+      },
+      {
+        "codigo": "5.08",
+        "descricao": "Aumento/Redução do Capital Social"
+      },
+      {
+        "codigo": "5.09",
+        "descricao": "Constituição/Realização Reservas Capital"
+      },
+      {
+        "codigo": "5.10",
+        "descricao": "Ações em Tesouraria"
+      },
+      {
+        "codigo": "5.11",
+        "descricao": "Outras Transações de Capital"
+      },
+      {
+        "codigo": "5.12",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "5.13",
+        "descricao": "Saldo Final"
+      }
+    ]
+  },
+  {
+    "tabela": "DRE_con",
+    "resumo": "A tabela 'DRE_con' armazena dados da Demonstração de Resultado Consolidada de empresas brasileiras, conforme publicada pela CVM.",
+    "proposito": "A tabela é usada para armazenar e acessar informações financeiras consolidadas de empresas, incluindo receitas, despesas e resultados operacionais.",
+    "entidades": [
+      "Empresa",
+      "Demonstração de Resultado",
+      "Conta Financeira",
+      "Valor Financeiro"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do período do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do período do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada nos valores financeiros",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor financeiro da conta",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira (fixa ou variável)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "3.01",
+        "descricao": "Receita de Venda de Bens e/ou Serviços"
+      },
+      {
+        "codigo": "3.01.03.01",
+        "descricao": "Rendas de Contribuições Retidas"
+      },
+      {
+        "codigo": "3.01.03.02",
+        "descricao": "Variações das Provisões Técnicas"
+      },
+      {
+        "codigo": "3.01.03.03",
+        "descricao": "Outras Receitas de Prev. Complementar"
+      },
+      {
+        "codigo": "3.01.04.01",
+        "descricao": "Receita Líquida com Títs. Capitalização"
+      },
+      {
+        "codigo": "3.01.04.02",
+        "descricao": "Variações das Provisões Técnicas"
+      },
+      {
+        "codigo": "3.01.04.03",
+        "descricao": "Outras Receitas de Capitalização"
+      },
+      {
+        "codigo": "3.02",
+        "descricao": "Custo dos Bens e/ou Serviços Vendidos"
+      },
+      {
+        "codigo": "3.02.03.01",
+        "descricao": "Despesas com Benefícios e Resgates"
+      },
+      {
+        "codigo": "3.02.03.02",
+        "descricao": "Despesas de Comercialização de Prev. Complementar"
+      },
+      {
+        "codigo": "3.02.03.03",
+        "descricao": "Outras Despesas de Prev. Complementar"
+      },
+      {
+        "codigo": "3.02.04.01",
+        "descricao": "Despesas com Resgates e Sorteios"
+      },
+      {
+        "codigo": "3.02.04.02",
+        "descricao": "Despesas de Comercialização de Op. de Capitalização"
+      },
+      {
+        "codigo": "3.02.04.03",
+        "descricao": "Outras Despesas de Op. de Capitalização"
+      },
+      {
+        "codigo": "3.03",
+        "descricao": "Resultado Bruto"
+      },
+      {
+        "codigo": "3.04",
+        "descricao": "Despesas/Receitas Operacionais"
+      },
+      {
+        "codigo": "3.04.01",
+        "descricao": "Despesas com Vendas"
+      },
+      {
+        "codigo": "3.04.02",
+        "descricao": "Despesas Gerais e Administrativas"
+      },
+      {
+        "codigo": "3.04.03",
+        "descricao": "Perdas pela Não Recuperabilidade de Ativos"
+      },
+      {
+        "codigo": "3.04.04",
+        "descricao": "Outras Receitas Operacionais"
+      },
+      {
+        "codigo": "3.04.05",
+        "descricao": "Outras Despesas Operacionais"
+      },
+      {
+        "codigo": "3.04.06",
+        "descricao": "Resultado de Equivalência Patrimonial"
+      },
+      {
+        "codigo": "3.04.07",
+        "descricao": "Outras Despesas Operacionais"
+      },
+      {
+        "codigo": "3.04.08",
+        "descricao": "Resultado da Equivalência Patrimonial"
+      },
+      {
+        "codigo": "3.05",
+        "descricao": "Resultado Antes do Resultado Financeiro e dos Tributos"
+      },
+      {
+        "codigo": "3.06",
+        "descricao": "Resultado Financeiro"
+      },
+      {
+        "codigo": "3.06.01",
+        "descricao": "Receitas Financeiras"
+      },
+      {
+        "codigo": "3.06.02",
+        "descricao": "Despesas Financeiras"
+      },
+      {
+        "codigo": "3.07",
+        "descricao": "Resultado Antes dos Tributos sobre o Lucro"
+      },
+      {
+        "codigo": "3.08",
+        "descricao": "Imposto de Renda e Contribuição Social sobre o Lucro"
+      },
+      {
+        "codigo": "3.08.01",
+        "descricao": "Corrente"
+      },
+      {
+        "codigo": "3.08.02",
+        "descricao": "Diferido"
+      },
+      {
+        "codigo": "3.09",
+        "descricao": "Resultado Líquido das Operações Continuadas"
+      },
+      {
+        "codigo": "3.09.01",
+        "descricao": "Atribuído a Sócios da Empresa Controladora"
+      },
+      {
+        "codigo": "3.09.02",
+        "descricao": "Atribuído a Sócios Não Controladores"
+      },
+      {
+        "codigo": "3.10",
+        "descricao": "Resultado Líquido de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.10.01",
+        "descricao": "Lucro/Prejuízo Líquido das Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.10.02",
+        "descricao": "Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.11",
+        "descricao": "Lucro/Prejuízo Consolidado do Período"
+      },
+      {
+        "codigo": "3.11.01",
+        "descricao": "Atribuído a Sócios da Empresa Controladora"
+      },
+      {
+        "codigo": "3.11.02",
+        "descricao": "Atribuído a Sócios Não Controladores"
+      },
+      {
+        "codigo": "3.12",
+        "descricao": "Resultado Líquido de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.12.01",
+        "descricao": "Lucro/Prejuízo Líquido das Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.12.02",
+        "descricao": "Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.13",
+        "descricao": "Lucro/Prejuízo Consolidado do Período"
+      },
+      {
+        "codigo": "3.13.01",
+        "descricao": "Atribuído a Sócios da Empresa Controladora"
+      },
+      {
+        "codigo": "3.13.02",
+        "descricao": "Atribuído a Sócios Não Controladores"
+      }
+    ]
+  },
+  {
+    "tabela": "DRE_ind",
+    "resumo": "A tabela 'DRE_ind' armazena dados da Demonstração de Resultado Individual, fornecendo informações financeiras detalhadas de uma empresa específica.",
+    "proposito": "Esta tabela é usada para documentar e analisar os resultados financeiros de uma empresa individual, conforme publicado pela CVM.",
+    "entidades": [
+      "Empresa",
+      "Demonstração de Resultado",
+      "Conta Financeira",
+      "Valor Financeiro",
+      "Moeda",
+      "Escala de Moeda"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do período do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do período do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor financeiro da conta",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira (fixa ou variável)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "3.01",
+        "descricao": "Receita de Venda de Bens e/ou Serviços"
+      },
+      {
+        "codigo": "3.01.03.01",
+        "descricao": "Rendas de Contribuições Retidas"
+      },
+      {
+        "codigo": "3.01.03.02",
+        "descricao": "Variações das Provisões Técnicas"
+      },
+      {
+        "codigo": "3.01.03.03",
+        "descricao": "Outras Receitas de Prev. Complementar"
+      },
+      {
+        "codigo": "3.01.04.01",
+        "descricao": "Receita Líquida com Títs. Capitalização"
+      },
+      {
+        "codigo": "3.01.04.02",
+        "descricao": "Variações das Provisões Técnicas"
+      },
+      {
+        "codigo": "3.01.04.03",
+        "descricao": "Outras Receitas de Capitalização"
+      },
+      {
+        "codigo": "3.02",
+        "descricao": "Custo dos Bens e/ou Serviços Vendidos"
+      },
+      {
+        "codigo": "3.02.03.01",
+        "descricao": "Despesas com Benefícios e Resgates"
+      },
+      {
+        "codigo": "3.02.03.02",
+        "descricao": "Despesas de Comercialização de Prev. Complementar"
+      },
+      {
+        "codigo": "3.02.03.03",
+        "descricao": "Outras Despesas de Prev. Complementar"
+      },
+      {
+        "codigo": "3.02.04.01",
+        "descricao": "Despesas com Resgates e Sorteios"
+      },
+      {
+        "codigo": "3.02.04.02",
+        "descricao": "Despesas de Comercialização de Op. de Capitalização"
+      },
+      {
+        "codigo": "3.02.04.03",
+        "descricao": "Outras Despesas de Op. de Capitalização"
+      },
+      {
+        "codigo": "3.03",
+        "descricao": "Resultado Bruto"
+      },
+      {
+        "codigo": "3.04",
+        "descricao": "Despesas/Receitas Operacionais"
+      },
+      {
+        "codigo": "3.04.01",
+        "descricao": "Despesas com Vendas"
+      },
+      {
+        "codigo": "3.04.02",
+        "descricao": "Despesas Gerais e Administrativas"
+      },
+      {
+        "codigo": "3.04.03",
+        "descricao": "Perdas pela Não Recuperabilidade de Ativos"
+      },
+      {
+        "codigo": "3.04.04",
+        "descricao": "Outras Receitas Operacionais"
+      },
+      {
+        "codigo": "3.04.05",
+        "descricao": "Outras Despesas Operacionais"
+      },
+      {
+        "codigo": "3.04.06",
+        "descricao": "Resultado de Equivalência Patrimonial"
+      },
+      {
+        "codigo": "3.04.07",
+        "descricao": "Outras Despesas Operacionais"
+      },
+      {
+        "codigo": "3.04.08",
+        "descricao": "Resultado da Equivalência Patrimonial"
+      },
+      {
+        "codigo": "3.05",
+        "descricao": "Resultado Antes do Resultado Financeiro e dos Tributos"
+      },
+      {
+        "codigo": "3.06",
+        "descricao": "Resultado Financeiro"
+      },
+      {
+        "codigo": "3.06.01",
+        "descricao": "Receitas Financeiras"
+      },
+      {
+        "codigo": "3.06.02",
+        "descricao": "Despesas Financeiras"
+      },
+      {
+        "codigo": "3.07",
+        "descricao": "Resultado Antes dos Tributos sobre o Lucro"
+      },
+      {
+        "codigo": "3.08",
+        "descricao": "Imposto de Renda e Contribuição Social sobre o Lucro"
+      },
+      {
+        "codigo": "3.08.01",
+        "descricao": "Corrente"
+      },
+      {
+        "codigo": "3.08.02",
+        "descricao": "Diferido"
+      },
+      {
+        "codigo": "3.09",
+        "descricao": "Resultado Líquido das Operações Continuadas"
+      },
+      {
+        "codigo": "3.10",
+        "descricao": "Resultado Líquido de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.10.01",
+        "descricao": "Lucro/Prejuízo Líquido das Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.10.02",
+        "descricao": "Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.11",
+        "descricao": "Lucro/Prejuízo do Período"
+      },
+      {
+        "codigo": "3.12",
+        "descricao": "Resultado Líquido de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.12.01",
+        "descricao": "Lucro/Prejuízo Líquido das Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.12.02",
+        "descricao": "Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas"
+      },
+      {
+        "codigo": "3.13",
+        "descricao": "Lucro/Prejuízo do Período"
+      }
+    ]
+  },
+  {
+    "tabela": "DVA_con",
+    "resumo": "A tabela 'DVA_con' armazena dados da Demonstração de Valor Adicionado consolidada, publicada pela CVM no Brasil.",
+    "proposito": "A tabela é usada para fornecer informações financeiras consolidadas de empresas do grupo, incluindo receitas, despesas e resultados operacionais.",
+    "entidades": [
+      "Empresa",
+      "Demonstração Financeira",
+      "Valor Adicionado",
+      "Contas Financeiras",
+      "Exercício Financeiro"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do período do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do período do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta financeira",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta financeira (fixa ou variável)",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "7.01",
+        "descricao": "Receitas"
+      },
+      {
+        "codigo": "7.01.01",
+        "descricao": "Vendas de Mercadorias, Produtos e Serviços"
+      },
+      {
+        "codigo": "7.01.02",
+        "descricao": "Outras Receitas"
+      },
+      {
+        "codigo": "7.01.03",
+        "descricao": "Receitas refs. à Construção de Ativos Próprios"
+      },
+      {
+        "codigo": "7.01.04",
+        "descricao": "Provisão/Reversão de Créds. Liquidação Duvidosa"
+      },
+      {
+        "codigo": "7.01.05",
+        "descricao": "Provisão/Reversão de Créds. Liquidação Duvidosa"
+      },
+      {
+        "codigo": "7.02",
+        "descricao": "Insumos Adquiridos de Terceiros"
+      },
+      {
+        "codigo": "7.02.01",
+        "descricao": "Custos Prods., Mercs. e Servs. Vendidos"
+      },
+      {
+        "codigo": "7.02.02",
+        "descricao": "Materiais, Energia, Servs. de Terceiros e Outros"
+      },
+      {
+        "codigo": "7.02.03",
+        "descricao": "Perda/Recuperação de Valores Ativos"
+      },
+      {
+        "codigo": "7.02.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.03",
+        "descricao": "Valor Adicionado Bruto"
+      },
+      {
+        "codigo": "7.03.01",
+        "descricao": "Materiais, Energia e Outros"
+      },
+      {
+        "codigo": "7.03.02",
+        "descricao": "Serviços de Terceiros"
+      },
+      {
+        "codigo": "7.03.03",
+        "descricao": "Perda/Recuperação de Valores Ativos"
+      },
+      {
+        "codigo": "7.03.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.04",
+        "descricao": "Retenções"
+      },
+      {
+        "codigo": "7.04.01",
+        "descricao": "Depreciação, Amortização e Exaustão"
+      },
+      {
+        "codigo": "7.04.02",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.05",
+        "descricao": "Valor Adicionado Líquido Produzido"
+      },
+      {
+        "codigo": "7.05.01",
+        "descricao": "Depreciação, Amortização e Exaustão"
+      },
+      {
+        "codigo": "7.05.02",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.05.03",
+        "descricao": "Var. Despesas Comercialização Diferidas"
+      },
+      {
+        "codigo": "7.05.04",
+        "descricao": "Perda/Recuperação de Valores Ativos"
+      },
+      {
+        "codigo": "7.05.05",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.06",
+        "descricao": "Vlr Adicionado Recebido em Transferência"
+      },
+      {
+        "codigo": "7.06.01",
+        "descricao": "Resultado de Equivalência Patrimonial"
+      },
+      {
+        "codigo": "7.06.02",
+        "descricao": "Receitas Financeiras"
+      },
+      {
+        "codigo": "7.06.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.07",
+        "descricao": "Valor Adicionado Total a Distribuir"
+      },
+      {
+        "codigo": "7.07.01",
+        "descricao": "Resultado de Equivalência Patrimonial"
+      },
+      {
+        "codigo": "7.07.02",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.08",
+        "descricao": "Distribuição do Valor Adicionado"
+      },
+      {
+        "codigo": "7.08.01",
+        "descricao": "Pessoal"
+      },
+      {
+        "codigo": "7.08.01.01",
+        "descricao": "Remuneração Direta"
+      },
+      {
+        "codigo": "7.08.01.02",
+        "descricao": "Benefícios"
+      },
+      {
+        "codigo": "7.08.01.03",
+        "descricao": "F.G.T.S."
+      },
+      {
+        "codigo": "7.08.01.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.08.02",
+        "descricao": "Impostos, Taxas e Contribuições"
+      },
+      {
+        "codigo": "7.08.02.01",
+        "descricao": "Federais"
+      },
+      {
+        "codigo": "7.08.02.02",
+        "descricao": "Estaduais"
+      },
+      {
+        "codigo": "7.08.02.03",
+        "descricao": "Municipais"
+      },
+      {
+        "codigo": "7.08.03",
+        "descricao": "Remuneração de Capitais de Terceiros"
+      },
+      {
+        "codigo": "7.08.03.01",
+        "descricao": "Juros"
+      },
+      {
+        "codigo": "7.08.03.02",
+        "descricao": "Aluguéis"
+      },
+      {
+        "codigo": "7.08.03.03",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.08.04",
+        "descricao": "Remuneração de Capitais Próprios"
+      },
+      {
+        "codigo": "7.08.04.01",
+        "descricao": "Juros sobre o Capital Próprio"
+      },
+      {
+        "codigo": "7.08.04.02",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "7.08.04.03",
+        "descricao": "Lucros Retidos / Prejuízo do Período"
+      },
+      {
+        "codigo": "7.08.04.04",
+        "descricao": "Part. Não Controladores nos Lucros Retidos"
+      },
+      {
+        "codigo": "7.08.05",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.09",
+        "descricao": "Distribuição do Valor Adicionado"
+      },
+      {
+        "codigo": "7.09.01",
+        "descricao": "Pessoal"
+      },
+      {
+        "codigo": "7.09.01.01",
+        "descricao": "Remuneração Direta"
+      },
+      {
+        "codigo": "7.09.01.02",
+        "descricao": "Benefícios"
+      },
+      {
+        "codigo": "7.09.01.03",
+        "descricao": "F.G.T.S."
+      },
+      {
+        "codigo": "7.09.01.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.09.02",
+        "descricao": "Impostos, Taxas e Contribuições"
+      },
+      {
+        "codigo": "7.09.02.01",
+        "descricao": "Federais"
+      },
+      {
+        "codigo": "7.09.02.02",
+        "descricao": "Estaduais"
+      },
+      {
+        "codigo": "7.09.02.03",
+        "descricao": "Municipais"
+      },
+      {
+        "codigo": "7.09.03",
+        "descricao": "Remuneração de Capitais de Terceiros"
+      },
+      {
+        "codigo": "7.09.03.01",
+        "descricao": "Aluguéis"
+      },
+      {
+        "codigo": "7.09.03.02",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.09.04",
+        "descricao": "Remuneração de Capitais Próprios"
+      },
+      {
+        "codigo": "7.09.04.01",
+        "descricao": "Juros sobre o Capital Próprio"
+      },
+      {
+        "codigo": "7.09.04.02",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "7.09.04.03",
+        "descricao": "Lucros Retidos / Prejuízo do Período"
+      },
+      {
+        "codigo": "7.09.04.04",
+        "descricao": "Participação de Não Controladores nos Lucros Retidos"
+      },
+      {
+        "codigo": "7.09.05",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.10",
+        "descricao": "Valor Adicionado Total a Distribuir"
+      },
+      {
+        "codigo": "7.11",
+        "descricao": "Distribuição do Valor Adicionado"
+      },
+      {
+        "codigo": "7.11.01",
+        "descricao": "Pessoal"
+      },
+      {
+        "codigo": "7.11.01.01",
+        "descricao": "Remuneração Direta"
+      },
+      {
+        "codigo": "7.11.01.02",
+        "descricao": "Benefícios"
+      },
+      {
+        "codigo": "7.11.01.03",
+        "descricao": "F.G.T.S."
+      },
+      {
+        "codigo": "7.11.01.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.11.02",
+        "descricao": "Impostos, Taxas e Contribuições"
+      },
+      {
+        "codigo": "7.11.02.01",
+        "descricao": "Federais"
+      },
+      {
+        "codigo": "7.11.02.02",
+        "descricao": "Estaduais"
+      },
+      {
+        "codigo": "7.11.02.03",
+        "descricao": "Municipais"
+      },
+      {
+        "codigo": "7.11.03",
+        "descricao": "Remuneração de Capitais de Terceiros"
+      },
+      {
+        "codigo": "7.11.03.01",
+        "descricao": "Juros"
+      },
+      {
+        "codigo": "7.11.03.02",
+        "descricao": "Aluguéis"
+      },
+      {
+        "codigo": "7.11.03.03",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.11.04",
+        "descricao": "Remuneração de Capitais Próprios"
+      },
+      {
+        "codigo": "7.11.04.01",
+        "descricao": "Juros sobre o Capital Próprio"
+      },
+      {
+        "codigo": "7.11.04.02",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "7.11.04.03",
+        "descricao": "Lucros Retidos / Prejuízo do Período"
+      },
+      {
+        "codigo": "7.11.04.04",
+        "descricao": "Part. Não Controladores nos Lucros Retidos"
+      },
+      {
+        "codigo": "7.11.05",
+        "descricao": "Outros"
+      }
+    ]
+  },
+  {
+    "tabela": "DVA_ind",
+    "resumo": "A tabela 'DVA_ind' armazena dados da Demonstração de Valor Adicionado, versão individual, publicada pela CVM no Brasil.",
+    "proposito": "A tabela é usada para fornecer informações financeiras detalhadas de empresas individuais.",
+    "entidades": [
+      "Empresa",
+      "Demonstração Financeira",
+      "Valor Adicionado",
+      "Contabilidade",
+      "CVM",
+      "Formulário de Demonstrações Financeiras Padronizadas"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da empresa conforme registrado pela CVM",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_INI_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data inicial do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DT_FIM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Data final do exercício financeiro",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ORDEM_EXERC",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Ordem do exercício financeiro",
+        "valores_possiveis": [
+          "PENÚLTIMO",
+          "ÚLTIMO"
+        ]
+      },
+      {
+        "nome": "MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Moeda utilizada nos valores financeiros",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ESCALA_MOEDA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Escala da moeda utilizada",
+        "valores_possiveis": [
+          "MIL",
+          "UNIDADE"
+        ]
+      },
+      {
+        "nome": "CD_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Código da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DS_CONTA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Descrição da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "VL_CONTA",
+        "tipo": "REAL",
+        "chave_primaria": false,
+        "descricao": "Valor da conta contábil",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "ST_CONTA_FIXA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Status da conta contábil fixa",
+        "valores_possiveis": [
+          "N",
+          "S"
+        ]
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "companhias",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referencia"
+      }
+    ],
+    "tabelas_conectadas": [
+      "companhias"
+    ],
+    "contas": [
+      {
+        "codigo": "7.01",
+        "descricao": "Receitas"
+      },
+      {
+        "codigo": "7.01.01",
+        "descricao": "Vendas de Mercadorias, Produtos e Serviços"
+      },
+      {
+        "codigo": "7.01.02",
+        "descricao": "Outras Receitas"
+      },
+      {
+        "codigo": "7.01.03",
+        "descricao": "Receitas refs. à Construção de Ativos Próprios"
+      },
+      {
+        "codigo": "7.01.04",
+        "descricao": "Provisão/Reversão de Créds. Liquidação Duvidosa"
+      },
+      {
+        "codigo": "7.01.05",
+        "descricao": "Provisão/Reversão de Créds. Liquidação Duvidosa"
+      },
+      {
+        "codigo": "7.02",
+        "descricao": "Insumos Adquiridos de Terceiros"
+      },
+      {
+        "codigo": "7.02.01",
+        "descricao": "Custos Prods., Mercs. e Servs. Vendidos"
+      },
+      {
+        "codigo": "7.02.02",
+        "descricao": "Materiais, Energia, Servs. de Terceiros e Outros"
+      },
+      {
+        "codigo": "7.02.03",
+        "descricao": "Perda/Recuperação de Valores Ativos"
+      },
+      {
+        "codigo": "7.02.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.03",
+        "descricao": "Valor Adicionado Bruto"
+      },
+      {
+        "codigo": "7.03.01",
+        "descricao": "Materiais, Energia e Outros"
+      },
+      {
+        "codigo": "7.03.02",
+        "descricao": "Serviços de Terceiros"
+      },
+      {
+        "codigo": "7.03.03",
+        "descricao": "Perda/Recuperação de Valores Ativos"
+      },
+      {
+        "codigo": "7.03.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.04",
+        "descricao": "Retenções"
+      },
+      {
+        "codigo": "7.04.01",
+        "descricao": "Depreciação, Amortização e Exaustão"
+      },
+      {
+        "codigo": "7.04.02",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.05",
+        "descricao": "Valor Adicionado Líquido Produzido"
+      },
+      {
+        "codigo": "7.05.01",
+        "descricao": "Depreciação, Amortização e Exaustão"
+      },
+      {
+        "codigo": "7.05.02",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.05.03",
+        "descricao": "Var. Despesas Comercialização Diferidas"
+      },
+      {
+        "codigo": "7.05.04",
+        "descricao": "Perda/Recuperação de Valores Ativos"
+      },
+      {
+        "codigo": "7.05.05",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.06",
+        "descricao": "Vlr Adicionado Recebido em Transferência"
+      },
+      {
+        "codigo": "7.06.01",
+        "descricao": "Resultado de Equivalência Patrimonial"
+      },
+      {
+        "codigo": "7.06.02",
+        "descricao": "Receitas Financeiras"
+      },
+      {
+        "codigo": "7.06.03",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.07",
+        "descricao": "Valor Adicionado Total a Distribuir"
+      },
+      {
+        "codigo": "7.07.01",
+        "descricao": "Resultado de Equivalência Patrimonial"
+      },
+      {
+        "codigo": "7.07.02",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.08",
+        "descricao": "Distribuição do Valor Adicionado"
+      },
+      {
+        "codigo": "7.08.01",
+        "descricao": "Pessoal"
+      },
+      {
+        "codigo": "7.08.01.01",
+        "descricao": "Remuneração Direta"
+      },
+      {
+        "codigo": "7.08.01.02",
+        "descricao": "Benefícios"
+      },
+      {
+        "codigo": "7.08.01.03",
+        "descricao": "F.G.T.S."
+      },
+      {
+        "codigo": "7.08.01.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.08.02",
+        "descricao": "Impostos, Taxas e Contribuições"
+      },
+      {
+        "codigo": "7.08.02.01",
+        "descricao": "Federais"
+      },
+      {
+        "codigo": "7.08.02.02",
+        "descricao": "Estaduais"
+      },
+      {
+        "codigo": "7.08.02.03",
+        "descricao": "Municipais"
+      },
+      {
+        "codigo": "7.08.03",
+        "descricao": "Remuneração de Capitais de Terceiros"
+      },
+      {
+        "codigo": "7.08.03.01",
+        "descricao": "Juros"
+      },
+      {
+        "codigo": "7.08.03.02",
+        "descricao": "Aluguéis"
+      },
+      {
+        "codigo": "7.08.03.03",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.08.04",
+        "descricao": "Remuneração de Capitais Próprios"
+      },
+      {
+        "codigo": "7.08.04.01",
+        "descricao": "Juros sobre o Capital Próprio"
+      },
+      {
+        "codigo": "7.08.04.02",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "7.08.04.03",
+        "descricao": "Lucros Retidos / Prejuízo do Período"
+      },
+      {
+        "codigo": "7.08.05",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.09",
+        "descricao": "Distribuição do Valor Adicionado"
+      },
+      {
+        "codigo": "7.09.01",
+        "descricao": "Pessoal"
+      },
+      {
+        "codigo": "7.09.01.01",
+        "descricao": "Remuneração Direta"
+      },
+      {
+        "codigo": "7.09.01.02",
+        "descricao": "Benefícios"
+      },
+      {
+        "codigo": "7.09.01.03",
+        "descricao": "F.G.T.S."
+      },
+      {
+        "codigo": "7.09.01.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.09.02",
+        "descricao": "Impostos, Taxas e Contribuições"
+      },
+      {
+        "codigo": "7.09.02.01",
+        "descricao": "Federais"
+      },
+      {
+        "codigo": "7.09.02.02",
+        "descricao": "Estaduais"
+      },
+      {
+        "codigo": "7.09.02.03",
+        "descricao": "Municipais"
+      },
+      {
+        "codigo": "7.09.03",
+        "descricao": "Remuneração do Capital de Terceiros"
+      },
+      {
+        "codigo": "7.09.03.01",
+        "descricao": "Aluguéis"
+      },
+      {
+        "codigo": "7.09.03.02",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.09.04",
+        "descricao": "Remuneração de Capital Próprio"
+      },
+      {
+        "codigo": "7.09.04.01",
+        "descricao": "Juros sobre o Capital Próprio"
+      },
+      {
+        "codigo": "7.09.04.02",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "7.09.04.03",
+        "descricao": "Lucros Retidos / Prejuízo do Período"
+      },
+      {
+        "codigo": "7.09.05",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.10",
+        "descricao": "Valor Adicionado Total a Distribuir"
+      },
+      {
+        "codigo": "7.11",
+        "descricao": "Distribuição do Valor Adicionado"
+      },
+      {
+        "codigo": "7.11.01",
+        "descricao": "Pessoal"
+      },
+      {
+        "codigo": "7.11.01.01",
+        "descricao": "Remuneração Direta"
+      },
+      {
+        "codigo": "7.11.01.02",
+        "descricao": "Benefícios"
+      },
+      {
+        "codigo": "7.11.01.03",
+        "descricao": "F.G.T.S."
+      },
+      {
+        "codigo": "7.11.01.04",
+        "descricao": "Outros"
+      },
+      {
+        "codigo": "7.11.02",
+        "descricao": "Impostos, Taxas e Contribuições"
+      },
+      {
+        "codigo": "7.11.02.01",
+        "descricao": "Federais"
+      },
+      {
+        "codigo": "7.11.02.02",
+        "descricao": "Estaduais"
+      },
+      {
+        "codigo": "7.11.02.03",
+        "descricao": "Municipais"
+      },
+      {
+        "codigo": "7.11.03",
+        "descricao": "Remuneração de Capitais de Terceiros"
+      },
+      {
+        "codigo": "7.11.03.01",
+        "descricao": "Juros"
+      },
+      {
+        "codigo": "7.11.03.02",
+        "descricao": "Aluguéis"
+      },
+      {
+        "codigo": "7.11.03.03",
+        "descricao": "Outras"
+      },
+      {
+        "codigo": "7.11.04",
+        "descricao": "Remuneração de Capitais Próprios"
+      },
+      {
+        "codigo": "7.11.04.01",
+        "descricao": "Juros sobre o Capital Próprio"
+      },
+      {
+        "codigo": "7.11.04.02",
+        "descricao": "Dividendos"
+      },
+      {
+        "codigo": "7.11.04.03",
+        "descricao": "Lucros Retidos / Prejuízo do Período"
+      },
+      {
+        "codigo": "7.11.05",
+        "descricao": "Outros"
+      }
+    ]
+  },
+  {
+    "tabela": "companhias",
+    "resumo": "A tabela 'companhias' armazena informações básicas sobre as empresas, incluindo seu código CVM e CNPJ.",
+    "proposito": "A tabela 'companhias' é usada para identificar e referenciar as empresas em outros registros do banco de dados.",
+    "entidades": [
+      "Empresa",
+      "Código CVM",
+      "CNPJ"
+    ],
+    "colunas": [
+      {
+        "nome": "CD_CVM",
+        "tipo": "TEXT",
+        "chave_primaria": true,
+        "descricao": "Código CVM da empresa, identificador único.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "CNPJ_CIA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "CNPJ da empresa, número de identificação jurídica.",
+        "valores_possiveis": []
+      },
+      {
+        "nome": "DENOM_CIA",
+        "tipo": "TEXT",
+        "chave_primaria": false,
+        "descricao": "Denominação da empresa.",
+        "valores_possiveis": []
+      }
+    ],
+    "chaves_de_juncao": [
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "BPA_con",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "BPA_ind",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "BPP_con",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "BPP_ind",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DFC_MI_con",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DFC_MI_ind",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DMPL_con",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DMPL_ind",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DRE_con",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DRE_ind",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DVA_con",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      },
+      {
+        "coluna": "CD_CVM",
+        "tabela_relacionada": "DVA_ind",
+        "coluna_relacionada": "CD_CVM",
+        "sentido": "referenciada_por"
+      }
+    ],
+    "tabelas_conectadas": [
+      "BPA_con",
+      "BPA_ind",
+      "BPP_con",
+      "BPP_ind",
+      "DFC_MI_con",
+      "DFC_MI_ind",
+      "DMPL_con",
+      "DMPL_ind",
+      "DRE_con",
+      "DRE_ind",
+      "DVA_con",
+      "DVA_ind"
+    ],
+    "contas": []
+  }
+]
