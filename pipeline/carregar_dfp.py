@@ -1,5 +1,5 @@
 """
-Carrega os dados DFP/CVM de 2025 em data/dfp.db, com o seguinte recorte:
+Carrega os dados DFP/CVM de 2025 em dados/dfp.db, com o seguinte recorte:
 
 - só DT_REFER = 2025-12-31 (exercicio social padrao dezembro);
 - so a VERSAO mais alta por CNPJ_CIA (descarta reapresentacoes antigas);
@@ -17,7 +17,7 @@ import os
 import sqlite3
 
 CAMINHO_DADOS_CVM = "dados/dfp_cia_aberta_2025"
-CAMINHO_DB = "data/dfp.db"
+CAMINHO_DB = "dados/dfp.db"
 DT_REFER_ALVO = "2025-12-31"
 
 # (sufixo do nome do arquivo/tabela, tem DT_INI_EXERC, tem COLUNA_DF)

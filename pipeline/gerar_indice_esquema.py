@@ -24,7 +24,7 @@ import sys
 import ollama
 from sentence_transformers import SentenceTransformer
 
-CAMINHO_DB = "data/dfp.db"
+CAMINHO_DB = "dados/dfp.db"
 CAMINHO_ESQUEMA = "embeddings/esquema.json"
 CAMINHO_INDICE = "embeddings/index_esquema.json"
 MODELO_LLM = "qwen2.5-coder:7b"

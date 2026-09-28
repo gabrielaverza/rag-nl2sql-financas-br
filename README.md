@@ -1,11 +1,9 @@
-# rag-nl2sql-financas-br
+# Arquitetura Híbrida RAG-to-SQL para Consulta em Linguagem Natural a Bancos de Dados Financeiros Estruturados
 
-Pipeline com dados reais da CVM para o TCC "Arquitetura Híbrida RAG-to-SQL
-para Consulta em Linguagem Natural a Bancos de Dados Financeiros
-Estruturados". A partir da Etapa 2 do cronograma, este repositório é a
-pasta de trabalho para os dados e o código sobre DFP/CVM; o
-`tcc-prototype` fica congelado como a validação da Etapa 1 sobre o banco
-Northwind.
+Pipeline que permite consultar, em linguagem natural, as Demonstrações Financeiras Padronizadas
+(DFP) publicadas pela CVM. Combina recuperação semântica sobre a documentação do esquema e sobre
+normativos contábeis com geração de SQL, para responder tanto perguntas quantitativas (que exigem
+consulta ao banco) quanto conceituais (que exigem apenas os normativos).
 
 ---
 
@@ -14,24 +12,22 @@ Northwind.
 ```
 rag-nl2sql-financas-br/
 ├── dados/
-│   ├── dfp_cia_aberta_2025/         # CSVs oficiais da CVM (658 companhias, exercicio 2025)
-│   ├── meta_dfp_cia_aberta_txt/     # dicionario de dados oficial da CVM
+│   ├── dfp_cia_aberta_2025/         # CSVs oficiais da CVM (658 companhias, exercício 2025)
+│   ├── meta_dfp_cia_aberta_txt/     # dicionário de dados oficial da CVM
 │   ├── normativos/
-│   │   ├── cvm/resol080consolid.pdf # Resolucao CVM 80/2022 consolidada
+│   │   ├── cvm/resol080consolid.pdf # Resolução CVM 80/2022 consolidada
 │   │   └── cpc/                     # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
-│   └── perguntas_dfp.json           # 28 perguntas de teste (7 conceituais, 14 quantitativas, 7 hibridas)
-├── data/
-│   └── dfp.db                       # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
+│   ├── dfp.db                       # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
+│   └── perguntas_dfp.json           # conjunto de perguntas de teste
 ├── embeddings/
-│   ├── esquema.json                 # documentacao do esquema, uma entrada por tabela
-│   ├── index_esquema.json           # indice vetorial de esquema
-│   └── index_glossario.json         # indice vetorial conceitual
+│   ├── esquema.json                 # documentação do esquema, uma entrada por tabela
+│   ├── index_esquema.json           # índice vetorial de esquema
+│   └── index_glossario.json         # índice vetorial conceitual
 ├── pipeline/
-│   ├── carregar_dfp.py              # CSVs da CVM -> data/dfp.db
-│   ├── gerar_indice_esquema.py      # data/dfp.db -> esquema.json -> index_esquema.json
+│   ├── carregar_dfp.py              # CSVs da CVM -> dados/dfp.db
+│   ├── gerar_indice_esquema.py      # dados/dfp.db -> esquema.json -> index_esquema.json
 │   └── gerar_indice_glossario.py    # normativos/*.pdf -> index_glossario.json
-├── requirements.txt
-└── .venv/                           # ambiente virtual (nao versionado)
+└── requirements.txt
 ```
 
 ## Ambiente
@@ -42,104 +38,62 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Precisa do Ollama rodando (`ollama serve`) com `qwen2.5-coder:7b` baixado, igual ao `tcc-prototype`
-(ver `CLAUDE.md` na raiz do TCC para detalhes do ambiente, incluindo a correção do driver NVIDIA).
+Requer um servidor Ollama rodando localmente, com um modelo de geração de texto compatível com
+formato JSON estruturado (ex.: `qwen2.5-coder:7b`) baixado.
 
 ## Passo a passo
 
 ```bash
-python pipeline/carregar_dfp.py              # 1: CSVs -> data/dfp.db
-python pipeline/gerar_indice_esquema.py      # 2: data/dfp.db -> esquema.json + index_esquema.json
-python pipeline/gerar_indice_glossario.py    # 3: normativos -> index_glossario.json (ainda nao adaptado às subpastas)
+python pipeline/carregar_dfp.py            # 1: CSVs -> dados/dfp.db
+python pipeline/gerar_indice_esquema.py    # 2: dados/dfp.db -> esquema.json + index_esquema.json
+python pipeline/gerar_indice_glossario.py  # 3: normativos -> index_glossario.json
 ```
 
-## Recorte de dados (fechado)
+## Recorte de dados
 
 - Exercício social: só `DT_REFER = 2025-12-31` (658 das 668 companhias do lote de 2025).
 - Reapresentações: mantida só a `VERSAO` mais alta por companhia.
-- Demonstrações: BPA, BPP, DRE, DFC (só método indireto), DVA, DMPL — consolidado e individual (12 tabelas).
-  DRA fora do escopo (residual nos dados e sem CPC dedicado).
+- Demonstrações: BPA, BPP, DRE, DFC (só método indireto), DVA, DMPL — consolidado e individual
+  (12 tabelas). DRA fora do escopo (residual nos dados e sem CPC dedicado).
 
-## Carga em `data/dfp.db`
+## Carga (`dados/dfp.db`)
 
-658 companhias, 1.131.701 linhas nas 12 tabelas de demonstração, 0 linhas órfãs de chave
-estrangeira. Valores conferidos contra o documento original de duas companhias conhecidas
-(Ambev: receita líquida R$ 88.242.467 mil na DRE consolidada 2025; Alpargatas: ativo total
-R$ 6.096.758 mil no BPA consolidado 2025). O CSV de origem da CVM tinha linhas com conteúdo
-idêntico repetido em 2 das 658 companhias (FGR Incorporações, VLI Multimodal); `carregar_dfp.py`
-descarta essas repetições exatas na carga.
+658 companhias, 1.131.701 linhas nas 12 tabelas de demonstração, todas com chave estrangeira para
+`companhias`. O CSV de origem da CVM tem linhas com conteúdo idêntico repetido em algumas
+companhias; `carregar_dfp.py` descarta essas repetições exatas na carga.
 
 ## Esquema (`esquema.json` / `index_esquema.json`)
 
-Adaptado de `tcc-prototype/pipeline/gerar_indice_esquema.py`, com duas extensões sobre os dados
-reais da CVM:
+A estrutura (colunas, tipos, chaves e relações) é lida direto do SQLite. Como o significado das
+DFPs está nos valores de `CD_CONTA`/`DS_CONTA` e não nos nomes de tabela ou coluna, o script também
+extrai, direto do banco e sem LLM:
 
-1. **Plano de contas.** Diferente do Northwind, o significado das DFPs está nos valores de
-   `CD_CONTA`/`DS_CONTA`, não nos nomes de tabela/coluna. Para cada tabela de demonstração, os
-   códigos e descrições das contas fixas (`ST_CONTA_FIXA='S'`) são extraídos direto do banco (sem
-   LLM) e viram um aspecto novo do esquema ("Contas: ..."). A mesma conta pode ter descrições
-   diferentes por setor (ex.: `3.01` é "Receita de Venda de Bens e/ou Serviços" para a maioria,
-   mas "Receitas da Intermediação Financeira" para bancos); fica só a descrição de maior
-   frequência, então setores minoritários (bancos, seguradoras) não são cobertos por este aspecto.
-2. **Valores possíveis de colunas de poucos valores distintos** (`ESCALA_MOEDA`, `ORDEM_EXERC`,
-   `ST_CONTA_FIXA`), extraídos direto do banco e anexados à descrição da coluna. Colunas de data
-   (`DT_*`) são excluídas dessa checagem, porque teriam poucos valores só pelo recorte de exercício
-   atual, não por serem um código estável.
-3. O prompt do LLM recebe o nome por extenso de cada demonstração (ex.: "BPA" -> "Balanço
-   Patrimonial Ativo") e se é consolidada ou individual, para não depender só da sigla da tabela.
+- o plano de contas de cada tabela (códigos e descrições das contas fixas, `ST_CONTA_FIXA='S'`);
+- os valores possíveis das colunas com poucos valores distintos (`ESCALA_MOEDA`, `ORDEM_EXERC`,
+  `ST_CONTA_FIXA`).
 
-Resultado (13 tabelas: `companhias` + 12 de demonstração, GPU): 171 registros no índice, gerados em
-2m04s (contra ~10 min em CPU para as 13 tabelas do Northwind). Validação (`validar_esquema`) sem
-problemas. Resumos conferidos manualmente: todos mencionam o nome completo da demonstração e a CVM.
+O LLM escreve só os textos em português (resumo, propósito, entidades e descrição das colunas),
+recebendo no prompt o nome por extenso de cada demonstração (ex.: "BPA" → "Balanço Patrimonial
+Ativo") e se é consolidada ou individual.
+
+Resultado: 13 tabelas (`companhias` + 12 de demonstração), 171 registros no índice.
 
 ## Normativos (`index_glossario.json`)
 
-Gerado sobre os 4 PDFs reais (Resolução CVM 80 consolidada e CPC 03, 09 e 26 vigentes), com três
-adaptações sobre a versão do `tcc-prototype` (feita para o documento fictício, sem cabeçalho/rodapé):
+Extrai o texto de cada PDF em `dados/normativos/` (varredura recursiva das subpastas `cvm/` e
+`cpc/`), remove cabeçalhos e rodapés repetidos (detectados por frequência entre páginas) e divide
+o texto em trechos de até 120 tokens, com sobreposição de ~15%, respeitando limites de parágrafo
+quando possível.
 
-1. **Varredura recursiva** de `dados/normativos/` (`glob(..., "**/*.pdf", recursive=True)`), para
-   pegar as subpastas `cvm/` e `cpc/` numa só passada.
-2. **Remoção de cabeçalho/rodapé repetido.** Documentos reais repetem um bloco em quase toda
-   página (endereço da CVM no topo da Resolução 80; um código do pronunciamento no rodapé de cada
-   CPC, ex.: `CPC_09R1`). Detecção genérica por frequência: um bloco (texto normalizado) que aparece
-   em mais de 50% das páginas do documento é cabeçalho/rodapé, não conteúdo, e é descartado antes de
-   montar os parágrafos. Também descarta blocos que são só um número isolado (número de página).
-3. **`local_files_only=True`** ao carregar o MiniLM (mesma proteção que `busca.py` já tinha, mas que
-   faltava nos scripts offline — uma queda de rede real interrompeu a primeira tentativa de rodar
-   este script sobre os PDFs reais).
+Resultado: 1.634 trechos (163 do CPC 03, 202 do CPC 09, 425 do CPC 26, 842 da Resolução 80).
 
-Resultado: 1.634 trechos (163 do CPC 03, 202 do CPC 09, 425 do CPC 26, 842 da Resolução 80), todos
-dentro do limite de 120 tokens, sem resíduo de cabeçalho/rodapé.
+## Conjunto de perguntas de teste (`dados/perguntas_dfp.json`)
 
-Duas limitações da primeira versão, já corrigidas:
-- **Variante de rodapé não detectada.** O CPC 09 muda de convenção de rodapé na metade do
-  documento (`CPC_09R1` nas páginas 1 a 14, `CPC 09(R1)` nas páginas 15 a 24); sozinha, nenhuma das
-  duas passava do limiar de 50% das páginas. Corrigido agrupando blocos curtos (até 30 caracteres)
-  por uma assinatura sem pontuação/espaços (`CPC09R1` para as duas variantes), somando as
-  contagens antes de comparar com o limiar.
-- **Fragmentos degenerados de tabela.** O `RecursiveCharacterTextSplitter` às vezes corta uma
-  tabela exatamente num limite de token e sobra um trecho só com um número de uma célula (ex.:
-  `"27"`, `". 31"`), sem contexto próprio. Corrigido descartando, depois da divisão em trechos,
-  qualquer trecho cujo conteúdo (sem pontuação e espaços nas bordas) seja só dígitos com até 4
-  caracteres.
+28 perguntas (7 conceituais, 14 quantitativas, 7 híbridas), com `id`, `pergunta`, `tipo`,
+`tabelas_esperadas`, `sql_referencia` e `evidencia`. Serve de base para métricas de recuperação
+(Recall@k, MRR), de resposta conceitual (faithfulness, answer relevance) e de geração de SQL (EX,
+EM).
 
-## Conjunto de perguntas de teste (`data/perguntas_dfp.json`)
-
-28 perguntas (7 conceituais, 14 quantitativas, 7 híbridas), no mesmo formato do
-`perguntas_teste.json` do `tcc-prototype` (`id`, `pergunta`, `tipo`, `tabelas_esperadas`,
-`sql_referencia`, `evidencia`). Serve de base para Recall@k/MRR (recuperação), faithfulness/answer
-relevance (caminho conceitual) e EX/EM (caminhos quantitativo e híbrido) na Etapa 4.
-
-- **Conceituais:** evidência conferida verbatim contra `index_glossario.json` (CPC 03: método
-  indireto, equivalentes de caixa; CPC 09: valor adicionado, distribuição; CPC 26: conjunto de
-  demonstrações; Resolução CVM 80: DFP, posse de administrador).
-- **Quantitativas e híbridas:** todos os 21 SQLs de referência executados e conferidos contra
-  `data/dfp.db` (resultado não vazio). Empresas usadas: Ambev, Alpargatas, JBS, Petrobras, Vale.
-
-**Achado relevante para a Etapa 3 (gerador de SQL):** comparar valores financeiros brutos entre
-companhias sem normalizar `ESCALA_MOEDA` produz um ranking errado. Das 658 companhias do BPA
-consolidado, 420 reportam em `MIL` e 9 em `UNIDADE`; sem normalizar, a Vivara Participações
-aparecia em 1º lugar num ranking de ativo total, com um valor de ~R$ 4,7 trilhões (na verdade
-~R$ 4,7 bilhões, por estar em `UNIDADE`). A pergunta de ranking usa
-`CASE WHEN ESCALA_MOEDA='MIL' THEN VL_CONTA*1000 ELSE VL_CONTA END` no SQL de referência — requisito
-concreto a passar para o prompt do gerador de SQL na próxima etapa.
+- Conceituais: evidência conferida contra o texto real de `index_glossario.json`.
+- Quantitativas e híbridas: todos os SQLs de referência executados e conferidos contra
+  `dados/dfp.db`.
