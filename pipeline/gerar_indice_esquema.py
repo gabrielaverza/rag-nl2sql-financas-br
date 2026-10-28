@@ -1,20 +1,36 @@
 """
-Pipeline offline: gera a documentação do esquema (esquema.json) e o índice
-vetorial de esquema (index_esquema.json) a partir do banco dfp.db (dados
-DFP/CVM 2025).
+Etapa: Offline.
 
+Função: constrói o índice de esquema usado pelo estágio online.
+
+Descrição geral do funcionamento:
+- Documenta o esquema do banco dfp.db e gera um índice vetorial com um
+  registro por aspecto de cada tabela (resumo e propósito, entidades,
+  relações, colunas e contas).
 - A estrutura (colunas, tipos, chaves e relações) vem direto do SQLite.
-- O plano de contas (códigos e descrições fixos) e os valores possíveis de
-  colunas de poucos valores distintos também vêm direto do banco, sem LLM.
+- O plano de contas e os valores possíveis de colunas de poucos valores
+  distintos também vêm direto do banco, sem LLM.
 - O qwen2.5-coder:7b escreve só os textos em português (resumo, propósito,
-  entidades e descrição das colunas), com o nome por extenso e o tipo
-  (consolidado/individual) de cada demonstração já informados no prompt.
+  entidades e descrição das colunas).
 - O paraphrase-multilingual-MiniLM-L12-v2 gera os embeddings.
+
+Dependências:
+- dados/dfp.db (gerado por pipeline/carregar_dfp.py);
+- servidor Ollama em execução com o modelo qwen2.5-coder:7b baixado;
+- bibliotecas ollama e sentence-transformers;
+- modelo MiniLM já em cache local (carregado com local_files_only).
+
+Parâmetros: argumentos opcionais de linha de comando com os nomes das tabelas
+a processar. Sem argumentos, processa todas.
+
+Resultado: gera embeddings/esquema.json, com uma entrada por tabela, e
+embeddings/index_esquema.json, com os registros vetoriais no formato
+id/fonte/conteudo/embedding, com a fonte igual ao nome da tabela. No modo de
+teste, os dois arquivos ganham o sufixo _teste.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/gerar_indice_esquema.py             (todas as tabelas)
-    python pipeline/gerar_indice_esquema.py DRE_con      (teste: só as tabelas indicadas,
-                                                         salva arquivos com sufixo _teste)
+    python pipeline/gerar_indice_esquema.py DRE_con     (teste: só as tabelas indicadas)
 """
 
 import json
@@ -33,14 +49,14 @@ MODELO_EMBEDDING = "paraphrase-multilingual-MiniLM-L12-v2"
 # O MiniLM lê no máximo 128 tokens por texto, e 2 são reservados pelo modelo.
 # Usamos 120 para ter uma folga.
 LIMITE_TOKENS = 120
-# Quantas vezes pedir a descrição ao LLM se a resposta vier com problemas.
+
 TENTATIVAS_LLM = 3
-# Colunas com poucos valores distintos cujos valores possíveis valem a pena
-# citar na descrição (o LLM não tem como adivinhar códigos como "MIL"/"UNIDADE").
+
+# Colunas com até esse número de valores distintos têm os valores listados na
+# descrição (o LLM não tem como adivinhar códigos como "MIL"/"UNIDADE").
 LIMITE_CARDINALIDADE_VALORES = 5
 
-# Nome por extenso de cada demonstração, para o LLM não depender só da sigla
-# da tabela (recomendação 3 da Etapa 1: vocabulário de domínio no prompt).
+# Nome por extenso de cada demonstração, para o LLM não depender só da sigla.
 NOMES_DEMONSTRACOES = {
     "BPA": "Balanço Patrimonial Ativo",
     "BPP": "Balanço Patrimonial Passivo",
@@ -55,10 +71,8 @@ NOMES_DEMONSTRACOES = {
 # 1) Estrutura do banco (fatos, sem LLM)
 # ---------------------------------------------------------------------------
 
+# Lê do SQLite o DDL, as colunas e as chaves estrangeiras de cada tabela.
 def ler_estrutura_banco(conn: sqlite3.Connection) -> dict:
-    # Lê do SQLite, para cada tabela: o DDL, as colunas (nome, tipo, chave
-    # primária) e as chaves estrangeiras. Tabelas "sqlite_*" são de controle
-    # interno do SQLite e ficam de fora.
     cursor = conn.cursor()
     cursor.execute(
         "SELECT name, sql FROM sqlite_master "
@@ -84,28 +98,25 @@ def ler_estrutura_banco(conn: sqlite3.Connection) -> dict:
     return estrutura
 
 
+# Extrai do banco os códigos e as descrições das contas fixas de uma demonstração.
 def ler_plano_contas(conn: sqlite3.Connection, tabela: str, colunas: list[dict]) -> list[dict]:
     # Nas DFPs, o significado está nos valores de CD_CONTA/DS_CONTA, não nos
-    # nomes de coluna. Só as tabelas de demonstração têm essas colunas
-    # (a tabela companhias não tem). Considera só contas fixas (padronizadas
-    # pela CVM, ST_CONTA_FIXA='S'): o LLM não tem como adivinhar essas contas
-    # a partir do DDL sozinho.
+    # nomes de coluna. A tabela companhias não tem essas colunas.
     nomes_colunas = {c["nome"] for c in colunas}
     if "CD_CONTA" not in nomes_colunas or "DS_CONTA" not in nomes_colunas:
         return []
+    # Só contas fixas (ST_CONTA_FIXA='S'), padronizadas pela CVM.
     tem_st_fixa = "ST_CONTA_FIXA" in nomes_colunas
     filtro = "WHERE ST_CONTA_FIXA = 'S'" if tem_st_fixa else ""
-    # A mesma conta fixa pode ter descrições diferentes por setor da empresa
-    # (ex.: "3.01" é "Receita de Venda de Bens e/ou Serviços" no modelo
-    # industrial/comercial, mas "Receitas da Intermediação Financeira" para
-    # bancos). Fica só a descrição de maior frequência (o modelo majoritário);
-    # setores minoritários (bancos, seguradoras) não são cobertos por este
-    # aspecto do esquema.
     linhas = conn.execute(f"""
         SELECT CD_CONTA, DS_CONTA, COUNT(*) freq FROM "{tabela}" {filtro}
         GROUP BY CD_CONTA, DS_CONTA
         ORDER BY CD_CONTA
     """).fetchall()
+    # A mesma conta pode ter descrições diferentes por setor (ex.: "3.01" é
+    # "Receita de Venda de Bens e/ou Serviços" na maioria das empresas, mas
+    # "Receitas da Intermediação Financeira" nos bancos). Fica a mais frequente,
+    # então setores minoritários (bancos, seguradoras) não são cobertos.
     melhor_por_conta: dict[str, tuple[str, int]] = {}
     for codigo, descricao, freq in linhas:
         atual = melhor_por_conta.get(codigo)
@@ -117,16 +128,12 @@ def ler_plano_contas(conn: sqlite3.Connection, tabela: str, colunas: list[dict])
     ]
 
 
+# Lista os valores reais de colunas com poucos valores distintos (ex.: ESCALA_MOEDA).
 def ler_valores_baixa_cardinalidade(conn: sqlite3.Connection, tabela: str, colunas: list[dict]) -> dict[str, list[str]]:
-    # Para colunas com poucos valores distintos (códigos como ESCALA_MOEDA,
-    # ORDEM_EXERC), lista os valores reais direto do banco. Sem isso, o LLM
-    # que gera SQL não tem como saber que a escala é "MIL"/"UNIDADE" e não,
-    # por exemplo, "milhares"/"unidades" (recomendação 12 da Etapa 1).
     valores: dict[str, list[str]] = {}
     for c in colunas:
-        # Datas (DT_*) tem poucos valores só porque o recorte atual cobre 2
-        # exercicios; nao sao um codigo estavel como ESCALA_MOEDA/ORDEM_EXERC,
-        # e listar as datas do recorte atual ficaria desatualizado a cada carga.
+        # Colunas de data ficam de fora: têm poucos valores só pelo recorte
+        # atual, e a lista ficaria desatualizada a cada nova carga.
         if c["chave_primaria"] or c["nome"].startswith("DT_") or c["nome"] in ("CD_CONTA", "DS_CONTA", "VL_CONTA"):
             continue
         distintos = conn.execute(
@@ -137,9 +144,8 @@ def ler_valores_baixa_cardinalidade(conn: sqlite3.Connection, tabela: str, colun
     return valores
 
 
+# Devolve o nome por extenso da demonstração e se é consolidada ou individual, ou None para outras tabelas.
 def nome_demonstracao(tabela: str) -> str | None:
-    # "BPA_con" -> ("Balanço Patrimonial Ativo", "consolidado"); tabelas sem
-    # sufixo reconhecido (ex.: companhias) devolvem None.
     for prefixo, nome_extenso in NOMES_DEMONSTRACOES.items():
         if tabela == f"{prefixo}_con":
             return f"{nome_extenso}, versão consolidada (todas as empresas do grupo)"
@@ -148,11 +154,11 @@ def nome_demonstracao(tabela: str) -> str | None:
     return None
 
 
+# Lista as ligações da tabela com as outras, nos dois sentidos.
 def calcular_relacoes(estrutura: dict, tabela: str) -> list[dict]:
-    # Lista as ligações da tabela nos dois sentidos: as chaves que ela mesma
-    # possui ("referencia") e as chaves de outras tabelas que apontam para ela
-    # ("referenciada_por"). Uma tabela só enxerga as próprias chaves no seu
-    # DDL, por isso o segundo sentido precisa ser calculado a partir das demais.
+    # O DDL de uma tabela só mostra as chaves que ela mesma possui
+    # ("referencia"); as que apontam para ela ("referenciada_por") são
+    # calculadas a partir das demais tabelas.
     relacoes = []
     for coluna, destino, coluna_destino in estrutura[tabela]["fks"]:
         relacoes.append({
@@ -162,7 +168,7 @@ def calcular_relacoes(estrutura: dict, tabela: str) -> list[dict]:
             "sentido": "referencia",
         })
     for outra, dados in estrutura.items():
-        if outra == tabela:  # autorreferência já está no laço acima
+        if outra == tabela:
             continue
         for coluna, destino, coluna_destino in dados["fks"]:
             if destino == tabela:
@@ -179,9 +185,9 @@ def calcular_relacoes(estrutura: dict, tabela: str) -> list[dict]:
 # 2) Textos em português (LLM) e validação
 # ---------------------------------------------------------------------------
 
+# Monta o prompt que pede ao LLM a descrição em português de uma tabela.
 def montar_prompt(tabela: str, ddl: str, relacoes: list[dict], problemas_anteriores: list[str]) -> str:
-    # As relações vão no prompt já calculadas, para o LLM não precisar
-    # adivinhar como as tabelas se ligam.
+    # As relações vão calculadas, para o LLM não precisar adivinhá-las.
     linhas = []
     for r in relacoes:
         if r["sentido"] == "referencia":
@@ -219,13 +225,14 @@ Use exatamente os nomes de coluna do DDL. Não invente colunas nem tabelas."""
     return prompt
 
 
+# Devolve o valor sem espaços nas pontas se for texto, ou string vazia caso contrário.
 def _texto(valor) -> str:
     return valor.strip() if isinstance(valor, str) else ""
 
 
+# Coloca a resposta do LLM sempre no mesmo formato e lista os problemas encontrados.
 def normalizar_descricao(bruto: dict, nomes_colunas: list[str]) -> tuple[dict, list[str]]:
-    # Confere a resposta do LLM e a coloca sempre no mesmo formato. O LLM às
-    # vezes devolve listas de objetos no lugar de textos, ou esquece colunas.
+    # O LLM às vezes devolve listas de objetos no lugar de textos, ou esquece colunas.
     problemas = []
 
     resumo = _texto(bruto.get("resumo"))
@@ -245,7 +252,8 @@ def normalizar_descricao(bruto: dict, nomes_colunas: list[str]) -> tuple[dict, l
         problemas.append("lista de entidades vazia")
 
     descricoes = bruto.get("colunas") or {}
-    if isinstance(descricoes, list):  # formato alternativo: [{"nome": ..., "descricao": ...}]
+    # Formato alternativo: [{"nome": ..., "descricao": ...}]
+    if isinstance(descricoes, list):
         descricoes = {
             _texto(i.get("nome") or i.get("coluna")): i.get("descricao")
             for i in descricoes if isinstance(i, dict)
@@ -262,6 +270,7 @@ def normalizar_descricao(bruto: dict, nomes_colunas: list[str]) -> tuple[dict, l
     return {"resumo": resumo, "proposito": proposito, "entidades": entidades, "colunas": colunas}, problemas
 
 
+# Pede ao LLM a descrição da tabela e devolve a melhor tentativa com os problemas que sobraram.
 def gerar_descricao(tabela: str, dados: dict, relacoes: list[dict]) -> tuple[dict, list[str]]:
     nomes_colunas = [c["nome"] for c in dados["colunas"]]
     melhor, menos_problemas = None, None
@@ -287,7 +296,8 @@ def gerar_descricao(tabela: str, dados: dict, relacoes: list[dict]) -> tuple[dic
         if menos_problemas is None or len(problemas) < len(menos_problemas):
             melhor, menos_problemas = descricao, problemas
         print(f"    tentativa {tentativa}: {len(problemas)} problema(s)")
-    if melhor is None:  # nenhuma tentativa devolveu JSON válido
+    # Nenhuma tentativa devolveu JSON válido.
+    if melhor is None:
         melhor = {"resumo": "", "proposito": "", "entidades": [], "colunas": {n: "" for n in nomes_colunas}}
         menos_problemas = problemas
     return melhor, menos_problemas
@@ -297,11 +307,11 @@ def gerar_descricao(tabela: str, dados: dict, relacoes: list[dict]) -> tuple[dic
 # 3) Documento do esquema (esquema.json)
 # ---------------------------------------------------------------------------
 
+# Junta os fatos do banco com os textos do LLM em uma entrada por tabela.
 def montar_entrada_esquema(
     tabela: str, dados: dict, relacoes: list[dict], descricao: dict,
     contas: list[dict], valores: dict[str, list[str]],
 ) -> dict:
-    # Junta os fatos do banco com os textos do LLM em uma entrada por tabela.
     return {
         "tabela": tabela,
         "resumo": descricao["resumo"],
@@ -323,10 +333,8 @@ def montar_entrada_esquema(
     }
 
 
+# Confere o esquema contra o banco e devolve os pontos de atenção.
 def validar_esquema(esquema: list[dict], estrutura: dict) -> list[str]:
-    # Confere o esquema.json contra o banco: colunas iguais ao DDL, e chaves
-    # de junção e tabelas conectadas que existem de fato. Textos vazios também
-    # são avisados.
     problemas = []
     for entrada in esquema:
         tabela = entrada["tabela"]
@@ -355,9 +363,8 @@ def validar_esquema(esquema: list[dict], estrutura: dict) -> list[str]:
 # 4) Índice vetorial (registros de até 120 tokens)
 # ---------------------------------------------------------------------------
 
+# Junta os itens em textos com o mesmo prefixo que cabem no limite de tokens.
 def empacotar(prefixo: str, itens: list[str], separador: str, contar) -> list[str]:
-    # Junta os itens em textos que começam com o prefixo e cabem no limite de
-    # tokens. Se não couberem em um só texto, começa outro com o mesmo prefixo.
     textos, atual = [], []
     for item in itens:
         candidato = prefixo + separador.join(atual + [item])
@@ -371,19 +378,16 @@ def empacotar(prefixo: str, itens: list[str], separador: str, contar) -> list[st
     return textos
 
 
+# Tira palavras do fim do texto até ele caber no limite de tokens.
 def cortar_no_limite(texto: str, contar) -> str:
-    # Rede de segurança: se um único item ainda passar do limite, tira palavras
-    # do fim até caber.
     palavras = texto.split(" ")
     while contar(" ".join(palavras)) > LIMITE_TOKENS and len(palavras) > 1:
         palavras.pop()
     return " ".join(palavras)
 
 
+# Gera os textos do índice de uma tabela, um para cada aspecto da descrição.
 def textos_do_indice(entrada: dict, contar) -> list[str]:
-    # Cada tabela gera vários textos, um para cada aspecto da descrição
-    # (resumo e propósito, entidades, relações e colunas), como no Datrics
-    # Text2SQL. As relações são escritas a partir das chaves do banco.
     t = entrada["tabela"]
     textos = []
 
@@ -417,10 +421,8 @@ def textos_do_indice(entrada: dict, contar) -> list[str]:
     return [cortar_no_limite(texto, contar) for texto in textos]
 
 
+# Gera os embeddings dos textos de uma tabela e monta os registros do índice.
 def montar_registros(entrada: dict, modelo_embedding: SentenceTransformer) -> list[dict]:
-    # Registro no formato do listing da monografia: id, fonte, conteudo e
-    # embedding. A fonte é o nome da tabela, e é por ela que o estágio online
-    # junta de volta os registros da mesma tabela.
     tokenizador = modelo_embedding.tokenizer
     contar = lambda texto: len(tokenizador.tokenize(texto))
     textos = textos_do_indice(entrada, contar)
@@ -439,6 +441,7 @@ def montar_registros(entrada: dict, modelo_embedding: SentenceTransformer) -> li
 
 # ---------------------------------------------------------------------------
 
+# Gera o esquema e o índice para todas as tabelas, ou só para as pedidas na linha de comando.
 def main():
     tabelas_pedidas = sys.argv[1:]
 
@@ -450,16 +453,12 @@ def main():
         raise ValueError(f"Tabelas não encontradas: {desconhecidas}")
     tabelas = tabelas_pedidas or list(estrutura)
 
-    # Em modo de teste os arquivos ganham o sufixo _teste, para não apagar os
-    # arquivos completos.
+    # No modo de teste os arquivos ganham o sufixo _teste, para não apagar os completos.
     sufixo = "_teste" if tabelas_pedidas else ""
     caminho_esquema = CAMINHO_ESQUEMA.replace(".json", f"{sufixo}.json")
     caminho_indice = CAMINHO_INDICE.replace(".json", f"{sufixo}.json")
 
-    # Carrega o modelo de embeddings uma única vez (é lento de carregar).
-    # local_files_only evita depender da rede para confirmar a versao do
-    # modelo a cada carga (uma queda de rede ja derrubou uma avaliacao antes,
-    # ver pipeline/online/busca.py); o modelo ja fica em cache apos o 1o uso.
+    # local_files_only evita depender da rede a cada carga do modelo.
     modelo_embedding = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
     esquema, registros = [], []
 
@@ -479,6 +478,7 @@ def main():
         print(f"    {len(relacoes)} relações, {len(contas)} contas, {len(novos)} registros no índice")
 
     conn.close()
+
     problemas = validar_esquema(esquema, estrutura)
     if problemas:
         print("\nValidação do esquema.json, pontos de atenção:")

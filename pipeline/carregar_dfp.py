@@ -1,12 +1,22 @@
 """
-Carrega os dados DFP/CVM de 2025 em dados/dfp.db, com o seguinte recorte:
+Etapa: Offline.
 
-- só DT_REFER = 2025-12-31 (exercicio social padrao dezembro);
-- so a VERSAO mais alta por CNPJ_CIA (descarta reapresentacoes antigas);
-- 6 demonstracoes, consolidado e individual (12 tabelas): BPA, BPP, DRE,
-  DFC_MI, DVA, DMPL. DRA e DFC_MD ficam de fora.
+Função: carrega os dados DFP/CVM de 2025 em um banco SQLite.
 
-Fonte dos CSVs: dados/dfp_cia_aberta_2025/.
+Descrição geral do funcionamento:
+- Usa só DT_REFER = 2025-12-31 (exercício social padrão dezembro).
+- Mantém só a VERSAO mais alta por CNPJ_CIA (descarta reapresentações antigas).
+- Carrega 6 demonstrações, consolidadas e individuais (12 tabelas): BPA, BPP,
+  DRE, DFC_MI, DVA e DMPL. DRA e DFC_MD ficam de fora.
+
+Dependências:
+- apenas a biblioteca padrão do Python;
+- CSVs da CVM em dados/dfp_cia_aberta_2025/.
+
+Parâmetros: nenhum argumento. O recorte é definido pelas constantes do arquivo.
+
+Resultado: gera dados/dfp.db, com a tabela companhias e as 12 tabelas de
+demonstração, ligadas a companhias por CD_CVM. O arquivo anterior é apagado.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/carregar_dfp.py
@@ -32,19 +42,20 @@ DEMONSTRACOES = [
 CONSOLIDACOES = ["con", "ind"]
 
 
+# Abre um CSV da CVM e devolve o leitor e o arquivo aberto.
 def ler_csv(caminho: str) -> csv.DictReader:
-    # Os CSVs da CVM sao latin-1, separados por ';'.
+    # Os CSVs da CVM são latin-1, separados por ';'.
     arquivo = open(caminho, encoding="latin-1", newline="")
     return csv.DictReader(arquivo, delimiter=";"), arquivo
 
 
 # ---------------------------------------------------------------------------
-# 1) Indice mestre: companhias aceitas e a VERSAO escolhida de cada uma
+# 1) Índice mestre
 # ---------------------------------------------------------------------------
 
+# Escolhe, por CNPJ, a linha de maior VERSAO do índice mestre.
 def selecionar_companhias(caminho_master: str) -> dict[str, dict]:
-    # Uma companhia pode ter ate 3 linhas para o mesmo DT_REFER (reapresentacoes).
-    # Mantem so a linha de maior VERSAO por CNPJ_CIA.
+    # Uma companhia pode ter até 3 linhas para o mesmo DT_REFER (reapresentações).
     leitor, arquivo = ler_csv(caminho_master)
     escolhidas: dict[str, dict] = {}
     try:
@@ -70,10 +81,12 @@ def selecionar_companhias(caminho_master: str) -> dict[str, dict]:
 # 2) Esquema do banco
 # ---------------------------------------------------------------------------
 
+# Monta o nome da tabela, por exemplo "BPA_con".
 def nome_tabela(demonstracao: str, consolidacao: str) -> str:
     return f"{demonstracao}_{consolidacao}"
 
 
+# Cria a tabela companhias e as 12 tabelas de demonstração.
 def criar_schema(conn: sqlite3.Connection) -> None:
     conn.execute("""
         CREATE TABLE companhias (
@@ -101,6 +114,7 @@ def criar_schema(conn: sqlite3.Connection) -> None:
             conn.execute(f"CREATE TABLE {tabela} ({', '.join(colunas)})")
 
 
+# Insere as companhias selecionadas na tabela companhias.
 def carregar_companhias(conn: sqlite3.Connection, companhias: dict[str, dict]) -> None:
     conn.executemany(
         "INSERT INTO companhias (CD_CVM, CNPJ_CIA, DENOM_CIA) VALUES (?, ?, ?)",
@@ -109,9 +123,10 @@ def carregar_companhias(conn: sqlite3.Connection, companhias: dict[str, dict]) -
 
 
 # ---------------------------------------------------------------------------
-# 3) Carga de cada demonstracao
+# 3) Carga de cada demonstração
 # ---------------------------------------------------------------------------
 
+# Carrega o CSV de uma demonstração na tabela correspondente e devolve quantas linhas inseriu.
 def carregar_demonstracao(
     conn: sqlite3.Connection,
     caminho_csv: str,
@@ -145,15 +160,13 @@ def carregar_demonstracao(
                 continue
             cnpj = linha["CNPJ_CIA"]
             companhia = companhias.get(cnpj)
-            # So aceita a linha se for da mesma VERSAO escolhida para a companhia
-            # (reapresentacoes antigas de uma demonstracao ficam de fora).
+            # Reapresentações antigas de uma demonstração ficam de fora.
             if companhia is None or int(linha["VERSAO"]) != companhia["VERSAO"]:
                 continue
-            # A CVM as vezes repete a mesma linha (conteudo identico) dentro do
-            # mesmo arquivo/VERSAO (achado na carga de 2025: FGR Incorporacoes
-            # e VLI Multimodal, byte a byte iguais). Descarta repeticoes exatas
-            # aqui; nao afeta o DMPL, onde o mesmo CD_CONTA se repete de forma
-            # legitima entre COLUNA_DF diferentes (linha com conteudo diferente).
+            # A CVM às vezes repete a mesma linha dentro do mesmo arquivo (em
+            # 2025: FGR Incorporações e VLI Multimodal). Descarta só repetições
+            # exatas: no DMPL, o mesmo CD_CONTA aparece legitimamente em
+            # COLUNA_DF diferentes.
             chave_linha = tuple(linha.values())
             if chave_linha in linhas_vistas:
                 linhas_duplicadas += 1
@@ -183,6 +196,7 @@ def carregar_demonstracao(
 
 # ---------------------------------------------------------------------------
 
+# Recria o banco do zero e carrega as companhias e as 12 demonstrações.
 def main():
     if os.path.exists(CAMINHO_DB):
         os.remove(CAMINHO_DB)
