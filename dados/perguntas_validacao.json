@@ -1,0 +1,148 @@
+[
+  {
+    "id": "v01",
+    "pergunta": "Qual foi o lucro líquido da WEG em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v02",
+    "pergunta": "Quanto a Natura tinha de caixa e equivalentes de caixa no fim de 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v03",
+    "pergunta": "Qual o patrimônio líquido consolidado da Suzano?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPP_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v04",
+    "pergunta": "Quanto caixa a Raia Drogasil gerou nas atividades operacionais em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'RAIA DROGASIL S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v05",
+    "pergunta": "Qual foi o resultado financeiro da Klabin em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'KLABIN S.A.') AND CD_CONTA = '3.06' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v06",
+    "pergunta": "Qual foi a receita da Lojas Renner no balanço individual, só da controladora, em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_ind",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM DRE_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'LOJAS RENNER S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v07",
+    "pergunta": "Quanto a Gerdau tinha de empréstimos e financiamentos de curto prazo em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPP_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'GERDAU S.A.') AND CD_CONTA = '2.01.04' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": []
+  },
+  {
+    "id": "v08",
+    "pergunta": "O que são atividades de investimento no fluxo de caixa?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Atividades de investimento são as referentes à aquisição e à venda de ativos de longo prazo"
+    ]
+  },
+  {
+    "id": "v09",
+    "pergunta": "Quando uma dívida deve ser tratada como de curto prazo no balanço?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "O passivo deve ser classificado como circulante quando satisfizer qualquer dos seguintes critérios"
+    ]
+  },
+  {
+    "id": "v10",
+    "pergunta": "O que são atividades operacionais na demonstração de fluxo de caixa?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Atividades operacionais são as principais atividades geradoras de receita da entidade"
+    ]
+  },
+  {
+    "id": "v11",
+    "pergunta": "Quanto a WEG distribuiu para pessoal em 2025 e o que é o valor adicionado que está sendo distribuído?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DVA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '7.08.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Valor adicionado representa a riqueza criada pela empresa"
+    ]
+  },
+  {
+    "id": "v12",
+    "pergunta": "Qual foi o caixa líquido das atividades de investimento da Suzano em 2025 e o que entra nessa atividade?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '6.02' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Atividades de investimento são as referentes à aquisição e à venda de ativos de longo prazo"
+    ]
+  },
+  {
+    "id": "v13",
+    "pergunta": "Qual o passivo circulante da Natura e o que faz um passivo ser circulante?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "BPP_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "O passivo deve ser classificado como circulante quando satisfizer qualquer dos seguintes critérios"
+    ]
+  }
+]
