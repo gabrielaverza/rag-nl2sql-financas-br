@@ -18,15 +18,20 @@ rag-nl2sql-financas-br/
 │   │   ├── cvm/resol080consolid.pdf # Resolução CVM 80/2022 consolidada
 │   │   └── cpc/                     # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
 │   ├── dfp.db                       # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
-│   └── perguntas_dfp.json           # conjunto de perguntas de teste
+│   ├── perguntas_dfp.json           # conjunto de perguntas de teste
+│   └── perguntas_validacao.json     # perguntas independentes, só para medir
 ├── embeddings/
 │   ├── esquema.json                 # documentação do esquema, uma entrada por tabela
 │   ├── index_esquema.json           # índice vetorial de esquema
 │   └── index_glossario.json         # índice vetorial conceitual
 ├── pipeline/
-│   ├── carregar_dfp.py              # CSVs da CVM -> dados/dfp.db
-│   ├── gerar_indice_esquema.py      # dados/dfp.db -> esquema.json -> index_esquema.json
-│   └── gerar_indice_glossario.py    # normativos/*.pdf -> index_glossario.json
+│   ├── offline/
+│   │   ├── carregar_dfp.py          # CSVs da CVM -> dados/dfp.db
+│   │   ├── gerar_indice_esquema.py  # dados/dfp.db -> esquema.json -> index_esquema.json
+│   │   └── gerar_indice_glossario.py  # normativos/*.pdf -> index_glossario.json
+│   └── online/
+│       ├── busca.py                 # busca por similaridade nos dois índices
+│       └── avaliar_recuperacao.py   # Recall@k e MRR da busca
 └── requirements.txt
 ```
 
@@ -44,9 +49,10 @@ formato JSON estruturado (ex.: `qwen2.5-coder:7b`) baixado.
 ## Passo a passo
 
 ```bash
-python pipeline/carregar_dfp.py            # 1: CSVs -> dados/dfp.db
-python pipeline/gerar_indice_esquema.py    # 2: dados/dfp.db -> esquema.json + index_esquema.json
-python pipeline/gerar_indice_glossario.py  # 3: normativos -> index_glossario.json
+python pipeline/offline/carregar_dfp.py            # 1: CSVs -> dados/dfp.db
+python pipeline/offline/gerar_indice_esquema.py    # 2: dados/dfp.db -> esquema.json + index_esquema.json
+python pipeline/offline/gerar_indice_glossario.py  # 3: normativos -> index_glossario.json
+python pipeline/online/avaliar_recuperacao.py      # 4: mede a busca (Recall@k, MRR)
 ```
 
 ## Recorte de dados
@@ -97,3 +103,24 @@ EM).
 - Conceituais: evidência conferida contra o texto real de `index_glossario.json`.
 - Quantitativas e híbridas: todos os SQLs de referência executados e conferidos contra
   `dados/dfp.db`.
+
+`dados/perguntas_validacao.json` tem 13 perguntas no mesmo formato, escritas no estilo de um
+analista e com outras empresas. Serve só para medir a busca, sem ajustá-la a elas. Os valores dos
+SQLs de referência não foram conferidos contra os documentos originais.
+
+## Busca (`pipeline/online/busca.py`)
+
+O MiniLM gera o vetor da pergunta, e o produto interno com os vetores normalizados do índice (igual
+ao cosseno) ordena os registros.
+
+- **Glossário:** devolve os k trechos mais parecidos.
+- **Esquema:** cada tabela é pontuada pelo melhor registro de resumo ou de entidades. Registros de
+  colunas, contas e relações não entram na pontuação. As k tabelas escolhidas vêm acompanhadas das
+  tabelas que elas referenciam por chave estrangeira (hoje, `companhias`), lidas de `esquema.json`.
+
+`avaliar_recuperacao.py` calcula Recall@k e MRR nos dois índices e aceita o arquivo de perguntas
+como argumento:
+
+```bash
+python pipeline/online/avaliar_recuperacao.py dados/perguntas_validacao.json
+```

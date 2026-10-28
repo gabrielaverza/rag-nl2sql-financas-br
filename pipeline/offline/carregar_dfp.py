@@ -19,7 +19,7 @@ Resultado: gera dados/dfp.db, com a tabela companhias e as 12 tabelas de
 demonstração, ligadas a companhias por CD_CVM. O arquivo anterior é apagado.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/carregar_dfp.py
+    python pipeline/offline/carregar_dfp.py
 """
 
 import csv

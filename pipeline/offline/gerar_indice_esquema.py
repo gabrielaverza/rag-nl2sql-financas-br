@@ -15,7 +15,7 @@ Descrição geral do funcionamento:
 - O paraphrase-multilingual-MiniLM-L12-v2 gera os embeddings.
 
 Dependências:
-- dados/dfp.db (gerado por pipeline/carregar_dfp.py);
+- dados/dfp.db (gerado por pipeline/offline/carregar_dfp.py);
 - servidor Ollama em execução com o modelo qwen2.5-coder:7b baixado;
 - bibliotecas ollama e sentence-transformers;
 - modelo MiniLM já em cache local (carregado com local_files_only).
@@ -29,8 +29,8 @@ id/fonte/conteudo/embedding, com a fonte igual ao nome da tabela. No modo de
 teste, os dois arquivos ganham o sufixo _teste.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/gerar_indice_esquema.py             (todas as tabelas)
-    python pipeline/gerar_indice_esquema.py DRE_con     (teste: só as tabelas indicadas)
+    python pipeline/offline/gerar_indice_esquema.py         (todas as tabelas)
+    python pipeline/offline/gerar_indice_esquema.py DRE_con (teste: só as tabelas indicadas)
 """
 
 import json

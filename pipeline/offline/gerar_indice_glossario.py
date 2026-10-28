@@ -20,7 +20,7 @@ Resultado: gera embeddings/index_glossario.json, com um registro por trecho no
 formato id/fonte/conteudo/embedding, com a fonte igual ao nome do PDF de origem.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/gerar_indice_glossario.py
+    python pipeline/offline/gerar_indice_glossario.py
 """
 
 import glob
