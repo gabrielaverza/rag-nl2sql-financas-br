@@ -4,7 +4,7 @@ Etapa: Online.
 Função: busca por similaridade nos índices vetoriais de esquema e de glossário.
 
 Descrição geral do funcionamento:
-- O MiniLM gera o vetor da pergunta.
+- O multilingual-E5-base gera o vetor da pergunta, com o prefixo "query: " que o modelo exige.
 - O produto interno com os vetores do índice indica os registros mais parecidos.
   Como todos os vetores são normalizados, ele equivale à similaridade de cosseno.
 - No índice de esquema, cada tabela é pontuada pelo melhor registro de resumo ou
@@ -16,7 +16,7 @@ Dependências:
 - embeddings/index_esquema.json, embeddings/index_glossario.json e
   embeddings/esquema.json (gerados por pipeline/offline/);
 - bibliotecas numpy e sentence-transformers;
-- modelo MiniLM em cache local (se não estiver, é baixado).
+- modelo multilingual-E5-base em cache local (se não estiver, é baixado, cerca de 1,1 GB).
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
 
@@ -29,7 +29,9 @@ import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-MODELO_EMBEDDING = "paraphrase-multilingual-MiniLM-L12-v2"
+MODELO_EMBEDDING = "intfloat/multilingual-e5-base"
+# O E5 foi treinado com esses prefixos; sem eles a qualidade da busca cai.
+PREFIXO_PERGUNTA = "query: "
 CAMINHO_INDICE_ESQUEMA = "embeddings/index_esquema.json"
 CAMINHO_INDICE_GLOSSARIO = "embeddings/index_glossario.json"
 CAMINHO_ESQUEMA = "embeddings/esquema.json"
@@ -41,7 +43,7 @@ SECOES_FORA_DA_PONTUACAO = ("Relações", "Colunas", "Contas")
 _modelo = None
 
 
-# Carrega o MiniLM uma única vez e o reaproveita nas buscas seguintes.
+# Carrega o modelo de embeddings uma única vez e o reaproveita nas buscas seguintes.
 def carregar_modelo() -> SentenceTransformer:
     global _modelo
     if _modelo is None:
@@ -53,9 +55,9 @@ def carregar_modelo() -> SentenceTransformer:
     return _modelo
 
 
-# Transforma o texto em um vetor normalizado (tamanho 1).
+# Transforma a pergunta em um vetor normalizado (tamanho 1).
 def vetorizar(texto: str) -> np.ndarray:
-    return carregar_modelo().encode(texto, normalize_embeddings=True)
+    return carregar_modelo().encode(PREFIXO_PERGUNTA + texto, normalize_embeddings=True)
 
 
 # Lê do esquema.json, para cada tabela, as tabelas que ela referencia por chave estrangeira.
