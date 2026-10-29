@@ -7,12 +7,13 @@ Descrição geral do funcionamento:
 - Extrai o texto dos PDFs normativos (Resolução CVM 80 e CPCs), removendo
   cabeçalhos e rodapés repetidos.
 - Divide o texto em trechos de até 120 tokens, com sobreposição de cerca de 15%.
-- O paraphrase-multilingual-MiniLM-L12-v2 gera um embedding por trecho.
+- O multilingual-E5-base gera um embedding por trecho, com o prefixo "passage: "
+  que o modelo exige.
 
 Dependências:
 - PDFs em dados/normativos/ (inclui as subpastas cvm/ e cpc/);
 - bibliotecas pymupdf, langchain-text-splitters e sentence-transformers;
-- modelo MiniLM já em cache local (carregado com local_files_only).
+- modelo multilingual-E5-base já em cache local (carregado com local_files_only).
 
 Parâmetros: nenhum argumento. O comportamento é definido pelas constantes do arquivo.
 
@@ -36,7 +37,9 @@ from sentence_transformers import SentenceTransformer
 
 PASTA_DOCUMENTOS = "dados/normativos"
 CAMINHO_SAIDA = "embeddings/index_glossario.json"
-MODELO_EMBEDDING = "paraphrase-multilingual-MiniLM-L12-v2"
+MODELO_EMBEDDING = "intfloat/multilingual-e5-base"
+# O E5 foi treinado com esse prefixo nos textos indexados; sem ele a qualidade da busca cai.
+PREFIXO_TRECHO = "passage: "
 
 # Um bloco que aparece em mais dessa fração das páginas é cabeçalho ou rodapé.
 LIMIAR_REPETICAO = 0.5
@@ -45,8 +48,8 @@ LIMIAR_REPETICAO = 0.5
 # espaços), para pegar variantes do mesmo rodapé, como "CPC_09R1" e "CPC 09(R1)".
 TAMANHO_MAX_BLOCO_CURTO = 30
 
-# O MiniLM lê no máximo 128 tokens por texto, e 2 são reservados pelo modelo.
-# Usamos 120 para ter uma folga.
+# O modelo aceita até 512 tokens, mas trechos maiores recuperaram pior nos
+# testes (250 e 400 tokens contra 120), então o tamanho fica em 120.
 TAMANHO_CHUNK_TOKENS = 120
 
 # Sobreposição de cerca de 15% entre trechos vizinhos, para não cortar uma
@@ -134,7 +137,7 @@ def extrair_texto_pdf(caminho_pdf: str) -> str:
     return "\n\n".join(paragrafos)
 
 
-# Cria o divisor de texto, que mede o tamanho dos trechos em tokens do MiniLM.
+# Cria o divisor de texto, que mede o tamanho dos trechos em tokens do modelo de embeddings.
 def criar_divisor(modelo_embedding: SentenceTransformer) -> RecursiveCharacterTextSplitter:
     tokenizador = modelo_embedding.tokenizer
     return RecursiveCharacterTextSplitter(
@@ -155,7 +158,7 @@ def eh_fragmento_degenerado(trecho: str) -> bool:
 # Gera um embedding por trecho e monta os registros do índice.
 def montar_registros(nome_arquivo: str, trechos: list[str], modelo_embedding: SentenceTransformer) -> list[dict]:
     nome_base = os.path.splitext(nome_arquivo)[0]
-    vetores = modelo_embedding.encode(trechos)
+    vetores = modelo_embedding.encode([PREFIXO_TRECHO + t for t in trechos])
     registros = []
     for numero, (trecho, vetor) in enumerate(zip(trechos, vetores), start=1):
         registros.append({
