@@ -12,16 +12,19 @@ Descrição geral do funcionamento:
   distintos também vêm direto do banco, sem LLM.
 - O qwen2.5-coder:7b escreve só os textos em português (resumo, propósito,
   entidades e descrição das colunas).
-- O paraphrase-multilingual-MiniLM-L12-v2 gera os embeddings.
+- O multilingual-E5-base gera os embeddings, com o prefixo "passage: " que o
+  modelo exige.
 
 Dependências:
 - dados/dfp.db (gerado por pipeline/offline/carregar_dfp.py);
 - servidor Ollama em execução com o modelo qwen2.5-coder:7b baixado;
 - bibliotecas ollama e sentence-transformers;
-- modelo MiniLM já em cache local (carregado com local_files_only).
+- modelo multilingual-E5-base já em cache local (carregado com local_files_only).
 
 Parâmetros: argumentos opcionais de linha de comando com os nomes das tabelas
-a processar. Sem argumentos, processa todas.
+a processar. Sem argumentos, processa todas. Com --so-indice, reaproveita o
+esquema.json existente e só regera o índice vetorial, sem banco nem LLM
+(usado ao trocar o modelo de embeddings).
 
 Resultado: gera embeddings/esquema.json, com uma entrada por tabela, e
 embeddings/index_esquema.json, com os registros vetoriais no formato
@@ -29,8 +32,9 @@ id/fonte/conteudo/embedding, com a fonte igual ao nome da tabela. No modo de
 teste, os dois arquivos ganham o sufixo _teste.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/offline/gerar_indice_esquema.py         (todas as tabelas)
-    python pipeline/offline/gerar_indice_esquema.py DRE_con (teste: só as tabelas indicadas)
+    python pipeline/offline/gerar_indice_esquema.py               (todas as tabelas)
+    python pipeline/offline/gerar_indice_esquema.py DRE_con       (teste: só as tabelas indicadas)
+    python pipeline/offline/gerar_indice_esquema.py --so-indice   (só o índice, a partir do esquema.json)
 """
 
 import json
@@ -44,10 +48,11 @@ CAMINHO_DB = "dados/dfp.db"
 CAMINHO_ESQUEMA = "embeddings/esquema.json"
 CAMINHO_INDICE = "embeddings/index_esquema.json"
 MODELO_LLM = "qwen2.5-coder:7b"
-MODELO_EMBEDDING = "paraphrase-multilingual-MiniLM-L12-v2"
+MODELO_EMBEDDING = "intfloat/multilingual-e5-base"
+# O E5 foi treinado com esse prefixo nos textos indexados; sem ele a qualidade da busca cai.
+PREFIXO_TRECHO = "passage: "
 
-# O MiniLM lê no máximo 128 tokens por texto, e 2 são reservados pelo modelo.
-# Usamos 120 para ter uma folga.
+# Tamanho máximo, em tokens do modelo de embeddings, de cada registro do índice.
 LIMITE_TOKENS = 120
 
 TENTATIVAS_LLM = 3
@@ -426,7 +431,7 @@ def montar_registros(entrada: dict, modelo_embedding: SentenceTransformer) -> li
     tokenizador = modelo_embedding.tokenizer
     contar = lambda texto: len(tokenizador.tokenize(texto))
     textos = textos_do_indice(entrada, contar)
-    vetores = modelo_embedding.encode(textos)
+    vetores = modelo_embedding.encode([PREFIXO_TRECHO + t for t in textos])
     base = entrada["tabela"].lower().replace(" ", "_")
     return [
         {
@@ -441,8 +446,25 @@ def montar_registros(entrada: dict, modelo_embedding: SentenceTransformer) -> li
 
 # ---------------------------------------------------------------------------
 
+# Regera só o índice vetorial a partir do esquema.json existente, sem banco nem LLM.
+def gerar_so_indice():
+    # local_files_only evita depender da rede a cada carga do modelo.
+    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
+    with open(CAMINHO_ESQUEMA, encoding="utf-8") as f:
+        esquema = json.load(f)
+    registros = []
+    for entrada in esquema:
+        registros.extend(montar_registros(entrada, modelo_embedding))
+    with open(CAMINHO_INDICE, "w", encoding="utf-8") as f:
+        json.dump(registros, f, ensure_ascii=False, indent=2)
+    print(f"Índice salvo em {CAMINHO_INDICE} ({len(registros)} registros, a partir de {len(esquema)} tabelas)")
+
+
 # Gera o esquema e o índice para todas as tabelas, ou só para as pedidas na linha de comando.
 def main():
+    if "--so-indice" in sys.argv[1:]:
+        gerar_so_indice()
+        return
     tabelas_pedidas = sys.argv[1:]
 
     conn = sqlite3.connect(CAMINHO_DB)
