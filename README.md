@@ -31,7 +31,9 @@ rag-nl2sql-financas-br/
 │   │   └── gerar_indice_glossario.py  # normativos/*.pdf -> index_glossario.json
 │   └── online/
 │       ├── busca.py                 # busca por similaridade nos dois índices
-│       └── avaliar_recuperacao.py   # Recall@k e MRR da busca
+│       ├── avaliar_recuperacao.py   # Recall@k e MRR da busca
+│       ├── classificador.py         # classifica a pergunta em conceitual, quantitativa ou híbrida
+│       └── avaliar_classificador.py # acurácia e matriz de confusão do classificador
 └── requirements.txt
 ```
 
@@ -60,6 +62,7 @@ python pipeline/offline/carregar_dfp.py            # 1: CSVs -> dados/dfp.db
 python pipeline/offline/gerar_indice_esquema.py    # 2: dados/dfp.db -> esquema.json + index_esquema.json
 python pipeline/offline/gerar_indice_glossario.py  # 3: normativos -> index_glossario.json
 python pipeline/online/avaliar_recuperacao.py      # 4: mede a busca (Recall@k, MRR)
+python pipeline/online/avaliar_classificador.py    # 5: mede o classificador de intenção (acurácia)
 ```
 
 ## Recorte de dados
@@ -137,4 +140,20 @@ como argumento:
 
 ```bash
 python pipeline/online/avaliar_recuperacao.py dados/perguntas_validacao.json
+```
+
+## Classificador de intenção (`pipeline/online/classificador.py`)
+
+Um LLM local classifica a pergunta em `conceitual`, `quantitativa` ou `hibrida`. O tipo decide o
+caminho: conceitual usa só o índice do glossário, quantitativa usa o índice de esquema e o SQL, e
+híbrida usa os dois. O prompt traz a definição de cada classe e 9 exemplos (few-shot), com as
+classes intercaladas, que não fazem parte de nenhum dos dois arquivos de perguntas. A saída é um
+JSON `{"tipo": ...}`, com temperatura 0 na primeira tentativa. Se o LLM não devolver uma classe
+válida em 2 tentativas, a pergunta é tratada como híbrida, que aciona os dois caminhos.
+
+`avaliar_classificador.py` calcula a acurácia geral e por classe, a matriz de confusão e o tempo por
+pergunta, e aceita o arquivo de perguntas como argumento:
+
+```bash
+python pipeline/online/avaliar_classificador.py dados/perguntas_validacao.json
 ```
