@@ -46,6 +46,13 @@ pip install -r requirements.txt
 Requer um servidor Ollama rodando localmente, com um modelo de geração de texto compatível com
 formato JSON estruturado (ex.: `qwen2.5-coder:7b`) baixado.
 
+Os embeddings são gerados pelo modelo `intfloat/multilingual-e5-base` (cerca de 1,1 GB). Os scripts
+o carregam do cache local, então ele precisa ser baixado uma vez:
+
+```bash
+python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+```
+
 ## Passo a passo
 
 ```bash
@@ -82,16 +89,22 @@ O LLM escreve só os textos em português (resumo, propósito, entidades e descr
 recebendo no prompt o nome por extenso de cada demonstração (ex.: "BPA" → "Balanço Patrimonial
 Ativo") e se é consolidada ou individual.
 
+Cada tabela gera um registro por aspecto (resumo e propósito, entidades, relações, colunas e
+contas), com até 120 tokens, e o E5-base gera o vetor de cada um. Para trocar o modelo de
+embeddings sem refazer os textos do LLM, `python pipeline/offline/gerar_indice_esquema.py
+--so-indice` regera só o índice a partir do `esquema.json`.
+
 Resultado: 13 tabelas (`companhias` + 12 de demonstração), 171 registros no índice.
 
 ## Normativos (`index_glossario.json`)
 
 Extrai o texto de cada PDF em `dados/normativos/` (varredura recursiva das subpastas `cvm/` e
 `cpc/`), remove cabeçalhos e rodapés repetidos (detectados por frequência entre páginas) e divide
-o texto em trechos de até 120 tokens, com sobreposição de ~15%, respeitando limites de parágrafo
-quando possível.
+o texto em trechos de até 120 tokens (medidos com o tokenizador do E5-base), com sobreposição de
+~15%, respeitando limites de parágrafo quando possível. O E5-base aceita até 512 tokens, mas
+trechos de 250 e 400 tokens recuperaram pior que os de 120 nos testes.
 
-Resultado: 1.634 trechos (163 do CPC 03, 202 do CPC 09, 425 do CPC 26, 842 da Resolução 80).
+Resultado: 1.634 trechos (165 do CPC 03, 202 do CPC 09, 425 do CPC 26, 842 da Resolução 80).
 
 ## Conjunto de perguntas de teste (`dados/perguntas_dfp.json`)
 
@@ -110,8 +123,9 @@ SQLs de referência não foram conferidos contra os documentos originais.
 
 ## Busca (`pipeline/online/busca.py`)
 
-O MiniLM gera o vetor da pergunta, e o produto interno com os vetores normalizados do índice (igual
-ao cosseno) ordena os registros.
+O `multilingual-e5-base` gera o vetor da pergunta, com o prefixo `query: ` (os textos dos índices
+usam `passage: `, como o modelo exige). O produto interno com os vetores normalizados do índice
+(igual ao cosseno) ordena os registros.
 
 - **Glossário:** devolve os k trechos mais parecidos.
 - **Esquema:** cada tabela é pontuada pelo melhor registro de resumo ou de entidades. Registros de
