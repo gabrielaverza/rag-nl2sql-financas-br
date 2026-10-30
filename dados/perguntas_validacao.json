@@ -7,7 +7,7 @@
       "DRE_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -18,7 +18,7 @@
       "BPA_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -29,7 +29,7 @@
       "BPP_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -40,7 +40,7 @@
       "DFC_MI_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'RAIA DROGASIL S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'RAIA DROGASIL S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -51,7 +51,7 @@
       "DRE_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'KLABIN S.A.') AND CD_CONTA = '3.06' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'KLABIN S.A.') AND CD_CONTA = '3.06' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -62,7 +62,7 @@
       "DRE_ind",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM DRE_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'LOJAS RENNER S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'LOJAS RENNER S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -73,7 +73,7 @@
       "BPP_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'GERDAU S.A.') AND CD_CONTA = '2.01.04' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'GERDAU S.A.') AND CD_CONTA = '2.01.04' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": []
   },
   {
@@ -114,7 +114,7 @@
       "DVA_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '7.08.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '7.08.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": [
       "Valor adicionado representa a riqueza criada pela empresa"
     ]
@@ -127,7 +127,7 @@
       "DFC_MI_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '6.02' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '6.02' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": [
       "Atividades de investimento são as referentes à aquisição e à venda de ativos de longo prazo"
     ]
@@ -140,7 +140,7 @@
       "BPP_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT VL_CONTA FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": [
       "O passivo deve ser classificado como circulante quando satisfizer qualquer dos seguintes critérios"
     ]
