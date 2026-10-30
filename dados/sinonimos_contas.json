@@ -1,0 +1,53 @@
+{
+  "BPA": {
+    "1": ["ativo total", "total do ativo"],
+    "1.01": ["ativo circulante", "curto prazo"],
+    "1.01.01": ["caixa", "caixa e equivalentes"],
+    "1.01.02": ["aplicações financeiras"],
+    "1.01.03": ["contas a receber", "recebíveis", "clientes"],
+    "1.02": ["ativo não circulante"],
+    "1.02.01": ["realizável a longo prazo"]
+  },
+  "BPP": {
+    "2": ["total do passivo"],
+    "2.01": ["passivo circulante"],
+    "2.01.02": ["fornecedores", "contas a pagar a fornecedores"],
+    "2.02": ["passivo não circulante"],
+    "2.02.01": ["dívida de longo prazo"],
+    "2.03": ["patrimônio líquido", "PL"],
+    "2.03.01": ["capital social"],
+    "2.03.04": ["reservas de lucros"],
+    "2.03.09": ["participação de não controladores"]
+  },
+  "DRE": {
+    "3.01": ["receita líquida"],
+    "3.02": ["custo dos produtos vendidos", "CPV", "CMV", "custo das mercadorias vendidas"],
+    "3.03": ["lucro bruto"],
+    "3.04.01": ["despesas de vendas"],
+    "3.04.02": ["despesas administrativas", "despesas gerais e administrativas"],
+    "3.04.06": ["equivalência patrimonial"],
+    "3.05": ["resultado operacional", "lucro operacional"],
+    "3.06": ["resultado financeiro"],
+    "3.06.01": ["receitas financeiras"],
+    "3.06.02": ["despesas financeiras"],
+    "3.07": ["resultado antes dos tributos"],
+    "3.08": ["imposto de renda e contribuição social", "IR e CSLL", "tributos sobre o lucro"],
+    "3.11": ["lucro líquido", "resultado líquido", "lucro do exercício"]
+  },
+  "DFC_MI": {
+    "6.01": ["caixa das atividades operacionais"],
+    "6.02": ["caixa das atividades de investimento"],
+    "6.03": ["caixa das atividades de financiamento", "fluxo de caixa de financiamento"]
+  },
+  "DVA": {
+    "7.01.01": ["receita bruta"],
+    "7.03": ["valor adicionado bruto"],
+    "7.05": ["valor adicionado líquido", "valor adicionado líquido produzido"],
+    "7.07": ["valor adicionado total a distribuir", "valor adicionado total", "riqueza gerada"],
+    "7.08": ["distribuição do valor adicionado", "distribuição da riqueza"],
+    "7.08.01": ["pessoal", "gastos com pessoal"],
+    "7.08.02": ["impostos, taxas e contribuições"],
+    "7.08.03": ["remuneração de capitais de terceiros", "juros e aluguéis"],
+    "7.08.04": ["remuneração de capitais próprios", "dividendos e lucros retidos"]
+  }
+}
