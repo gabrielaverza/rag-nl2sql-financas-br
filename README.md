@@ -19,7 +19,8 @@ rag-nl2sql-financas-br/
 │   │   └── cpc/                     # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
 │   ├── dfp.db                       # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
 │   ├── perguntas_dfp.json           # conjunto de perguntas de teste
-│   └── perguntas_validacao.json     # perguntas independentes, só para medir
+│   ├── perguntas_validacao.json     # perguntas independentes, só para medir
+│   └── sinonimos_contas.json        # termos de analista de cada conta (ex.: receita líquida)
 ├── embeddings/
 │   ├── esquema.json                 # documentação do esquema, uma entrada por tabela
 │   ├── index_esquema.json           # índice vetorial de esquema
@@ -33,7 +34,9 @@ rag-nl2sql-financas-br/
 │       ├── busca.py                 # busca por similaridade nos dois índices
 │       ├── avaliar_recuperacao.py   # Recall@k e MRR da busca
 │       ├── classificador.py         # classifica a pergunta em conceitual, quantitativa ou híbrida
-│       └── avaliar_classificador.py # acurácia e matriz de confusão do classificador
+│       ├── avaliar_classificador.py # acurácia e matriz de confusão do classificador
+│       ├── gerador_sql.py           # gera e executa o SQL das perguntas quantitativas
+│       └── avaliar_sql.py           # EX do gerador de SQL
 └── requirements.txt
 ```
 
@@ -63,6 +66,7 @@ python pipeline/offline/gerar_indice_esquema.py    # 2: dados/dfp.db -> esquema.
 python pipeline/offline/gerar_indice_glossario.py  # 3: normativos -> index_glossario.json
 python pipeline/online/avaliar_recuperacao.py      # 4: mede a busca (Recall@k, MRR)
 python pipeline/online/avaliar_classificador.py    # 5: mede o classificador de intenção (acurácia)
+python pipeline/online/avaliar_sql.py              # 6: mede o gerador de SQL (EX)
 ```
 
 ## Recorte de dados
@@ -156,4 +160,40 @@ pergunta, e aceita o arquivo de perguntas como argumento:
 
 ```bash
 python pipeline/online/avaliar_classificador.py dados/perguntas_validacao.json
+```
+
+## Gerador de SQL (`pipeline/online/gerador_sql.py`)
+
+Para as perguntas quantitativas e híbridas. A busca escolhe as `k` tabelas mais parecidas com a
+pergunta (padrão `k = 3`) e acrescenta as que elas referenciam por chave estrangeira. O contexto do
+LLM traz só essas tabelas, lidas de `esquema.json`: colunas, tipos, valores possíveis das colunas
+categóricas, junções e o plano de contas. Cada conta aparece com o filtro pronto e, quando há, com os
+termos de analista de `dados/sinonimos_contas.json` (65 termos de 41 contas, todos presentes nos
+normativos indexados):
+
+```
+- Receita de Venda de Bens e/ou Serviços (também chamada de: receita líquida) -> CD_CONTA = '3.01'
+```
+
+As regras do prompt tratam de consolidado (`_con`) como padrão, `ORDEM_EXERC`, filtro de companhia
+por `LIKE` em `DENOM_CIA` e valores sempre em reais (`CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA *
+1000 ELSE VL_CONTA END`). Um nome pode combinar com mais de uma companhia (`%JBS%` traz JBS S.A. e
+JBS N.V.): o SQL não soma nem limita, e devolve uma linha por companhia, com `DENOM_CIA` na primeira
+coluna.
+
+O LLM responde com um JSON `{"sql": ...}`. O código só aceita um único `SELECT`, executa o banco em
+modo somente leitura, com limite de tempo, e devolve o erro ao LLM (ou avisa que o resultado veio
+vazio) por até 3 tentativas. `gerar_sql(pergunta, k, tabelas)` também aceita a lista de tabelas, sem
+usar a busca.
+
+`avaliar_sql.py` calcula a acurácia de execução (EX) nas perguntas com SQL de referência. Dois
+resultados são equivalentes se só diferem pela ordem das colunas e das linhas, com números
+arredondados em 2 casas. Como o gerador lista todas as companhias que combinam com o nome, o script
+também conta o EX que aceita, além das linhas da referência, as de outras companhias que combinam
+com o mesmo nome (marcado `ok+`; `DENOM_CIA` é a única coluna extra aceita). Aceita o arquivo de
+perguntas, o número de tabelas e a opção de usar as tabelas esperadas das perguntas:
+
+```bash
+python pipeline/online/avaliar_sql.py dados/perguntas_validacao.json --k 5
+python pipeline/online/avaliar_sql.py --tabelas-ideais
 ```
