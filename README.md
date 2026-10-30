@@ -36,7 +36,15 @@ rag-nl2sql-financas-br/
 │       ├── classificador.py         # classifica a pergunta em conceitual, quantitativa ou híbrida
 │       ├── avaliar_classificador.py # acurácia e matriz de confusão do classificador
 │       ├── gerador_sql.py           # gera e executa o SQL das perguntas quantitativas
-│       └── avaliar_sql.py           # EX do gerador de SQL
+│       ├── avaliar_sql.py           # EX do gerador de SQL
+│       ├── sintetizador.py          # escreve a resposta em linguagem natural
+│       ├── avaliar_sintese.py       # inspeciona a síntese
+│       ├── validador.py             # relevância do contexto e fidelidade da resposta
+│       ├── avaliar_validador.py     # inspeciona a validação
+│       ├── formatador.py            # resposta final com proveniência
+│       ├── avaliar_formatador.py    # inspeciona o formatador
+│       ├── main.py                  # orquestrador: pergunta -> resposta final
+│       └── avaliar_pipeline.py      # mede o fluxo completo (classe, EX, fidelidade, tempo)
 └── requirements.txt
 ```
 
@@ -67,6 +75,11 @@ python pipeline/offline/gerar_indice_glossario.py  # 3: normativos -> index_glos
 python pipeline/online/avaliar_recuperacao.py      # 4: mede a busca (Recall@k, MRR)
 python pipeline/online/avaliar_classificador.py    # 5: mede o classificador de intenção (acurácia)
 python pipeline/online/avaliar_sql.py              # 6: mede o gerador de SQL (EX)
+python pipeline/online/avaliar_sintese.py          # 7: inspeciona a síntese da resposta
+python pipeline/online/avaliar_validador.py        # 8: inspeciona a validação
+python pipeline/online/avaliar_formatador.py       # 9: inspeciona a resposta formatada
+python pipeline/online/avaliar_pipeline.py         # 10: mede o fluxo completo
+python pipeline/online/main.py "Qual foi a receita líquida consolidada da Ambev em 2025?"   # uma pergunta
 ```
 
 ## Recorte de dados
@@ -197,3 +210,55 @@ perguntas, o número de tabelas e a opção de usar as tabelas esperadas das per
 python pipeline/online/avaliar_sql.py dados/perguntas_validacao.json --k 5
 python pipeline/online/avaliar_sql.py --tabelas-ideais
 ```
+
+## Síntese da resposta (`pipeline/online/sintetizador.py`)
+
+Escreve a resposta em português a partir do que o LLM recebe, e só dele. No tipo conceitual, o
+contexto são os 3 trechos do glossário mais parecidos com a pergunta; no quantitativo, o resultado
+do SQL; no híbrido, os dois. O resultado do SQL entra no prompt com cada valor rotulado pelo nome
+da coluna e os números no padrão brasileiro (valores monetários já em reais). Se os trechos não
+trouxerem a informação pedida, o LLM responde que não encontrou nos documentos disponíveis; numa
+pergunta híbrida, a parte de dados é respondida mesmo assim. A resposta tem limite de tokens. A
+função devolve também o contexto mostrado ao LLM, que a validação usa.
+
+`avaliar_sintese.py` usa o SQL de referência (para isolar a síntese dos erros do gerador), imprime
+as respostas, conta quantos números do resultado aparecem no texto e confere se perguntas fora do
+escopo dos normativos são recusadas.
+
+## Validação (`pipeline/online/validador.py`)
+
+Duas verificações com o mesmo LLM, em temperatura 0:
+
+- **Relevância do contexto:** cada trecho do glossário é julgado como relevante ou não para a
+  pergunta (fração de trechos relevantes).
+- **Fidelidade:** a resposta é decomposta em afirmações e cada uma é verificada contra o contexto
+  (fração de afirmações sustentadas). Uma resposta sem afirmações, como uma recusa, tem fidelidade 1.
+
+A resposta é aprovada se a fidelidade for pelo menos 0,8. `avaliar_validador.py` aplica a validação
+a respostas geradas e a casos conhecidos (número trocado, fato inventado e resposta correta).
+
+## Resposta final (`pipeline/online/formatador.py`)
+
+Monta o texto entregue: a resposta, a tabela de dados do resultado do SQL (até 20 linhas) e a
+proveniência. Os quatro campos da proveniência vêm do SQL gerado e do banco, sem LLM: **empresa e
+código CVM** (as companhias do resultado ou as que o SQL filtra), **demonstração financeira** (as
+tabelas citadas no SQL, com consolidada ou individual) e **exercício social** (período das linhas da
+demonstração para o exercício usado). Também entram a consulta SQL e os documentos do glossário
+usados; numa recusa nenhum documento é listado. Se a fidelidade ficar abaixo do limiar, a resposta
+recebe um aviso. `avaliar_formatador.py` mostra casos de cada tipo, um com nome ambíguo e um com
+fidelidade baixa.
+
+## Fluxo completo (`pipeline/online/main.py`)
+
+`executar(pergunta)` classifica a pergunta e segue o caminho do tipo: gera o SQL (quantitativa e
+híbrida), sintetiza, valida e formata. Se o SQL falha em todas as tentativas, a pergunta
+quantitativa recebe uma mensagem de falha e a híbrida é respondida só com os normativos, com um
+aviso. Pela linha de comando, recebe a pergunta como argumento:
+
+```bash
+python pipeline/online/main.py "Qual foi o lucro líquido consolidado da Ambev em 2025?"
+```
+
+`avaliar_pipeline.py` roda o fluxo em todas as perguntas de um arquivo e resume: acerto da classe,
+EX do SQL, fidelidade e relevância médias, respostas aprovadas e tempo. A opção `--saida` grava as
+respostas completas em JSON.
