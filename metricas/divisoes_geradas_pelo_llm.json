@@ -1,0 +1,82 @@
+[
+  {
+    "id": "h01",
+    "pergunta": "Qual foi o caixa líquido das atividades operacionais da Ambev em 2025, e como o método indireto chega a esse valor?",
+    "parte_dados": "Qual foi o caixa líquido das atividades operacionais da Ambev em 2025?",
+    "parte_conceitual": "Como o método indireto chega a esse valor?",
+    "dividida": true,
+    "segundos": 10.33
+  },
+  {
+    "id": "h02",
+    "pergunta": "Quanto a Ambev distribuiu para pessoal na DVA de 2025, e o que representa o valor adicionado que está sendo distribuído?",
+    "parte_dados": "Quanto a Ambev distribuiu para pessoal na DVA de 2025?",
+    "parte_conceitual": "O que representa o valor adicionado que está sendo distribuído?",
+    "dividida": true,
+    "segundos": 1.6
+  },
+  {
+    "id": "h03",
+    "pergunta": "Qual foi o ativo total consolidado da Alpargatas em 2025, e o balanço patrimonial é um dos quais documentos do conjunto completo de demonstrações contábeis?",
+    "parte_dados": "Qual foi o ativo total consolidado da Alpargatas em 2025?",
+    "parte_conceitual": "O balanço patrimonial é um dos quais documentos do conjunto completo de demonstrações contábeis?",
+    "dividida": true,
+    "segundos": 1.84
+  },
+  {
+    "id": "h04",
+    "pergunta": "Quantas companhias reportaram prejuízo líquido em 2025, e que informações periódicas uma companhia aberta deve divulgar segundo a Resolução CVM 80?",
+    "parte_dados": "Quantas companhias reportaram prejuízo líquido em 2025?",
+    "parte_conceitual": "Que informações periódicas uma companhia aberta deve divulgar segundo a Resolução CVM 80?",
+    "dividida": true,
+    "segundos": 1.88
+  },
+  {
+    "id": "h05",
+    "pergunta": "Qual foi o caixa e equivalentes de caixa da Ambev no balanço de 2025, e o que são equivalentes de caixa segundo o CPC 03?",
+    "parte_dados": "Qual foi o caixa e equivalentes de caixa da Ambev no balanço de 2025?",
+    "parte_conceitual": "O que são equivalentes de caixa segundo o CPC 03?",
+    "dividida": true,
+    "segundos": 1.73
+  },
+  {
+    "id": "h06",
+    "pergunta": "Qual foi o patrimônio líquido consolidado da Ambev em 2025, e a demonstração das mutações do patrimônio líquido faz parte de qual conjunto de demonstrações?",
+    "parte_dados": "Qual foi o patrimônio líquido consolidado da Ambev em 2025?",
+    "parte_conceitual": "A demonstração das mutações do patrimônio líquido faz parte de qual conjunto de demonstrações?",
+    "dividida": true,
+    "segundos": 1.88
+  },
+  {
+    "id": "h07",
+    "pergunta": "Entre Ambev e JBS, qual teve maior receita líquida em 2025, e quais grupos compõem a distribuição do valor adicionado que essas companhias também divulgam?",
+    "parte_dados": "Entre Ambev e JBS, qual teve maior receita líquida em 2025?",
+    "parte_conceitual": "Quais grupos compõem a distribuição do valor adicionado que essas companhias também divulgam?",
+    "dividida": true,
+    "segundos": 1.91
+  },
+  {
+    "id": "v11",
+    "pergunta": "Quanto a WEG distribuiu para pessoal em 2025 e o que é o valor adicionado que está sendo distribuído?",
+    "parte_dados": "Quanto a WEG distribuiu para pessoal em 2025?",
+    "parte_conceitual": "O que é o valor adicionado que está sendo distribuído?",
+    "dividida": true,
+    "segundos": 1.48
+  },
+  {
+    "id": "v12",
+    "pergunta": "Qual foi o caixa líquido das atividades de investimento da Suzano em 2025 e o que entra nessa atividade?",
+    "parte_dados": "Qual foi o caixa líquido das atividades de investimento da Suzano em 2025?",
+    "parte_conceitual": "O que entra nessa atividade?",
+    "dividida": true,
+    "segundos": 1.49
+  },
+  {
+    "id": "v13",
+    "pergunta": "Qual o passivo circulante da Natura e o que faz um passivo ser circulante?",
+    "parte_dados": "Qual o passivo circulante da Natura?",
+    "parte_conceitual": "O que faz um passivo ser circulante?",
+    "dividida": true,
+    "segundos": 1.22
+  }
+]
