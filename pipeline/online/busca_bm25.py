@@ -11,8 +11,9 @@ Descrição geral do funcionamento:
   palavras, remoção de stopwords do português (lista do NLTK) e, se pedido, radicalização com o
   stemmer Snowball do português. No fim, os acentos são removidos (o stemmer recebe a palavra
   ainda acentuada, porque as regras dele usam os acentos).
-- A pontuação é o Okapi BM25 da biblioteca rank_bm25, com os parâmetros padrão (k1 = 1,5, b = 0,75
-  e epsilon = 0,25), sem ajuste.
+- A pontuação é o Okapi BM25 da biblioteca rank_bm25, sem ajuste nos dados. Por padrão usa k1 = 2 e
+  b = 0,5, a combinação comum citada por Robertson e Zaragoza (2009, p. 31); os valores da biblioteca
+  (k1 = 1,5 e b = 0,75) podem ser passados no construtor. O epsilon fica no padrão da biblioteca (0,25).
 - A interface é a mesma de Indice (buscar e buscar_por_fonte), então buscar_tabelas de busca.py
   funciona sem mudança. A consulta é o texto da pergunta, no lugar do vetor.
 - No índice de esquema, só os registros de resumo e de entidades participam da pontuação e do
@@ -37,6 +38,13 @@ import numpy as np
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 from rank_bm25 import BM25Okapi
+
+# Combinação comum de k1 e b citada por Robertson e Zaragoza (2009, p. 31).
+K1_REFERENCIA = 2.0
+B_REFERENCIA = 0.5
+# Padrões da biblioteca rank_bm25, dentro das faixas 1,2 < k1 < 2 e 0,5 < b < 0,8 (mesma obra, p. 30).
+K1_BIBLIOTECA = 1.5
+B_BIBLIOTECA = 0.75
 
 _stopwords = None
 _stemmer = SnowballStemmer("portuguese")
@@ -70,7 +78,10 @@ def preprocessar(texto: str, radicalizar: bool) -> list[str]:
 
 class IndiceBM25:
     # Lê os registros de um índice, descarta as seções fora da pontuação e monta o BM25.
-    def __init__(self, caminho: str, radicalizar: bool, secoes_fora: tuple[str, ...] = ()):
+    def __init__(
+        self, caminho: str, radicalizar: bool, secoes_fora: tuple[str, ...] = (),
+        k1: float = K1_REFERENCIA, b: float = B_REFERENCIA,
+    ):
         with open(caminho, encoding="utf-8") as f:
             todos = json.load(f)
         self.registros = [
@@ -79,7 +90,7 @@ class IndiceBM25:
             if not any(r["conteudo"].startswith(f"Tabela {r['fonte']}. {secao}:") for secao in secoes_fora)
         ]
         self.radicalizar = radicalizar
-        self.bm25 = BM25Okapi([preprocessar(r["conteudo"], radicalizar) for r in self.registros])
+        self.bm25 = BM25Okapi([preprocessar(r["conteudo"], radicalizar) for r in self.registros], k1=k1, b=b)
 
     # Pontua todos os registros para uma pergunta.
     def _pontuar(self, consulta: str) -> np.ndarray:
