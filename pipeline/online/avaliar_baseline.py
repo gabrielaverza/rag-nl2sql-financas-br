@@ -1,11 +1,11 @@
 """
 Etapa: Online (avaliação do baseline de recuperação).
 
-Função: compara a busca por embeddings (E5-base) com o baseline BM25, sem e com stemmer, nas
-mesmas perguntas.
+Função: compara a busca por embeddings (E5-base) com o baseline BM25 (sem e com stemmer) e com a
+fusão dos dois por RRF, nas mesmas perguntas.
 
 Descrição geral do funcionamento:
-- As premissas são as mesmas nos três métodos: mesmas perguntas, mesmos registros indexados,
+- As premissas são as mesmas em todos os métodos: mesmas perguntas, mesmos registros indexados,
   mesma pontuação por tabela (melhor registro de resumo ou entidades) e mesma expansão por chave
   estrangeira. Mudam só o método de pontuação e, no BM25, o pré-processamento do texto.
 - Tabelas (quantitativas e híbridas): Recall@k, cobertura total@k (todas as tabelas esperadas na
@@ -16,12 +16,14 @@ Descrição geral do funcionamento:
   usa a fórmula do monografia.tex (DCG com o desconto 1/log2(i) a partir da posição 2).
 - Híbridas: contagem das perguntas com as tabelas completas e o trecho relevante ao mesmo tempo
   no top-k.
+- Por índice e por tipo: as duas políticas de busca_roteada.py (tabelas E5 e trechos BM25; e a anterior,
+  com RRF nas híbridas) aplicadas com o tipo correto de cada pergunta.
 - Piso aleatório: valor esperado de uma lista sorteada ao acaso, por fórmula exata (sem sorteio).
 - Comparação pareada por pergunta: diferença média, intervalo de 95% por bootstrap (10.000
   reamostragens, semente 42) e vitórias, derrotas e empates.
 
 Dependências:
-- pipeline/online/busca.py, busca_bm25.py e avaliar_recuperacao.py, e os índices e o esquema em
+- pipeline/online/busca.py, busca_bm25.py, fusao_rrf.py, busca_roteada.py e avaliar_recuperacao.py, e os índices e o esquema em
   embeddings/;
 - bibliotecas numpy, sentence-transformers, rank-bm25 e nltk (com o corpus de stopwords);
 - arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
@@ -57,7 +59,9 @@ from busca import (
     carregar_tabelas_referenciadas,
     vetorizar,
 )
-from busca_bm25 import IndiceBM25
+from busca_bm25 import B_BIBLIOTECA, B_REFERENCIA, K1_BIBLIOTECA, K1_REFERENCIA, IndiceBM25
+from busca_roteada import POLITICA_HIBRIDA_RRF, POLITICA_PADRAO
+from fusao_rrf import CONSTANTE_RRF, IndiceHibrido
 
 CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 PASTA_SAIDA = "metricas"
@@ -68,6 +72,14 @@ TABELA_COMUM = "companhias"
 AMOSTRAS_BOOTSTRAP = 10000
 SEMENTE = 42
 NOME_PISO = "Piso aleatório"
+NOME_E5 = "E5-base (embeddings)"
+NOME_BM25 = "BM25 sem stemmer"
+NOME_BM25_STEMMER = "BM25 com stemmer (Snowball)"
+NOME_BM25_BIBLIOTECA = "BM25 sem stemmer (parâmetros da biblioteca)"
+NOME_RRF = "RRF (E5 + BM25)"
+NOME_ROTEADO = "Por índice (tabelas E5, trechos BM25)"
+NOME_ROTEADO_RRF = "Por tipo (híbrida com RRF)"
+NOME_DO_METODO = {"embeddings": NOME_E5, "bm25": NOME_BM25, "rrf": NOME_RRF}
 
 # Pares comparados: (chave da métrica, descrição).
 METRICAS_COMPARADAS = [
@@ -93,14 +105,26 @@ class Metodo:
         self.lexical = lexical
 
 
-# Cria o método de embeddings e as duas variantes do BM25.
+# Cria o método de embeddings, as variantes do BM25 e a fusão dos dois por RRF.
 def criar_metodos() -> list[Metodo]:
-    metodos = [Metodo("E5-base (embeddings)", Indice(CAMINHO_INDICE_ESQUEMA), Indice(CAMINHO_INDICE_GLOSSARIO), vetorizar, False)]
-    for nome, radicalizar in (("BM25 sem stemmer", False), ("BM25 com stemmer (Snowball)", True)):
-        esquema = IndiceBM25(CAMINHO_INDICE_ESQUEMA, radicalizar, SECOES_FORA_DA_PONTUACAO)
-        glossario = IndiceBM25(CAMINHO_INDICE_GLOSSARIO, radicalizar)
+    e5 = Metodo(NOME_E5, Indice(CAMINHO_INDICE_ESQUEMA), Indice(CAMINHO_INDICE_GLOSSARIO), vetorizar, False)
+    metodos = [e5]
+    variantes = (
+        (NOME_BM25, False, K1_REFERENCIA, B_REFERENCIA),
+        (NOME_BM25_STEMMER, True, K1_REFERENCIA, B_REFERENCIA),
+        (NOME_BM25_BIBLIOTECA, False, K1_BIBLIOTECA, B_BIBLIOTECA),
+    )
+    for nome, radicalizar, k1, b in variantes:
+        esquema = IndiceBM25(CAMINHO_INDICE_ESQUEMA, radicalizar, SECOES_FORA_DA_PONTUACAO, k1, b)
+        glossario = IndiceBM25(CAMINHO_INDICE_GLOSSARIO, radicalizar, k1=k1, b=b)
         metodos.append(Metodo(nome, esquema, glossario, lambda texto: texto, True))
-    return metodos
+    # A fusão usa o BM25 sem stemmer, com os parâmetros da referência.
+    bm25 = metodos[1]
+    rrf = Metodo(
+        NOME_RRF, IndiceHibrido(e5.esquema, bm25.esquema), IndiceHibrido(e5.glossario, bm25.glossario),
+        lambda texto: (vetorizar(texto), texto), False,
+    )
+    return metodos + [rrf]
 
 
 # ---------------------------------------------------------------------------
@@ -241,6 +265,26 @@ def avaliar_piso(p: dict, n_tabelas: int, n_trechos: int, n_relevantes: int) -> 
 # 3) Agregação e comparação pareada
 # ---------------------------------------------------------------------------
 
+# Monta o resultado da busca por tipo: tabelas e trechos de cada pergunta vêm do método que a política indica.
+def montar_roteado(perguntas: list[dict], resultados: dict, politica: dict) -> list[dict]:
+    roteado = []
+    for i, p in enumerate(perguntas):
+        passos = politica.get(p["tipo"], {})
+        m, posicoes = {}, {}
+        for onde, prefixos in (("tabelas", ("tab_", "tabsem_")), ("trechos", ("glo_",))):
+            metodo = passos.get(onde)
+            if metodo is None:
+                continue
+            origem = resultados[NOME_DO_METODO[metodo]][i]
+            m.update({c: v for c, v in origem["m"].items() if c.startswith(prefixos)})
+            if onde in origem["posicoes"]:
+                posicoes[onde] = origem["posicoes"][onde]
+        if p["tipo"] == "hibrida" and p["tabelas_esperadas"] and p["evidencia"]:
+            juntar_hibrida(m)
+        roteado.append({"id": p["id"], "tipo": p["tipo"], "m": m, "posicoes": posicoes})
+    return roteado
+
+
 # Média de uma métrica sobre as perguntas que a têm, e quantas perguntas entraram.
 def media(resultados: list[dict], chave: str):
     valores = [r["m"][chave] for r in resultados if r["m"].get(chave) is not None]
@@ -308,16 +352,20 @@ def montar_relatorio(caminho_perguntas: str, perguntas: list[dict], resultados: 
     bm25 = metodos[1]
     diag_e = bm25.esquema.diagnostico()
     diag_g = bm25.glossario.diagnostico()
-    k1, b, eps = bm25.esquema.bm25.k1, bm25.esquema.bm25.b, bm25.esquema.bm25.epsilon
+    eps = bm25.esquema.bm25.epsilon
+    params = "; ".join(f"{m.nome}: k1 = {fmt(m.esquema.bm25.k1)}, b = {fmt(m.esquema.bm25.b)}" for m in metodos if m.lexical)
 
-    t = [f"# Baseline BM25 contra E5-base: recuperação ({os.path.basename(caminho_perguntas)})", ""]
+    t = [f"# Baseline BM25 e fusão RRF contra E5-base: recuperação ({os.path.basename(caminho_perguntas)})", ""]
     t += [
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `python pipeline/online/avaliar_baseline.py {caminho_perguntas}`.",
         f"- Perguntas: {len(perguntas)} no arquivo; {n_tab} com tabelas esperadas, {n_glo} com evidência, {n_hib} híbridas com os dois.",
         f"- Bibliotecas: rank-bm25 {version('rank-bm25')}, nltk {version('nltk')}, sentence-transformers {version('sentence-transformers')}, numpy {version('numpy')}.",
-        f"- BM25: Okapi BM25 da rank_bm25, parâmetros padrão sem ajuste (k1 = {fmt(k1)}, b = {fmt(b)}, epsilon = {fmt(eps)}).",
+        f"- BM25: Okapi BM25 da rank_bm25, sem ajuste nos dados. Parâmetros: {params}; epsilon = {fmt(eps)} (padrão da biblioteca). Os valores k1 = 2 e b = 0,5 são a combinação comum citada por Robertson e Zaragoza (2009, p. 31); os da biblioteca (k1 = 1,5 e b = 0,75) ficam dentro das faixas 0,5 < b < 0,8 e 1,2 < k1 < 2 (p. 30) e entram só como verificação de sensibilidade.",
+        f"- RRF: fusão por posição dos rankings do E5-base e do BM25 sem stemmer; a nota de cada item é a soma de 1 / (k + posição), com k = {CONSTANTE_RRF}, o valor do artigo original (Cormack, Clarke e Büttcher, 2009), sem ajuste. No glossário reproduz a busca híbrida do MimirRAG; no esquema é uma extensão exploratória (as tabelas fundidas recebem depois a expansão por chave estrangeira).",
+        "- Por índice: a política padrão de busca_roteada.py, com as tabelas buscadas pelo E5-base e os trechos pelo BM25 (BM25 sem stemmer, k1 = 2 e b = 0,5), para todos os tipos de pergunta, aplicada com o tipo correto de cada pergunta (sem erro do classificador). Foi escolhida pela autora depois de ver os resultados dos métodos nestes mesmos conjuntos, então esta linha NÃO é uma confirmação independente: só a avaliação em perguntas novas pode confirmá-la.",
+        "- Por tipo (híbrida com RRF): a política anterior de busca_roteada.py (quantitativa: tabelas com E5; conceitual: trechos com BM25; híbrida: tabelas e trechos com RRF), mantida só para comparação.",
         "- Pré-processamento do BM25: minúsculas, palavras (letras e dígitos), stopwords do português do NLTK, stemmer Snowball do português só na variante com stemmer, acentos removidos no fim. O E5-base recebe a pergunta com o prefixo `query: `.",
-        "- Premissas iguais nos três métodos: mesmas perguntas, mesmos registros indexados, pontuação da tabela pelo melhor registro de resumo ou entidades, expansão por chave estrangeira, mesmos k.",
+        "- Premissas iguais em todos os métodos: mesmas perguntas, mesmos registros indexados, pontuação da tabela pelo melhor registro de resumo ou entidades, expansão por chave estrangeira, mesmos k.",
         f"- Índice de esquema no BM25 (só resumo e entidades): {diag_e['registros']} registros, {diag_e['palavras']} palavras, {diag_e['idf_negativo']} em mais da metade dos registros (IDF negativo trocado por epsilon vezes o IDF médio = {fmt(diag_e['piso_idf'], 3)}; IDF médio = {fmt(diag_e['idf_medio'], 3)}), na variante sem stemmer.",
         f"- Índice do glossário no BM25: {diag_g['registros']} trechos, {diag_g['palavras']} palavras, {diag_g['idf_negativo']} em mais da metade dos trechos, na variante sem stemmer.",
         "",
@@ -358,12 +406,14 @@ def montar_relatorio(caminho_perguntas: str, perguntas: list[dict], resultados: 
         "## 5. Ressalvas",
         "",
         f"- Amostras pequenas ({n_tab} perguntas de tabelas, {n_glo} de trechos, {n_hib} híbridas): uma pergunta vale de 5 a 10 pontos percentuais, e diferenças de 1 a 3 perguntas são ruído. Os intervalos de bootstrap refletem só a variação entre perguntas deste conjunto.",
-        "- O BM25 roda com os parâmetros padrão, sem ajuste. A regra de pontuação por tabela foi escolhida olhando o conjunto de teste (`perguntas_dfp.json`), e a escolha do E5-base entre quatro modelos usou as perguntas de teste e de validação. Logo, nenhum dos dois conjuntos é totalmente independente para o E5-base, e o teste o favorece mais; o BM25 não foi ajustado em nenhum deles.",
+        "- O BM25 roda sem ajuste nos dados (parâmetros tirados da referência, ver acima). A regra de pontuação por tabela foi escolhida olhando o conjunto de teste (`perguntas_dfp.json`), e a escolha do E5-base entre quatro modelos usou as perguntas de teste e de validação. Logo, nenhum dos dois conjuntos é totalmente independente para o E5-base, e o teste o favorece mais; o BM25 não foi ajustado em nenhum deles.",
         "- Cada pergunta tem uma só evidência literal, e um trecho só conta como relevante se a contém. Trechos úteis sem essa frase contam como erro, e a Precision@k fica limitada (com um relevante e k = 5, o máximo é 0,2).",
         "- As perguntas foram escritas pela autora; as do teste, com a evidência à vista, o que tende a favorecer a busca por palavras.",
-        "- A tabela companhias está entre as esperadas em quase todas as perguntas e entra na lista pela regra de chave estrangeira nos três métodos; a seção 1.2 mostra o acerto sem ela.",
+        "- A tabela companhias está entre as esperadas em quase todas as perguntas e entra na lista pela regra de chave estrangeira em todos os métodos; a seção 1.2 mostra o acerto sem ela.",
         "- Nenhuma referência do trabalho define um valor mínimo aceitável de Recall. O piso aleatório e o BM25 são referências relativas.",
         "- Empates de pontuação no BM25 ficam na ordem do índice (alfabética por tabela no esquema).",
+        "- O RRF usa k = 60 como no artigo original, sem ajuste. A escolha do BM25 sem stemmer para a fusão veio de resultados anteriores (o stemmer piorou a recuperação dos trechos), então é uma escolha informada pelos próprios dados.",
+        "- No esquema, a fusão é uma extensão exploratória do que o MimirRAG faz, pois ele aplica a fusão só a trechos de documentos.",
         "",
     ]
     return "\n".join(t)
@@ -415,14 +465,19 @@ def main():
             avaliar_pergunta(metodo, p, referenciadas, n_tabelas, n_trechos, relevantes.get(p["id"], set()))
             for p in perguntas
         ]
+    resultados[NOME_ROTEADO] = montar_roteado(perguntas, resultados, POLITICA_PADRAO)
+    resultados[NOME_ROTEADO_RRF] = montar_roteado(perguntas, resultados, POLITICA_HIBRIDA_RRF)
     resultados[NOME_PISO] = [
         avaliar_piso(p, n_tabelas, n_trechos, len(relevantes.get(p["id"], ())))
         for p in perguntas
     ]
 
     rng = np.random.default_rng(SEMENTE)
-    nomes = [m.nome for m in metodos]
-    pares = [(nomes[0], nomes[1]), (nomes[0], nomes[2]), (nomes[2], nomes[1])]
+    pares = [
+        (NOME_E5, NOME_BM25), (NOME_RRF, NOME_E5), (NOME_RRF, NOME_BM25),
+        (NOME_BM25_STEMMER, NOME_BM25), (NOME_BM25_BIBLIOTECA, NOME_BM25),
+        (NOME_ROTEADO, NOME_E5), (NOME_ROTEADO, NOME_ROTEADO_RRF),
+    ]
     linhas = []
     for primeiro, segundo in pares:
         for chave, descricao in METRICAS_COMPARADAS:
