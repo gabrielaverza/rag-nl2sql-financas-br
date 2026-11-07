@@ -1,0 +1,52 @@
+[
+  {
+    "id": "h01",
+    "parte_dados": "Qual foi o caixa líquido das atividades operacionais da Ambev em 2025?",
+    "parte_conceitual": "Como o método indireto chega ao caixa líquido das atividades operacionais?"
+  },
+  {
+    "id": "h02",
+    "parte_dados": "Quanto a Ambev distribuiu para pessoal na DVA de 2025?",
+    "parte_conceitual": "O que representa o valor adicionado que está sendo distribuído?"
+  },
+  {
+    "id": "h03",
+    "parte_dados": "Qual foi o ativo total consolidado da Alpargatas em 2025?",
+    "parte_conceitual": "O balanço patrimonial é um dos documentos do conjunto completo de demonstrações contábeis?"
+  },
+  {
+    "id": "h04",
+    "parte_dados": "Quantas companhias reportaram prejuízo líquido em 2025?",
+    "parte_conceitual": "Que informações periódicas uma companhia aberta deve divulgar segundo a Resolução CVM 80?"
+  },
+  {
+    "id": "h05",
+    "parte_dados": "Qual foi o caixa e equivalentes de caixa da Ambev no balanço de 2025?",
+    "parte_conceitual": "O que são equivalentes de caixa segundo o CPC 03?"
+  },
+  {
+    "id": "h06",
+    "parte_dados": "Qual foi o patrimônio líquido consolidado da Ambev em 2025?",
+    "parte_conceitual": "A demonstração das mutações do patrimônio líquido faz parte de qual conjunto de demonstrações?"
+  },
+  {
+    "id": "h07",
+    "parte_dados": "Entre Ambev e JBS, qual teve maior receita líquida em 2025?",
+    "parte_conceitual": "Quais grupos compõem a distribuição do valor adicionado?"
+  },
+  {
+    "id": "v11",
+    "parte_dados": "Quanto a WEG distribuiu para pessoal em 2025?",
+    "parte_conceitual": "O que é o valor adicionado que está sendo distribuído?"
+  },
+  {
+    "id": "v12",
+    "parte_dados": "Qual foi o caixa líquido das atividades de investimento da Suzano em 2025?",
+    "parte_conceitual": "O que entra nas atividades de investimento?"
+  },
+  {
+    "id": "v13",
+    "parte_dados": "Qual o passivo circulante da Natura?",
+    "parte_conceitual": "O que faz um passivo ser circulante?"
+  }
+]
