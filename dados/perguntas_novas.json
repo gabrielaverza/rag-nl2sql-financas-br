@@ -41,10 +41,10 @@
   },
   {
     "id": "nq05",
-    "pergunta": "Qual era o patrimônio líquido consolidado da TIM ao fim de 2025?",
+    "pergunta": "Qual era o patrimônio líquido da TIM ao fim de 2025, nas demonstrações individuais?",
     "tipo": "quantitativa",
     "tabelas_esperadas": [
-      "BPP_con",
+      "BPP_ind",
       "companhias"
     ],
     "evidencia": []
@@ -146,11 +146,11 @@
   },
   {
     "id": "nc06",
-    "pergunta": "De que depende a materialidade de uma omissão ou divulgação distorcida nas demonstrações contábeis?",
+    "pergunta": "De que depende a materialidade de uma informação nas demonstrações contábeis?",
     "tipo": "conceitual",
     "tabelas_esperadas": [],
     "evidencia": [
-      "A materialidade depende do tamanho e da natureza da omissão ou da divulgação distorcida, julgada à luz das circunstâncias que a rodeiam."
+      "A materialidade depende da natureza ou magnitude da informação, ou de ambas."
     ]
   },
   {
