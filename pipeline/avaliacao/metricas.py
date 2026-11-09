@@ -21,6 +21,8 @@ Descrição geral do funcionamento:
   rara, entre as da pergunta que são o início de uma palavra do nome da companhia de referência,
   ignorando as palavras comuns nos nomes das companhias (as que aparecem em mais de 1% dos nomes). A
   frequência vem dos nomes do banco.
+- Conferência dos números (sem LLM): quantos valores numéricos do resultado do SQL aparecem no texto
+  da resposta, comparando só os dígitos. Serve às perguntas com dados; não é métrica de artigo.
 - Formatação: números com vírgula decimal e tabelas em Markdown, para os relatórios.
 
 Dependências: só a biblioteca padrão do Python. Não lê arquivos nem chama o LLM.
@@ -174,7 +176,30 @@ def resultado_adaptado(colunas: list[str], gerado: list[tuple], referencia: list
 
 
 # ---------------------------------------------------------------------------
-# 3) Formatação dos relatórios
+# 3) Conferência dos números da resposta
+# ---------------------------------------------------------------------------
+
+MAX_LINHAS_CONFERIDAS = 30
+
+
+def so_digitos(texto: str) -> str:
+    return re.sub(r"[^0-9]", "", texto)
+
+
+# Conta os valores numéricos do resultado que aparecem na resposta. Compara só os dígitos, para
+# "88.242.467.000,00" casar com 88242467000.0. Valores com parte decimal usam as 2 casas.
+def numeros_presentes(resposta: str, linhas: list) -> tuple[int, int]:
+    alvo = so_digitos(resposta)
+    numeros = [v for linha in linhas[:MAX_LINHAS_CONFERIDAS] for v in linha if isinstance(v, (int, float))]
+    achados = 0
+    for v in numeros:
+        texto = f"{v:.0f}" if float(v) == round(v) else f"{v:.2f}"
+        achados += so_digitos(texto) in alvo
+    return achados, len(numeros)
+
+
+# ---------------------------------------------------------------------------
+# 4) Formatação dos relatórios
 # ---------------------------------------------------------------------------
 
 # Escreve um número com vírgula decimal, ou "n/d" se não houver.

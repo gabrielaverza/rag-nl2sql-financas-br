@@ -36,13 +36,14 @@ Executar de dentro de rag-nl2sql-financas-br/:
 import argparse
 import json
 import os
-import re
 import sys
 
 # Os módulos do fluxo ficam em pipeline/online/ e os compartilhados em pipeline/.
 PASTA = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(PASTA, "..", "online"))
 sys.path.insert(0, os.path.join(PASTA, ".."))
+
+from metricas import numeros_presentes  # noqa: E402
 
 CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 
@@ -53,7 +54,6 @@ FORA_DO_ESCOPO = [
     "Qual a capital da França?",
     "Qual é o preço da ação da Petrobras hoje?",
 ]
-MAX_LINHAS_CONFERIDAS = 30
 QUANTITATIVAS_POR_PADRAO = 5
 
 # Validador. Quantitativas conferidas (as demais são puladas para o teste não demorar).
@@ -98,22 +98,6 @@ def resultado_de_referencia(p: dict, com_tabelas: bool = False):
 # ---------------------------------------------------------------------------
 # 1) Síntese
 # ---------------------------------------------------------------------------
-
-def so_digitos(texto: str) -> str:
-    return re.sub(r"[^0-9]", "", texto)
-
-
-# Conta os valores numéricos do resultado que aparecem na resposta. Compara só os dígitos, para
-# "88.242.467.000,00" casar com 88242467000.0. Valores com parte decimal usam as 2 casas.
-def numeros_presentes(resposta: str, linhas: list[tuple]) -> tuple[int, int]:
-    alvo = so_digitos(resposta)
-    numeros = [v for linha in linhas[:MAX_LINHAS_CONFERIDAS] for v in linha if isinstance(v, (int, float))]
-    achados = 0
-    for v in numeros:
-        texto = f"{v:.0f}" if float(v) == round(v) else f"{v:.2f}"
-        achados += so_digitos(texto) in alvo
-    return achados, len(numeros)
-
 
 # Imprime as respostas da síntese com o SQL de referência e confere as recusas fora do escopo.
 def verificar_sintese(todas: bool):

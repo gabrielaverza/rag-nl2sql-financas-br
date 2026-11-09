@@ -20,7 +20,8 @@ Descrição geral do funcionamento:
   guardadas em metricas/divisoes_hibridas.json, para todas as configurações usarem as mesmas.
 - Nível pipeline: para cada rodada, configuração e pergunta, chama executar() de main.py e mede a
   classe prevista, o EX (estrito e adaptado, que aceita a coluna DENOM_CIA e linhas de companhias com o nome da pergunta), a
-  fidelidade, a relevância do contexto, a aprovação do validador e o tempo de cada passo. O SQL gerado
+  o tempo de cada passo; guarda no respostas.json o texto da resposta, o contexto e o resultado do SQL,
+  que o ragas_avaliacao.py usa para a RAGAS (fidelidade e relevância da resposta). O SQL gerado
   fica em um cache por (pergunta, tabelas do contexto) que vale entre as configurações da mesma
   rodada e é refeito a cada rodada, para a variação do LLM aparecer nas rodadas. Com
   "tabelas_ideais": true, uma passada extra gera o SQL só com as tabelas de tabelas_esperadas.
@@ -123,8 +124,6 @@ METRICAS_PIPELINE = [
     ("ex_estrito", "EX estrito", "contagem"),
     ("ideal_ex_adaptado", "EX adaptado com tabelas ideais", "contagem"),
     ("ideal_ex_estrito", "EX estrito com tabelas ideais", "contagem"),
-    ("fidelidade", "Fidelidade média", "media"),
-    ("relevancia", "Relevância média do contexto", "media"),
     ("tempo_total", "Tempo total por pergunta (s)", "media"),
 ]
 PASSOS = ("classificador", "divisor", "sql", "sintese", "validacao")
@@ -153,7 +152,6 @@ DESCRICAO_METRICAS = [
     ("EX estrito (`ex_estrito`)", "0 ou 1", "O resultado do SQL gerado é igual ao do `sql_referencia` (ordem das colunas e das linhas ignorada, números com 2 casas). Só nas perguntas com SQL."),
     ("EX adaptado (`ex_adaptado`)", "0 ou 1", "Vale se o EX estrito vale ou se o resultado traz todas as linhas da referência (a coluna `DENOM_CIA` é tolerada) e as linhas a mais são de companhias cujo `DENOM_CIA` contém a palavra que identifica a companhia dita na pergunta. Adaptação do EX de Zhong et al. (2020), sem artigo; mais permissiva que o EX estrito."),
     ("Tabelas ideais (`ideal_ex_*`)", "0 ou 1", "EX do SQL gerado quando o gerador recebe as tabelas certas (`tabelas_esperadas`) em vez das da busca. É um teto, e a diferença para o EX normal mostra quanto da perda vem da busca."),
-    ("Fidelidade e relevância (`fidelidade`, `relevancia`)", "0 a 1", "Do validador: fração das afirmações da resposta sustentadas pelo contexto, e fração dos trechos que contribuem para a pergunta. Medem sustentação pelo contexto, não a correção do dado."),
     ("Tempos (`tempo_*`)", "segundos", "Tempo da pergunta inteira e de cada passo do fluxo. Menor é melhor."),
 ]
 
@@ -363,14 +361,10 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
                 r = executar(p["pergunta"], cache_sql=cache)
                 total = time.time() - inicio
                 r_sql = r["resultado_sql"]
-                v = r["validacao"]
                 m = {
                     "classe_certa": float(r["classe"] == p["tipo"]),
-                    "fidelidade": v["fidelidade"]["score"],
                     "tempo_total": total,
                 }
-                if v["relevancia_contexto"]["score"] is not None:
-                    m["relevancia"] = v["relevancia_contexto"]["score"]
                 for passo in PASSOS:
                     if passo in r["tempos"]:
                         m[f"tempo_{passo}"] = r["tempos"][passo]
@@ -386,6 +380,10 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
                     "rodada": rodada, "configuracao": nome, "id": p["id"], "tipo": p["tipo"], "classe": r["classe"],
                     "pergunta": p["pergunta"], "divisao": r["divisao"], "sql": r_sql["sql"] if r_sql else None,
                     "tabelas_contexto": r_sql["tabelas_contexto"] if r_sql else None, "resposta": r["resposta"],
+                    # Para a pontuação da RAGAS (ragas_avaliacao.py): o texto que o LLM escreveu, o contexto que ele
+                    # recebeu e o resultado do SQL (até 30 linhas).
+                    "texto_resposta": r["texto_resposta"], "contexto": r["contexto"], "trechos_ids": [t["id"] for t in r["trechos"]],
+                    "resultado_sql": {"colunas": r_sql["colunas"], "linhas": [list(l) for l in r_sql["linhas"][:30]]} if r_sql and r_sql["status"] == "ok" else None,
                 })
     return {"resultados": resultados, "respostas": respostas}
 
@@ -731,7 +729,7 @@ def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str) -> l
     if nivel == "pipeline":
         t += [
             "- O gerador de SQL e a síntese usam o LLM e não dão exatamente o mesmo resultado a cada execução; com uma rodada só, diferenças pequenas não são interpretáveis.",
-            "- A fidelidade e a relevância medem sustentação pelo contexto, não a correção do dado; o validador aprova respostas com SQL errado.",
+            "- A fidelidade e a relevância da resposta (RAGAS) não estão neste relatório: saem de `ragas_avaliacao.py`, que lê o `respostas.json` desta pasta e grava `ragas.csv` e `ragas.md`.",
         ]
     t += ["", f"## {n + 2}. Comandos", "", "```", comando, "```", ""]
     return t

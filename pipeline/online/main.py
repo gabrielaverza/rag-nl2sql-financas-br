@@ -133,6 +133,9 @@ def executar(pergunta: str, cache_sql: dict | None = None) -> dict:
         "divisao": divisao,
         "resultado_sql": resultado_sql,
         "resposta": resposta_final,
+        "texto_resposta": resposta["resposta"],
+        "contexto": resposta["contexto"],
+        "trechos": resposta["trechos"],
         "validacao": validacao,
         "tempos": tempos,
     }

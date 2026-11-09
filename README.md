@@ -62,6 +62,7 @@ rag-nl2sql-financas-br/
     └── avaliacao/
         ├── executar_experimentos.py    # executor dos experimentos (recuperação e pipeline completo)
         ├── metricas.py                 # fórmulas de métrica e EX
+        ├── ragas_avaliacao.py          # RAGAS (fidelidade e relevância da resposta) e conferência dos números
         ├── verificacoes.py             # testes de sanidade da síntese, do validador e do formatador
         ├── validar_perguntas.py        # confere o arquivo de perguntas e a base de cada uma
         └── medir_tempo_busca.py        # tempo de partida e por pergunta de cada busca
@@ -306,6 +307,7 @@ deles.
 |---|---|
 | `executar_experimentos.py` | Executor dos experimentos descritos em `experimentos.json`, em dois níveis (abaixo); é o ponto de entrada de todas as medições |
 | `metricas.py` | Fórmulas usadas pelo executor: a chamada à biblioteca `ranx` (Precision@k, Recall@k, nDCG@k e MRR), o EX estrito e o EX adaptado, e a formatação dos relatórios |
+| `ragas_avaliacao.py` | Lê o `respostas.json` de um experimento do nível `pipeline` e pontua, com a biblioteca `ragas` e o Qwen local como juiz, a fidelidade e a relevância da resposta das conceituais e híbridas (relevância do contexto não é usada); confere por código se os números do resultado do SQL aparecem no texto. Grava `ragas.csv` e `ragas.md` na pasta do experimento. A `ragas` 0.4.3 só importa com um contorno, declarado no arquivo |
 | `verificacoes.py` | Testes de sanidade com o LLM: `sintese` (respostas com o SQL de referência e recusas fora do escopo), `validador` (número trocado e fato inventado devem ser reprovados, resposta correta aprovada) e `formatador` (proveniência, aviso de fidelidade baixa e recusa) |
 | `validar_perguntas.py` | Confere o arquivo de perguntas (campos, tabelas, evidência nos trechos); com `--base`, confere também `base_dados`, `sql_referencia` e `base_normativo` |
 | `medir_tempo_busca.py` | Tempo de partida e por pergunta de cada busca |
@@ -325,11 +327,13 @@ por tipo, `k`, divisor, pronomes, stemmer).
   médias por tipo, e as híbridas têm tabelas e trechos em separado. As divisões das híbridas ficam em
   `metricas/divisoes_hibridas.json`, para todas as configurações usarem as mesmas.
 - **Nível `pipeline`** (com LLM): roda `main.py` em cada pergunta, por rodada e configuração, e mede
-  classe, EX adaptado, EX estrito, fidelidade, relevância e tempo por passo (o EX adaptado também
+  classe, EX adaptado, EX estrito e tempo por passo (o EX adaptado também
   aceita a coluna `DENOM_CIA` e linhas de companhias cujo nome tem a palavra que identifica a companhia
   da pergunta); o relatório traz também a matriz de confusão do classificador (tipo
   real contra tipo previsto, uma por configuração). Com `"tabelas_ideais": true`, uma passada extra
-  gera o SQL só com as tabelas esperadas, para separar o erro da busca do erro da geração.
+  gera o SQL só com as tabelas esperadas, para separar o erro da busca do erro da geração. A fidelidade
+  e a relevância da resposta (RAGAS) são pontuadas depois, por `ragas_avaliacao.py`, sobre o
+  `respostas.json` da pasta do experimento.
 
 **Resultados e versão.** Cada experimento tem a sua pasta, `metricas/<nome>/`, com nomes fixos que são
 sobrescritos a cada execução:
