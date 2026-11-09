@@ -3,7 +3,8 @@
 Pipeline que permite consultar, em linguagem natural, as Demonstrações Financeiras Padronizadas
 (DFP) publicadas pela CVM. Combina recuperação semântica sobre a documentação do esquema e sobre
 normativos contábeis com geração de SQL, para responder tanto perguntas quantitativas (que exigem
-consulta ao banco) quanto conceituais (que exigem apenas os normativos).
+consulta ao banco) quanto conceituais (que exigem apenas os normativos) e híbridas (que exigem os
+dois).
 
 ---
 
@@ -11,42 +12,64 @@ consulta ao banco) quanto conceituais (que exigem apenas os normativos).
 
 ```
 rag-nl2sql-financas-br/
+├── configuracao.json                   # escolhas do pipeline: modelo, métodos de busca, k, divisor, stemmer
+├── experimentos.json                   # experimentos de avaliação: configurações nomeadas e comparações
+├── requirements.txt                    # dependências Python
 ├── dados/
-│   ├── dfp_cia_aberta_2025/         # CSVs oficiais da CVM (658 companhias, exercício 2025)
-│   ├── meta_dfp_cia_aberta_txt/     # dicionário de dados oficial da CVM
+│   ├── dfp_cia_aberta_2025/            # CSVs oficiais da CVM (lote anual de 2025)
+│   ├── meta_dfp_cia_aberta_txt/        # dicionário de dados oficial da CVM
 │   ├── normativos/
-│   │   ├── cvm/resol080consolid.pdf # Resolução CVM 80/2022 consolidada
-│   │   └── cpc/                     # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
-│   ├── dfp.db                       # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
-│   ├── perguntas_dfp.json           # conjunto de perguntas de teste
-│   ├── perguntas_validacao.json     # perguntas independentes, só para medir
-│   └── sinonimos_contas.json        # termos de analista de cada conta (ex.: receita líquida)
+│   │   ├── cvm/resol080consolid.pdf    # Resolução CVM 80/2022 consolidada
+│   │   └── cpc/                        # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
+│   ├── dfp.db                          # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
+│   ├── perguntas_validacao.json        # as 60 perguntas oficiais de avaliação
+│   ├── perguntas_validacao_ficha.md    # ficha de conferência das 60 perguntas
+│   └── sinonimos_contas.json           # termos de analista de cada conta (ex.: receita líquida)
 ├── embeddings/
-│   ├── esquema.json                 # documentação do esquema, uma entrada por tabela
-│   ├── index_esquema.json           # índice vetorial de esquema
-│   └── index_glossario.json         # índice vetorial conceitual
-├── pipeline/
-│   ├── offline/
-│   │   ├── carregar_dfp.py          # CSVs da CVM -> dados/dfp.db
-│   │   ├── gerar_indice_esquema.py  # dados/dfp.db -> esquema.json -> index_esquema.json
-│   │   └── gerar_indice_glossario.py  # normativos/*.pdf -> index_glossario.json
-│   └── online/
-│       ├── busca.py                 # busca por similaridade nos dois índices
-│       ├── avaliar_recuperacao.py   # Recall@k e MRR da busca
-│       ├── classificador.py         # classifica a pergunta em conceitual, quantitativa ou híbrida
-│       ├── avaliar_classificador.py # acurácia e matriz de confusão do classificador
-│       ├── gerador_sql.py           # gera e executa o SQL das perguntas quantitativas
-│       ├── avaliar_sql.py           # EX do gerador de SQL
-│       ├── sintetizador.py          # escreve a resposta em linguagem natural
-│       ├── avaliar_sintese.py       # inspeciona a síntese
-│       ├── validador.py             # relevância do contexto e fidelidade da resposta
-│       ├── avaliar_validador.py     # inspeciona a validação
-│       ├── formatador.py            # resposta final com proveniência
-│       ├── avaliar_formatador.py    # inspeciona o formatador
-│       ├── main.py                  # orquestrador: pergunta -> resposta final
-│       └── avaliar_pipeline.py      # mede o fluxo completo (classe, EX, fidelidade, tempo)
-└── requirements.txt
+│   ├── esquema.json                    # documentação do esquema, uma entrada por tabela
+│   ├── index_esquema.json              # índice vetorial do esquema (modelo padrão)
+│   ├── index_glossario.json            # índice vetorial dos normativos (modelo padrão)
+│   ├── index_bm25_esquema.json         # índice de palavras (BM25) do esquema
+│   ├── index_bm25_glossario.json       # índice de palavras (BM25) dos normativos
+│   └── modelos/<chave>/                # índices vetoriais dos outros modelos (gerados, fora do git)
+├── metricas/                           # relatórios e CSVs gerados pelos scripts de avaliação
+└── pipeline/
+    ├── modelos_embedding.py            # registro dos modelos de embeddings (usado pelos dois estágios)
+    ├── offline/
+    │   ├── carregar_dfp.py             # CSVs da CVM -> dados/dfp.db
+    │   ├── gerar_indice_esquema.py     # dados/dfp.db -> esquema.json -> index_esquema.json
+    │   ├── gerar_indice_glossario.py   # normativos/*.pdf -> index_glossario.json
+    │   ├── gerar_indice_bm25.py        # índices vetoriais -> índices de palavras (BM25)
+    │   └── rodar_offline.py            # gera os três índices acima, para um ou mais modelos
+    └── online/
+        ├── configuracao.py             # lê, confere e sobrescreve o configuracao.json
+        ├── busca.py                    # busca por embeddings nos dois índices
+        ├── busca_bm25.py               # busca por palavras (BM25)
+        ├── fusao_rrf.py                # fusão por posição (RRF) de embeddings e BM25
+        ├── busca_configuravel.py       # ponto único de busca: escolhe o método pela configuração
+        ├── classificador.py            # classifica a pergunta em conceitual, quantitativa ou híbrida
+        ├── divisor.py                  # divide a pergunta híbrida em parte de dados e parte conceitual
+        ├── gerador_sql.py              # gera e executa o SQL das perguntas quantitativas e híbridas
+        ├── sintetizador.py             # escreve a resposta em linguagem natural
+        ├── validador.py                # relevância do contexto e fidelidade da resposta
+        ├── formatador.py               # resposta final com proveniência
+        ├── main.py                     # orquestrador: pergunta -> resposta final
+        ├── validar_perguntas.py        # confere o arquivo de perguntas e a base de cada uma
+        ├── executar_experimentos.py    # executor dos experimentos (recuperação e pipeline completo)
+        ├── avaliar_recuperacao.py      # Recall@k e MRR da busca por embeddings
+        ├── avaliar_baseline.py         # embeddings, BM25 e RRF nas mesmas perguntas
+        ├── avaliar_divisao_hibridas.py # efeito de dividir a pergunta híbrida na recuperação
+        ├── avaliar_classificador.py    # acurácia e matriz de confusão do classificador
+        ├── avaliar_sql.py              # EX do gerador de SQL
+        ├── avaliar_sintese.py          # inspeciona a síntese
+        ├── avaliar_validador.py        # inspeciona a validação
+        ├── avaliar_formatador.py       # inspeciona o formatador
+        ├── avaliar_pipeline.py         # mede o fluxo completo (classe, EX, fidelidade, tempo)
+        ├── medir_tempo_busca.py        # tempo de partida e por pergunta de cada busca
+        └── resumir_por_tipo.py         # resume por tipo as métricas de recuperação já gravadas
 ```
+
+---
 
 ## Ambiente
 
@@ -54,211 +77,266 @@ rag-nl2sql-financas-br/
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+python -m nltk.downloader stopwords      # lista de palavras vazias usada pelo BM25
 ```
 
 Requer um servidor Ollama rodando localmente, com um modelo de geração de texto compatível com
 formato JSON estruturado (ex.: `qwen2.5-coder:7b`) baixado.
 
-Os embeddings são gerados pelo modelo `intfloat/multilingual-e5-base` (cerca de 1,1 GB). Os scripts
-o carregam do cache local, então ele precisa ser baixado uma vez:
+**Modelos de embeddings.** O modelo padrão é o `intfloat/multilingual-e5-base` (cerca de 1,1 GB). Os
+scripts só carregam modelos do cache local e nunca baixam nada sozinhos. O download é feito pelos
+scripts do estágio offline, com a opção `--baixar-modelos`, que baixa só os modelos que faltarem
+(sem ela, o script para e diz o que falta, com nome, fonte e tamanho):
 
 ```bash
-python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+python pipeline/offline/rodar_offline.py --baixar-modelos
+python pipeline/modelos_embedding.py        # lista os modelos e diz quais já estão no cache
 ```
+
+---
 
 ## Passo a passo
 
-```bash
-python pipeline/offline/carregar_dfp.py            # 1: CSVs -> dados/dfp.db
-python pipeline/offline/gerar_indice_esquema.py    # 2: dados/dfp.db -> esquema.json + index_esquema.json
-python pipeline/offline/gerar_indice_glossario.py  # 3: normativos -> index_glossario.json
-python pipeline/online/avaliar_recuperacao.py      # 4: mede a busca (Recall@k, MRR)
-python pipeline/online/avaliar_classificador.py    # 5: mede o classificador de intenção (acurácia)
-python pipeline/online/avaliar_sql.py              # 6: mede o gerador de SQL (EX)
-python pipeline/online/avaliar_sintese.py          # 7: inspeciona a síntese da resposta
-python pipeline/online/avaliar_validador.py        # 8: inspeciona a validação
-python pipeline/online/avaliar_formatador.py       # 9: inspeciona a resposta formatada
-python pipeline/online/avaliar_pipeline.py         # 10: mede o fluxo completo
-python pipeline/online/main.py "Qual foi a receita líquida consolidada da Ambev em 2025?"   # uma pergunta
-```
+Os comandos rodam de dentro de `rag-nl2sql-financas-br/`, com o ambiente ativo. O `esquema.json`, os
+índices e os arquivos de configuração já estão no repositório; o único arquivo que precisa ser
+gerado para consultar é o `dados/dfp.db` (passo 1).
 
-## Recorte de dados
-
-- Exercício social: só `DT_REFER = 2025-12-31` (658 das 668 companhias do lote de 2025).
-- Reapresentações: mantida só a `VERSAO` mais alta por companhia.
-- Demonstrações: BPA, BPP, DRE, DFC (só método indireto), DVA, DMPL — consolidado e individual
-  (12 tabelas). DRA fora do escopo (residual nos dados e sem CPC dedicado).
-
-## Carga (`dados/dfp.db`)
-
-658 companhias, 1.131.701 linhas nas 12 tabelas de demonstração, todas com chave estrangeira para
-`companhias`. O CSV de origem da CVM tem linhas com conteúdo idêntico repetido em algumas
-companhias; `carregar_dfp.py` descarta essas repetições exatas na carga.
-
-## Esquema (`esquema.json` / `index_esquema.json`)
-
-A estrutura (colunas, tipos, chaves e relações) é lida direto do SQLite. Como o significado das
-DFPs está nos valores de `CD_CONTA`/`DS_CONTA` e não nos nomes de tabela ou coluna, o script também
-extrai, direto do banco e sem LLM:
-
-- o plano de contas de cada tabela (códigos e descrições das contas fixas, `ST_CONTA_FIXA='S'`);
-- os valores possíveis das colunas com poucos valores distintos (`ESCALA_MOEDA`, `ORDEM_EXERC`,
-  `ST_CONTA_FIXA`).
-
-O LLM escreve só os textos em português (resumo, propósito, entidades e descrição das colunas),
-recebendo no prompt o nome por extenso de cada demonstração (ex.: "BPA" → "Balanço Patrimonial
-Ativo") e se é consolidada ou individual.
-
-Cada tabela gera um registro por aspecto (resumo e propósito, entidades, relações, colunas e
-contas), com até 120 tokens, e o E5-base gera o vetor de cada um. Para trocar o modelo de
-embeddings sem refazer os textos do LLM, `python pipeline/offline/gerar_indice_esquema.py
---so-indice` regera só o índice a partir do `esquema.json`.
-
-Resultado: 13 tabelas (`companhias` + 12 de demonstração), 171 registros no índice.
-
-## Normativos (`index_glossario.json`)
-
-Extrai o texto de cada PDF em `dados/normativos/` (varredura recursiva das subpastas `cvm/` e
-`cpc/`), remove cabeçalhos e rodapés repetidos (detectados por frequência entre páginas) e divide
-o texto em trechos de até 120 tokens (medidos com o tokenizador do E5-base), com sobreposição de
-~15%, respeitando limites de parágrafo quando possível. O E5-base aceita até 512 tokens, mas
-trechos de 250 e 400 tokens recuperaram pior que os de 120 nos testes.
-
-Resultado: 1.634 trechos (165 do CPC 03, 202 do CPC 09, 425 do CPC 26, 842 da Resolução 80).
-
-## Conjunto de perguntas de teste (`dados/perguntas_dfp.json`)
-
-28 perguntas (7 conceituais, 14 quantitativas, 7 híbridas), com `id`, `pergunta`, `tipo`,
-`tabelas_esperadas`, `sql_referencia` e `evidencia`. Serve de base para métricas de recuperação
-(Recall@k, MRR), de resposta conceitual (faithfulness, answer relevance) e de geração de SQL (EX,
-EM).
-
-- Conceituais: evidência conferida contra o texto real de `index_glossario.json`.
-- Quantitativas e híbridas: todos os SQLs de referência executados e conferidos contra
-  `dados/dfp.db`.
-
-`dados/perguntas_validacao.json` tem 13 perguntas no mesmo formato, escritas no estilo de um
-analista e com outras empresas. Serve só para medir a busca, sem ajustá-la a elas. Os valores dos
-SQLs de referência não foram conferidos contra os documentos originais.
-
-## Busca (`pipeline/online/busca.py`)
-
-O `multilingual-e5-base` gera o vetor da pergunta, com o prefixo `query: ` (os textos dos índices
-usam `passage: `, como o modelo exige). O produto interno com os vetores normalizados do índice
-(igual ao cosseno) ordena os registros.
-
-- **Glossário:** devolve os k trechos mais parecidos.
-- **Esquema:** cada tabela é pontuada pelo melhor registro de resumo ou de entidades. Registros de
-  colunas, contas e relações não entram na pontuação. As k tabelas escolhidas vêm acompanhadas das
-  tabelas que elas referenciam por chave estrangeira (hoje, `companhias`), lidas de `esquema.json`.
-
-`avaliar_recuperacao.py` calcula Recall@k e MRR nos dois índices e aceita o arquivo de perguntas
-como argumento:
+**1. Estágio offline (prepara os dados e os índices)**
 
 ```bash
-python pipeline/online/avaliar_recuperacao.py dados/perguntas_validacao.json
+python pipeline/offline/carregar_dfp.py              # CSVs -> dados/dfp.db
+python pipeline/offline/gerar_indice_esquema.py      # opcional: refaz esquema.json + index_esquema.json (usa o LLM)
+python pipeline/offline/rodar_offline.py             # índice do esquema, do glossário e BM25 (modelo padrão)
+python pipeline/offline/rodar_offline.py --modelos e5-base bge-m3   # também para outros modelos
 ```
 
-## Classificador de intenção (`pipeline/online/classificador.py`)
-
-Um LLM local classifica a pergunta em `conceitual`, `quantitativa` ou `hibrida`. O tipo decide o
-caminho: conceitual usa só o índice do glossário, quantitativa usa o índice de esquema e o SQL, e
-híbrida usa os dois. O prompt traz a definição de cada classe e 9 exemplos (few-shot), com as
-classes intercaladas, que não fazem parte de nenhum dos dois arquivos de perguntas. A saída é um
-JSON `{"tipo": ...}`, com temperatura 0 na primeira tentativa. Se o LLM não devolver uma classe
-válida em 2 tentativas, a pergunta é tratada como híbrida, que aciona os dois caminhos.
-
-`avaliar_classificador.py` calcula a acurácia geral e por classe, a matriz de confusão e o tempo por
-pergunta, e aceita o arquivo de perguntas como argumento:
+**2. Estágio online (responde perguntas)**
 
 ```bash
-python pipeline/online/avaliar_classificador.py dados/perguntas_validacao.json
+python pipeline/online/main.py "Qual foi a receita líquida consolidada da Ambev em 2025?"
+python pipeline/online/main.py --interativo                  # várias perguntas, sem recarregar o sistema
+python pipeline/online/main.py --arquivo perguntas.txt       # uma pergunta por linha (ou JSON)
+python pipeline/online/main.py "pergunta" --set divisor.ativo=false   # troca um valor da configuração
 ```
 
-## Gerador de SQL (`pipeline/online/gerador_sql.py`)
+**3. Avaliação**
 
-Para as perguntas quantitativas e híbridas. A busca escolhe as `k` tabelas mais parecidas com a
-pergunta (padrão `k = 3`) e acrescenta as que elas referenciam por chave estrangeira. O contexto do
-LLM traz só essas tabelas, lidas de `esquema.json`: colunas, tipos, valores possíveis das colunas
-categóricas, junções e o plano de contas. Cada conta aparece com o filtro pronto e, quando há, com os
-termos de analista de `dados/sinonimos_contas.json` (65 termos de 41 contas, todos presentes nos
-normativos indexados):
+```bash
+python pipeline/online/validar_perguntas.py dados/perguntas_validacao.json --base   # confere o conjunto
+python pipeline/online/executar_experimentos.py --listar                            # experimentos disponíveis
+python pipeline/online/executar_experimentos.py metodos                             # embeddings, BM25 e RRF
+python pipeline/online/avaliar_pipeline.py                                          # fluxo completo, resumo
+```
+
+Os demais scripts de avaliação estão descritos na seção "Avaliação e experimentos".
+
+---
+
+## Configuração
+
+`configuracao.json` reúne as escolhas do pipeline. Os scripts do estágio online leem o arquivo, e
+qualquer valor pode ser trocado na linha de comando com `--set chave=valor` (chaves aninhadas
+separadas por ponto), sem editar o arquivo. `python pipeline/online/configuracao.py` mostra a
+configuração efetiva.
+
+| Chave | Padrão | O que controla |
+|---|---|---|
+| `modelo_embedding` | `e5-base` | Modelo dos embeddings (as chaves estão em `pipeline/modelos_embedding.py`) |
+| `busca.esquema.metodo` | `embeddings` | Método que busca as tabelas: `embeddings`, `bm25` ou `rrf` |
+| `busca.glossario.metodo` | `embeddings` | Método que busca os trechos dos normativos |
+| `busca.<índice>.por_tipo` | vazio | Troca o método para um tipo de pergunta (`quantitativa`, `conceitual`, `hibrida`) |
+| `k_tabelas` | `3` | Tabelas escolhidas pela busca (as referenciadas por chave estrangeira entram além delas) |
+| `k_trechos` | `3` | Trechos dos normativos que vão à síntese |
+| `divisor.ativo` | `true` | Divide as perguntas híbridas em parte de dados e parte conceitual |
+| `divisor.bloquear_pronomes` | `true` | Recusa a parte conceitual que tenha pronome ("nesse valor") |
+| `bm25.radicalizar` | `true` | O BM25 usa o radicalizador (stemmer) |
+
+`experimentos.json` descreve os experimentos de avaliação (ver "Avaliação e experimentos").
+
+---
+
+## Dados
+
+**Recorte.** Exercício social `DT_REFER = 2025-12-31` (658 das 668 companhias do lote de 2025);
+reapresentações: só a `VERSAO` mais alta por companhia; demonstrações BPA, BPP, DRE, DFC (só método
+indireto), DVA e DMPL, consolidadas e individuais (12 tabelas). A DRA fica fora do escopo.
+
+**Carga (`dados/dfp.db`).** 658 companhias e 1.131.701 linhas nas 12 tabelas de demonstração, todas
+com chave estrangeira para `companhias`. O CSV da CVM tem linhas idênticas repetidas em algumas
+companhias; `carregar_dfp.py` descarta essas repetições exatas. Os valores ficam como publicados
+(`VL_CONTA`), com `ESCALA_MOEDA` ao lado (`MIL` ou `UNIDADE`); o gerador de SQL converte para reais.
+
+**Normativos.** Resolução CVM 80/2022 consolidada, CPC 03 (R2, fluxos de caixa), CPC 09 (R1, valor
+adicionado) e CPC 26 (R1, apresentação das demonstrações), em `dados/normativos/`.
+
+**Conjunto de perguntas (`dados/perguntas_validacao.json`).** 60 perguntas, 20 de cada tipo
+(quantitativa, conceitual e híbrida), usadas em todas as avaliações. Cada uma tem `id` (`q01` a
+`q20`, `c01` a `c20`, `h01` a `h20`), `pergunta`, `tipo`, `tabelas_esperadas`, `sql_referencia` (nas
+quantitativas e híbridas), `evidencia` (frase literal do normativo, nas conceituais e híbridas) e os
+campos de base: `base_dados` (companhia, código CVM, tabela e conta) e `base_normativo` (arquivo,
+página, trechos do índice e dispositivo). `perguntas_validacao_ficha.md` registra a conferência de
+cada pergunta contra os dados e os normativos, e `validar_perguntas.py --base` repete as conferências
+automáticas.
+
+---
+
+## Estágio offline
+
+Prepara tudo o que a consulta usa: o banco, a documentação do esquema e os índices de busca.
+
+| Arquivo | Função |
+|---|---|
+| `carregar_dfp.py` | Lê os CSVs da CVM e cria `dados/dfp.db` (SQLite) com `companhias` e as 12 tabelas de demonstração |
+| `gerar_indice_esquema.py` | Lê a estrutura do banco, pede ao LLM os textos em português de cada tabela, grava `esquema.json` e o índice vetorial. Com `--so-indice`, regera só o índice a partir do `esquema.json`; `--modelo` escolhe o modelo |
+| `gerar_indice_glossario.py` | Extrai o texto dos PDFs, divide em trechos e grava o índice vetorial dos normativos; `--modelo` escolhe o modelo |
+| `gerar_indice_bm25.py` | Grava os índices de palavras (BM25) do esquema e do glossário, a partir dos registros dos índices vetoriais |
+| `rodar_offline.py` | Roda o índice de esquema, o do glossário e o BM25 na ordem certa, para um ou mais modelos (`--modelos`, `--todos-os-modelos`, `--etapas`) |
+| `../modelos_embedding.py` | Registro dos modelos (identificador, prefixos, dimensões, limite de tokens) e verificação do cache; é usado também pelo estágio online |
+
+**Esquema.** A estrutura (colunas, tipos, chaves e relações) é lida direto do SQLite. Como o
+significado das DFPs está nos valores de `CD_CONTA` e `DS_CONTA`, o script também extrai do banco, sem
+LLM, o plano de contas de cada tabela (contas fixas, `ST_CONTA_FIXA='S'`) e os valores possíveis das
+colunas com poucos valores distintos (`ESCALA_MOEDA`, `ORDEM_EXERC`, `ST_CONTA_FIXA`). O LLM escreve só
+os textos (resumo, propósito, entidades e descrição das colunas), recebendo o nome por extenso de cada
+demonstração e se ela é consolidada ou individual. Cada tabela gera um registro por aspecto (resumo e
+propósito, entidades, relações, colunas e contas), com até 120 tokens: 13 tabelas e 171 registros.
+
+**Glossário.** Extrai o texto de cada PDF (varredura recursiva de `cvm/` e `cpc/`), remove cabeçalhos
+e rodapés repetidos (detectados por frequência entre páginas) e as linhas riscadas (redação substituída
+nos PDFs consolidados) e divide o texto em trechos de até 120 tokens, medidos com o tokenizador do
+E5-base, com sobreposição de cerca de 15%. Resultado: 1.283 trechos (157 do CPC 03, 202 do CPC 09, 330
+do CPC 26 e 594 da Resolução 80). Os trechos são os mesmos qualquer que seja o modelo de embeddings.
+
+**BM25.** O índice guarda, por registro, o texto e as palavras já limpas (minúsculas, sem acentos,
+sem palavras vazias do português), com e sem radicalização, para a busca não refazer isso a cada
+partida.
+
+**Modelos.** `minilm`, `e5-small`, `e5-base` (padrão), `bge-m3` e `e5-base-v2` (só inglês, usado como
+controle). O índice do modelo padrão fica em `embeddings/`; o dos outros, em
+`embeddings/modelos/<chave>/`, fora do git.
+
+---
+
+## Estágio online
+
+Responde uma pergunta: classifica, busca, gera o SQL, escreve a resposta, valida e formata.
+
+| Arquivo | Função |
+|---|---|
+| `configuracao.py` | Lê o `configuracao.json`, confere os valores e aceita sobrescritas `--set chave=valor` |
+| `busca.py` | Busca por embeddings: vetoriza a pergunta e ordena os registros pelo produto interno |
+| `busca_bm25.py` | Busca por palavras (BM25, biblioteca `rank_bm25`), com radicalização opcional |
+| `fusao_rrf.py` | Funde os rankings de embeddings e BM25 por posição (Reciprocal Rank Fusion, k = 60) |
+| `busca_configuravel.py` | Ponto único de busca: escolhe o método e o modelo pela configuração e devolve tabelas e trechos |
+| `classificador.py` | Classifica a pergunta em `conceitual`, `quantitativa` ou `hibrida` |
+| `divisor.py` | Divide a pergunta híbrida em parte de dados e parte conceitual |
+| `gerador_sql.py` | Gera o SQL com o LLM, executa em modo somente leitura e corrige em caso de erro |
+| `sintetizador.py` | Escreve a resposta em português a partir do resultado do SQL e dos trechos |
+| `validador.py` | Mede a relevância do contexto e a fidelidade da resposta |
+| `formatador.py` | Monta a resposta final com a tabela de dados e a proveniência |
+| `main.py` | Orquestrador: liga os passos em um fluxo único por pergunta |
+
+**Busca.** Os embeddings usam o prefixo `query: ` na pergunta e `passage: ` nos textos indexados, como
+o E5 exige. No índice de esquema, cada tabela é pontuada pelo melhor registro de resumo ou de
+entidades (colunas, contas e relações não entram na pontuação), e as tabelas escolhidas vêm
+acompanhadas das que elas referenciam por chave estrangeira (hoje, `companhias`). No glossário, a
+busca devolve os trechos mais parecidos. O BM25 usa k1 = 2 e b = 0,5.
+
+**Classificador.** Um LLM local recebe a definição de cada classe e 9 exemplos e responde um JSON
+`{"tipo": ...}`. O tipo decide o caminho: conceitual usa o glossário, quantitativa usa o esquema e o
+SQL, e híbrida usa os dois. Se o LLM não devolver uma classe válida em 2 tentativas, a pergunta é
+tratada como híbrida.
+
+**Divisor.** Só nas perguntas híbridas e com `divisor.ativo`. O LLM separa a pergunta em parte de dados
+e parte conceitual (5 exemplos no prompt); a parte conceitual não pode ter pronome ("nesse valor"), e,
+se tiver, o LLM é chamado de novo. Se a divisão falhar, as duas partes viram a pergunta inteira. As
+tabelas continuam sendo buscadas com a pergunta inteira e os trechos, com a parte conceitual.
+
+**Gerador de SQL.** Para as perguntas quantitativas e híbridas. O contexto do LLM traz só as tabelas
+escolhidas, lidas do `esquema.json`: colunas, tipos, valores possíveis, junções e o plano de contas.
+Cada conta aparece com o filtro pronto e, quando há, com os termos de analista de
+`dados/sinonimos_contas.json` (65 termos de 41 contas):
 
 ```
 - Receita de Venda de Bens e/ou Serviços (também chamada de: receita líquida) -> CD_CONTA = '3.01'
 ```
 
-As regras do prompt tratam de consolidado (`_con`) como padrão, `ORDEM_EXERC`, filtro de companhia
-por `LIKE` em `DENOM_CIA` e valores sempre em reais (`CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA *
-1000 ELSE VL_CONTA END`). Um nome pode combinar com mais de uma companhia (`%JBS%` traz JBS S.A. e
-JBS N.V.): o SQL não soma nem limita, e devolve uma linha por companhia, com `DENOM_CIA` na primeira
-coluna.
+As regras do prompt tratam de consolidado (`_con`) como padrão, `ORDEM_EXERC`, filtro de companhia por
+`LIKE` em `DENOM_CIA` e valores sempre em reais (`CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000
+ELSE VL_CONTA END`). Um nome pode combinar com mais de uma companhia (`%JBS%` traz JBS S.A. e JBS N.V.):
+o SQL devolve uma linha por companhia, com `DENOM_CIA` na primeira coluna. O código só aceita um único
+`SELECT`, com limite de tempo, e devolve o erro ao LLM (ou avisa que o resultado veio vazio) por até 3
+tentativas. `gerar_sql` também aceita a lista de tabelas, sem usar a busca, e um dicionário de cache
+que reaproveita o SQL de um mesmo par (pergunta, tabelas do contexto).
 
-O LLM responde com um JSON `{"sql": ...}`. O código só aceita um único `SELECT`, executa o banco em
-modo somente leitura, com limite de tempo, e devolve o erro ao LLM (ou avisa que o resultado veio
-vazio) por até 3 tentativas. `gerar_sql(pergunta, k, tabelas)` também aceita a lista de tabelas, sem
-usar a busca.
+**Síntese.** O LLM responde só com o que recebe. Conceitual: os trechos mais parecidos; quantitativa: o
+resultado do SQL, com cada valor rotulado pelo nome da coluna e os números no padrão brasileiro;
+híbrida: os dois. Se os trechos não trouxerem a informação pedida, a resposta diz que não encontrou nos
+documentos disponíveis (na híbrida, a parte de dados é respondida mesmo assim). A resposta tem limite
+de tokens, e a função devolve também o contexto mostrado ao LLM, que a validação usa.
 
-`avaliar_sql.py` calcula a acurácia de execução (EX) nas perguntas com SQL de referência. Dois
-resultados são equivalentes se só diferem pela ordem das colunas e das linhas, com números
-arredondados em 2 casas. Como o gerador lista todas as companhias que combinam com o nome, o script
-também conta o EX que aceita, além das linhas da referência, as de outras companhias que combinam
-com o mesmo nome (marcado `ok+`; `DENOM_CIA` é a única coluna extra aceita). Aceita o arquivo de
-perguntas, o número de tabelas e a opção de usar as tabelas esperadas das perguntas:
+**Validação.** Duas verificações com o mesmo LLM, em temperatura 0: a *relevância do contexto* (fração
+dos trechos relevantes para a pergunta) e a *fidelidade* (a resposta é decomposta em afirmações e cada
+uma é verificada contra o contexto). A resposta é aprovada se a fidelidade for pelo menos 0,8. Ela mede
+a sustentação pelo contexto, não a correção do dado.
+
+**Resposta final.** O texto entregue traz a resposta, a tabela de dados do resultado do SQL (até 20
+linhas) e a proveniência. Os quatro campos da proveniência vêm do SQL gerado e do banco, sem LLM:
+empresa e código CVM, demonstração financeira e exercício social. Também entram a consulta SQL e os
+documentos usados (numa recusa, nenhum documento é listado). Fidelidade abaixo do limiar gera um aviso.
+
+**Fluxo (`main.py`).** `executar(pergunta)` classifica e segue o caminho do tipo: divide a pergunta
+híbrida, gera o SQL (quantitativa e híbrida), sintetiza, valida e formata. Se o SQL falha em todas as
+tentativas, a quantitativa recebe uma mensagem de falha e a híbrida é respondida só com os normativos,
+com um aviso. Pela linha de comando: `--interativo` e `--arquivo` carregam o sistema uma vez e
+respondem várias perguntas, `--configuracao` troca o arquivo de configuração e `--set` troca um valor.
+
+---
+
+## Avaliação e experimentos
+
+| Arquivo | Função |
+|---|---|
+| `validar_perguntas.py` | Confere o arquivo de perguntas (campos, tabelas, evidência nos trechos); com `--base`, confere também `base_dados`, `sql_referencia` e `base_normativo` |
+| `executar_experimentos.py` | Executor dos experimentos descritos em `experimentos.json`, em dois níveis (abaixo) |
+| `avaliar_recuperacao.py` | Recall@k e MRR da busca por embeddings nos dois índices |
+| `avaliar_baseline.py` | Compara embeddings, BM25 (com e sem stemmer) e RRF nas mesmas perguntas, com piso aleatório e comparação pareada |
+| `avaliar_divisao_hibridas.py` | Mede o efeito de dividir a pergunta híbrida na recuperação (pergunta inteira, dividida e mista) |
+| `avaliar_classificador.py` | Acurácia geral e por classe, matriz de confusão e tempo do classificador |
+| `avaliar_sql.py` | Acurácia de execução (EX) do gerador de SQL; aceita `--k N` e `--tabelas-ideais` |
+| `avaliar_sintese.py` | Imprime as respostas da síntese usando o SQL de referência e confere recusas fora do escopo |
+| `avaliar_validador.py` | Aplica a validação a respostas geradas e a casos conhecidos (número trocado, fato inventado, resposta correta) |
+| `avaliar_formatador.py` | Mostra a resposta formatada de casos de cada tipo e de fidelidade baixa |
+| `avaliar_pipeline.py` | Roda o fluxo completo e resume classe, EX, fidelidade, relevância, aprovação e tempo; `--saida` grava as respostas |
+| `medir_tempo_busca.py` | Tempo de partida e por pergunta de cada busca |
+| `resumir_por_tipo.py` | Resume por tipo de pergunta as métricas de recuperação gravadas por `avaliar_baseline.py` |
+
+Todos usam o conjunto oficial (`dados/perguntas_validacao.json`) e aceitam outro arquivo de perguntas
+como argumento, quando o script o prevê.
+
+**Executor de experimentos.** `experimentos.json` descreve cada experimento: nível, configurações
+nomeadas e pares a comparar. Cada configuração é uma lista de trocas `chave=valor` sobre o
+`configuracao.json`, como o `--set`, então qualquer escolha pode variar (modelo, método por índice e
+por tipo, `k`, divisor, pronomes, stemmer).
+
+- **Nível `recuperacao`** (sem LLM, exceto o divisor): para cada configuração e pergunta, mede se a busca
+  traz as tabelas e os trechos certos. Tabelas: todas as tabelas no top-k, Recall e MRR. Trechos: Hit@k,
+  Recall@k, Precision@k, nDCG@k e MRR. Híbridas: acerto conjunto de tabelas e trecho. Inclui o piso
+  aleatório e a comparação pareada (diferença média, vitórias, derrotas e empates, e intervalo de 95%
+  por bootstrap). As divisões das híbridas ficam em `metricas/divisoes_hibridas.json`, para todas as
+  configurações usarem as mesmas.
+- **Nível `pipeline`** (com LLM): roda `main.py` em cada pergunta, por rodada e configuração, e mede
+  classe, EX (estrito e aceitando outras companhias que combinam com o nome), fidelidade, relevância,
+  aprovação e tempo por passo. Com `"tabelas_ideais": true`, uma passada extra gera o SQL só com as
+  tabelas esperadas, para separar o erro da busca do erro da geração.
+
+Os resultados vão para `metricas/`, com nomes fixos que são sobrescritos a cada execução:
+`experimento_<nome>.csv` (uma linha por rodada, configuração, pergunta e métrica),
+`experimento_<nome>_resumo.csv`, `experimento_<nome>.md` (tabelas, comparações, métricas e escalas,
+ressalvas e comandos) e, no nível `pipeline`, `experimento_<nome>_respostas.json`. Com `--ids` o
+executor roda só algumas perguntas e os arquivos ganham o sufixo `_parcial`.
 
 ```bash
-python pipeline/online/avaliar_sql.py dados/perguntas_validacao.json --k 5
-python pipeline/online/avaliar_sql.py --tabelas-ideais
+python pipeline/online/executar_experimentos.py metodos
+python pipeline/online/executar_experimentos.py teste_pipeline --ids q01,c01,h01 --rodadas 1
 ```
-
-## Síntese da resposta (`pipeline/online/sintetizador.py`)
-
-Escreve a resposta em português a partir do que o LLM recebe, e só dele. No tipo conceitual, o
-contexto são os 3 trechos do glossário mais parecidos com a pergunta; no quantitativo, o resultado
-do SQL; no híbrido, os dois. O resultado do SQL entra no prompt com cada valor rotulado pelo nome
-da coluna e os números no padrão brasileiro (valores monetários já em reais). Se os trechos não
-trouxerem a informação pedida, o LLM responde que não encontrou nos documentos disponíveis; numa
-pergunta híbrida, a parte de dados é respondida mesmo assim. A resposta tem limite de tokens. A
-função devolve também o contexto mostrado ao LLM, que a validação usa.
-
-`avaliar_sintese.py` usa o SQL de referência (para isolar a síntese dos erros do gerador), imprime
-as respostas, conta quantos números do resultado aparecem no texto e confere se perguntas fora do
-escopo dos normativos são recusadas.
-
-## Validação (`pipeline/online/validador.py`)
-
-Duas verificações com o mesmo LLM, em temperatura 0:
-
-- **Relevância do contexto:** cada trecho do glossário é julgado como relevante ou não para a
-  pergunta (fração de trechos relevantes).
-- **Fidelidade:** a resposta é decomposta em afirmações e cada uma é verificada contra o contexto
-  (fração de afirmações sustentadas). Uma resposta sem afirmações, como uma recusa, tem fidelidade 1.
-
-A resposta é aprovada se a fidelidade for pelo menos 0,8. `avaliar_validador.py` aplica a validação
-a respostas geradas e a casos conhecidos (número trocado, fato inventado e resposta correta).
-
-## Resposta final (`pipeline/online/formatador.py`)
-
-Monta o texto entregue: a resposta, a tabela de dados do resultado do SQL (até 20 linhas) e a
-proveniência. Os quatro campos da proveniência vêm do SQL gerado e do banco, sem LLM: **empresa e
-código CVM** (as companhias do resultado ou as que o SQL filtra), **demonstração financeira** (as
-tabelas citadas no SQL, com consolidada ou individual) e **exercício social** (período das linhas da
-demonstração para o exercício usado). Também entram a consulta SQL e os documentos do glossário
-usados; numa recusa nenhum documento é listado. Se a fidelidade ficar abaixo do limiar, a resposta
-recebe um aviso. `avaliar_formatador.py` mostra casos de cada tipo, um com nome ambíguo e um com
-fidelidade baixa.
-
-## Fluxo completo (`pipeline/online/main.py`)
-
-`executar(pergunta)` classifica a pergunta e segue o caminho do tipo: gera o SQL (quantitativa e
-híbrida), sintetiza, valida e formata. Se o SQL falha em todas as tentativas, a pergunta
-quantitativa recebe uma mensagem de falha e a híbrida é respondida só com os normativos, com um
-aviso. Pela linha de comando, recebe a pergunta como argumento:
-
-```bash
-python pipeline/online/main.py "Qual foi o lucro líquido consolidado da Ambev em 2025?"
-```
-
-`avaliar_pipeline.py` roda o fluxo em todas as perguntas de um arquivo e resume: acerto da classe,
-EX do SQL, fidelidade e relevância médias, respostas aprovadas e tempo. A opção `--saida` grava as
-respostas completas em JSON.
