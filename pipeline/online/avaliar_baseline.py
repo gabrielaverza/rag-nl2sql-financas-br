@@ -16,14 +16,14 @@ Descrição geral do funcionamento:
   usa a fórmula do monografia.tex (DCG com o desconto 1/log2(i) a partir da posição 2).
 - Híbridas: contagem das perguntas com as tabelas completas e o trecho relevante ao mesmo tempo
   no top-k.
-- Por índice e por tipo: as duas políticas de busca_roteada.py (tabelas E5 e trechos BM25; e a anterior,
-  com RRF nas híbridas) aplicadas com o tipo correto de cada pergunta.
+- Por índice e por tipo: duas políticas, escritas como configurações do configuracao.json (tabelas E5 e
+  trechos BM25; e a anterior, com RRF nas híbridas) e aplicadas com o tipo correto de cada pergunta.
 - Piso aleatório: valor esperado de uma lista sorteada ao acaso, por fórmula exata (sem sorteio).
 - Comparação pareada por pergunta: diferença média, intervalo de 95% por bootstrap (10.000
   reamostragens, semente 42) e vitórias, derrotas e empates.
 
 Dependências:
-- pipeline/online/busca.py, busca_bm25.py, fusao_rrf.py, busca_roteada.py e avaliar_recuperacao.py, e os índices e o esquema em
+- pipeline/online/busca.py, busca_bm25.py, fusao_rrf.py, busca_configuravel.py, configuracao.py e avaliar_recuperacao.py, e os índices e o esquema em
   embeddings/;
 - bibliotecas numpy, sentence-transformers, rank-bm25 e nltk (com o corpus de stopwords);
 - arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
@@ -68,7 +68,8 @@ from busca_bm25 import (
     K1_REFERENCIA,
     IndiceBM25,
 )
-from busca_roteada import POLITICA_HIBRIDA_RRF, POLITICA_PADRAO
+from busca_configuravel import politica
+from configuracao import carregar as carregar_configuracao
 from fusao_rrf import CONSTANTE_RRF, IndiceHibrido
 
 CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
@@ -88,6 +89,17 @@ NOME_RRF = "RRF (E5 + BM25)"
 NOME_ROTEADO = "Por índice (tabelas E5, trechos BM25)"
 NOME_ROTEADO_RRF = "Por tipo (híbrida com RRF)"
 NOME_DO_METODO = {"embeddings": NOME_E5, "bm25": NOME_BM25, "rrf": NOME_RRF}
+
+# As duas linhas "por índice" e "por tipo" são configurações do configuracao.json, escritas por inteiro
+# aqui para não dependerem do que estiver no arquivo: método por índice (tabelas com embeddings e trechos
+# com BM25, igual para todos os tipos) e a política anterior, com RRF nas duas buscas das híbridas.
+SOBRESCRITAS_POR_INDICE = [
+    "busca.esquema.metodo=embeddings", "busca.esquema.por_tipo={}",
+    "busca.glossario.metodo=bm25", "busca.glossario.por_tipo={}",
+]
+SOBRESCRITAS_POR_TIPO_RRF = SOBRESCRITAS_POR_INDICE + [
+    "busca.esquema.por_tipo.hibrida=rrf", "busca.glossario.por_tipo.hibrida=rrf",
+]
 
 # Pares comparados: (chave da métrica, descrição).
 METRICAS_COMPARADAS = [
@@ -370,8 +382,8 @@ def montar_relatorio(caminho_perguntas: str, perguntas: list[dict], resultados: 
         f"- Bibliotecas: rank-bm25 {version('rank-bm25')}, nltk {version('nltk')}, sentence-transformers {version('sentence-transformers')}, numpy {version('numpy')}.",
         f"- BM25: Okapi BM25 da rank_bm25, sem ajuste nos dados. Parâmetros: {params}; epsilon = {fmt(eps)} (padrão da biblioteca). Os valores k1 = 2 e b = 0,5 são a combinação comum citada por Robertson e Zaragoza (2009, p. 31); os da biblioteca (k1 = 1,5 e b = 0,75) ficam dentro das faixas 0,5 < b < 0,8 e 1,2 < k1 < 2 (p. 30) e entram só como verificação de sensibilidade.",
         f"- RRF: fusão por posição dos rankings do E5-base e do BM25 sem stemmer; a nota de cada item é a soma de 1 / (k + posição), com k = {CONSTANTE_RRF}, o valor do artigo original (Cormack, Clarke e Büttcher, 2009), sem ajuste. No glossário reproduz a busca híbrida do MimirRAG; no esquema é uma extensão exploratória (as tabelas fundidas recebem depois a expansão por chave estrangeira).",
-        "- Por índice: a política padrão de busca_roteada.py, com as tabelas buscadas pelo E5-base e os trechos pelo BM25 (BM25 sem stemmer, k1 = 2 e b = 0,5), para todos os tipos de pergunta, aplicada com o tipo correto de cada pergunta (sem erro do classificador). Foi escolhida pela autora depois de ver os resultados dos métodos nestes mesmos conjuntos, então esta linha NÃO é uma confirmação independente: só a avaliação em perguntas novas pode confirmá-la.",
-        "- Por tipo (híbrida com RRF): a política anterior de busca_roteada.py (quantitativa: tabelas com E5; conceitual: trechos com BM25; híbrida: tabelas e trechos com RRF), mantida só para comparação.",
+        "- Por índice: a política com as tabelas buscadas pelo E5-base e os trechos pelo BM25 (BM25 sem stemmer, k1 = 2 e b = 0,5), para todos os tipos de pergunta, aplicada com o tipo correto de cada pergunta (sem erro do classificador). Foi escolhida pela autora depois de ver os resultados dos métodos nestes mesmos conjuntos, então esta linha NÃO é uma confirmação independente: só a avaliação em perguntas novas pode confirmá-la.",
+        "- Por tipo (híbrida com RRF): a política anterior (quantitativa: tabelas com E5; conceitual: trechos com BM25; híbrida: tabelas e trechos com RRF), mantida só para comparação.",
         "- Pré-processamento do BM25: minúsculas, palavras (letras e dígitos), stopwords do português do NLTK, stemmer Snowball do português só na variante com stemmer, acentos removidos no fim. O E5-base recebe a pergunta com o prefixo `query: `.",
         "- Premissas iguais em todos os métodos: mesmas perguntas, mesmos registros indexados, pontuação da tabela pelo melhor registro de resumo ou entidades, expansão por chave estrangeira, mesmos k.",
         f"- Índice de esquema no BM25 (só resumo e entidades): {diag_e['registros']} registros, {diag_e['palavras']} palavras, {diag_e['idf_negativo']} em mais da metade dos registros (IDF negativo trocado por epsilon vezes o IDF médio = {fmt(diag_e['piso_idf'], 3)}; IDF médio = {fmt(diag_e['idf_medio'], 3)}), na variante sem stemmer.",
@@ -473,8 +485,8 @@ def main():
             avaliar_pergunta(metodo, p, referenciadas, n_tabelas, n_trechos, relevantes.get(p["id"], set()))
             for p in perguntas
         ]
-    resultados[NOME_ROTEADO] = montar_roteado(perguntas, resultados, POLITICA_PADRAO)
-    resultados[NOME_ROTEADO_RRF] = montar_roteado(perguntas, resultados, POLITICA_HIBRIDA_RRF)
+    resultados[NOME_ROTEADO] = montar_roteado(perguntas, resultados, politica(carregar_configuracao(sobrescritas=SOBRESCRITAS_POR_INDICE)))
+    resultados[NOME_ROTEADO_RRF] = montar_roteado(perguntas, resultados, politica(carregar_configuracao(sobrescritas=SOBRESCRITAS_POR_TIPO_RRF)))
     resultados[NOME_PISO] = [
         avaliar_piso(p, n_tabelas, n_trechos, len(relevantes.get(p["id"], ())))
         for p in perguntas

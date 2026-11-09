@@ -112,7 +112,7 @@ def main():
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `python pipeline/online/resumir_por_tipo.py`, a partir dos CSVs de `metricas/`.",
         "- Contagens \"x/n\": x perguntas com acerto entre n. Val. é o conjunto de validação (`perguntas_validacao.json`), Teste é `perguntas_dfp.json`, Total soma os dois. Os dois conjuntos são pequenos e não totalmente independentes do ajuste do E5-base (o teste o favorece mais).",
         "- Todas as tabelas no top-k: todas as tabelas necessárias estão entre as k escolhidas (mais as referenciadas por chave estrangeira). Hit@k: pelo menos um trecho relevante entre os k primeiros. Ambos: tabelas completas e trecho relevante ao mesmo tempo. MRR: média de 1/posição do primeiro item certo.",
-        "- Métodos: BM25 sem stemmer com k1 = 2 e b = 0,5; RRF com k = 60; Por índice é a política padrão de `busca_roteada.py` (tabelas com E5 e trechos com BM25, para todos os tipos; escolhida depois de ver estes mesmos dados, então não é confirmação independente) e Política anterior é a que usava RRF nas híbridas, ambas com o tipo correto de cada pergunta. No piso aleatório, o número é o valor esperado de um sorteio.",
+        "- Métodos: BM25 sem stemmer com k1 = 2 e b = 0,5; RRF com k = 60; Por índice é a política (tabelas com E5 e trechos com BM25, para todos os tipos; escolhida depois de ver estes mesmos dados, então não é confirmação independente) e Política anterior é a que usava RRF nas híbridas, ambas com o tipo correto de cada pergunta. No piso aleatório, o número é o valor esperado de um sorteio.",
         "",
     ]
     for titulo, tipo, medidas in SECOES:
