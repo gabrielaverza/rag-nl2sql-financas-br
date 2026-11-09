@@ -11,15 +11,13 @@ Descrição geral do funcionamento:
   e MRR. O nDCG usa a fórmula do monografia.tex (DCG com o desconto 1/log2(i) a partir da posição 2).
 - Híbridas: contagem das perguntas com as tabelas completas e o trecho relevante ao mesmo tempo no top-k.
 - Piso aleatório: valor esperado de uma lista sorteada ao acaso, por fórmula exata (sem sorteio).
-- Comparação pareada por pergunta: diferença média, intervalo de 95% por bootstrap (10.000
-  reamostragens, semente 42) e vitórias, derrotas e empates.
 - Execução das consultas (EX): compara o resultado do SQL gerado com o da referência. Como em Zhong et
   al. (2020), resultados que só diferem pela ordem das colunas são equivalentes; a ordem das linhas é
   ignorada e os números são arredondados em 2 casas. Há também a versão que aceita a coluna DENOM_CIA e
   as linhas de outras companhias que combinam com o nome do LIKE.
 - Formatação: números com vírgula decimal e tabelas em Markdown, para os relatórios.
 
-Dependências: bibliotecas numpy e as padrão do Python. Não lê arquivos nem chama o LLM.
+Dependências: só a biblioteca padrão do Python. Não lê arquivos nem chama o LLM.
 
 Parâmetros: nenhum. É um módulo importado por executar_experimentos.py.
 
@@ -34,14 +32,10 @@ import re
 from collections import Counter
 from math import comb
 
-import numpy as np
-
 KS_TABELAS = (1, 3, 5)
 KS_TRECHOS = (1, 3, 5, 10, 20)
 KS_CONJUNTA = (3, 5)
 TABELA_COMUM = "companhias"
-AMOSTRAS_BOOTSTRAP = 10000
-SEMENTE = 42
 NOME_PISO = "Piso aleatório"
 
 
@@ -155,24 +149,7 @@ def avaliar_piso(p: dict, n_tabelas: int, n_trechos: int, n_relevantes: int) -> 
 
 
 # ---------------------------------------------------------------------------
-# 3) Comparação pareada
-# ---------------------------------------------------------------------------
-
-# Compara dois métodos pergunta a pergunta: diferença média, IC de 95% por bootstrap e vitórias.
-def comparar(a: list[dict], b: list[dict], chave: str, rng) -> dict | None:
-    dif = np.array([x["m"][chave] - y["m"][chave] for x, y in zip(a, b) if chave in x["m"] and chave in y["m"]])
-    if len(dif) == 0:
-        return None
-    amostras = rng.choice(dif, size=(AMOSTRAS_BOOTSTRAP, len(dif)), replace=True).mean(axis=1)
-    inferior, superior = np.percentile(amostras, [2.5, 97.5])
-    return {
-        "n": len(dif), "dif": float(dif.mean()), "ic": (float(inferior), float(superior)),
-        "vitorias": int((dif > 0).sum()), "derrotas": int((dif < 0).sum()), "empates": int((dif == 0).sum()),
-    }
-
-
-# ---------------------------------------------------------------------------
-# 4) Execução das consultas (EX)
+# 3) Execução das consultas (EX)
 # ---------------------------------------------------------------------------
 
 # Arredonda os números e ordena as linhas, para comparar resultados sem depender da ordem.
@@ -216,7 +193,7 @@ def resultado_contem_referencia(colunas: list[str], gerado: list[tuple], referen
 
 
 # ---------------------------------------------------------------------------
-# 5) Formatação dos relatórios
+# 4) Formatação dos relatórios
 # ---------------------------------------------------------------------------
 
 # Escreve um número com vírgula decimal, ou "n/d" se não houver.

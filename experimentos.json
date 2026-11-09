@@ -9,16 +9,6 @@
         {"nome": "BM25 sem stemmer", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
         {"nome": "RRF com stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=true", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
         {"nome": "RRF sem stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
-      ],
-      "comparacoes": [
-        ["Embeddings", "BM25 com stemmer"],
-        ["Embeddings", "BM25 sem stemmer"],
-        ["Embeddings", "RRF com stemmer"],
-        ["Embeddings", "RRF sem stemmer"],
-        ["BM25 com stemmer", "BM25 sem stemmer"],
-        ["RRF com stemmer", "RRF sem stemmer"],
-        ["RRF com stemmer", "BM25 com stemmer"],
-        ["RRF sem stemmer", "BM25 sem stemmer"]
       ]
     },
     "teste_equivalencia": {
@@ -31,10 +21,6 @@
         {"nome": "RRF (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "divisor.ativo=false", "bm25.radicalizar=false"]},
         {"nome": "E5 (mista, divisor ligado)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=true", "bm25.radicalizar=false"]},
         {"nome": "RRF (mista, divisor ligado)", "sobrescritas": ["busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "divisor.ativo=true", "bm25.radicalizar=false"]}
-      ],
-      "comparacoes": [
-        ["E5 (mista, divisor ligado)", "E5 (pergunta inteira)"],
-        ["E5 (pergunta inteira)", "BM25 sem stemmer (pergunta inteira)"]
       ]
     },
     "teste_pipeline": {

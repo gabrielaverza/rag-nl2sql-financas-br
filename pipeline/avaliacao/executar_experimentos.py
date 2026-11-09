@@ -7,7 +7,7 @@ traz as tabelas e os trechos certos, sem LLM, exceto o divisor das perguntas hí
 
 Descrição geral do funcionamento:
 - Um experimento é um grupo de configurações comparadas entre si e está descrito em experimentos.json
-  (na raiz do repositório): nível, configurações nomeadas, pares a comparar e, no nível pipeline,
+  (na raiz do repositório): nível, configurações nomeadas e, no nível pipeline,
   rodadas e a passada de tabelas ideais. Cada configuração é uma lista de trocas "chave=valor" sobre o
   configuracao.json, no formato do --set (configuracao.py), então qualquer chave pode variar: modelo de
   embeddings, método de busca por índice e por tipo, k, divisor, bloqueio de pronomes, radicalizador.
@@ -24,9 +24,9 @@ Descrição geral do funcionamento:
   fica em um cache por (pergunta, tabelas do contexto) que vale entre as configurações da mesma
   rodada e é refeito a cada rodada, para a variação do LLM aparecer nas rodadas. Com
   "tabelas_ideais": true, uma passada extra gera o SQL só com as tabelas de tabelas_esperadas.
-- Comparação pareada: diferença média pergunta a pergunta (sempre o primeiro menos o segundo), vitórias,
-  derrotas e empates, e intervalo de 95% por bootstrap (comparar() de metricas.py: 10.000
-  reamostragens, semente 42). O relatório diz onde o intervalo fica em relação ao zero.
+- Sem teste estatístico: o relatório mostra as métricas de cada configuração, por tipo de pergunta
+  (contagens "x/n" e médias), e quem compara é o leitor, como em BEIR, E5 e BGE-M3. Com 20 perguntas por
+  tipo, cada pergunta vale 5 pontos percentuais; os números comparam as configurações nesta amostra.
 
 Dependências:
 - pipeline/avaliacao/metricas.py; pipeline/online/busca*.py, divisor.py e main.py; os índices e o
@@ -72,8 +72,6 @@ from datetime import datetime
 from importlib.metadata import PackageNotFoundError, version
 from statistics import mean
 
-import numpy as np
-
 # Os módulos do fluxo ficam em pipeline/online/ e os compartilhados em pipeline/.
 PASTA = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(PASTA, "..", "online"))
@@ -82,10 +80,8 @@ sys.path.insert(0, os.path.join(PASTA, ".."))
 from metricas import (  # noqa: E402
     KS_TABELAS,
     NOME_PISO,
-    SEMENTE,
     TABELA_COMUM,
     avaliar_piso,
-    comparar,
     fmt,
     juntar_hibrida,
     metricas_tabelas,
@@ -228,9 +224,6 @@ def carregar_experimento(caminho: str, nome: str) -> dict:
     if len(set(nomes)) != len(nomes):
         raise ValueError(f"{nome}: nomes de configuração repetidos")
     exp["configs"] = {c["nome"]: carregar(sobrescritas=c.get("sobrescritas", [])) for c in exp["configuracoes"]}
-    for a, b in exp.get("comparacoes", []):
-        if a not in exp["configs"] or b not in exp["configs"]:
-            raise ValueError(f"{nome}: comparação com configuração inexistente: {a!r}, {b!r}")
     return exp
 
 
@@ -525,7 +518,7 @@ def iniciar_ficha(exp: dict, perguntas: list[dict], comando: str, ids: list[str]
         "modelos_embeddings": {m: MODELOS[m]["id"] for m in modelos},
         "llm": info_llm() if usa_llm else None,
         "bibliotecas": versoes(),
-        "configuracoes": exp["configs"], "comparacoes": exp.get("comparacoes", []),
+        "configuracoes": exp["configs"],
     }
 
 
@@ -640,15 +633,6 @@ def celula(lista: list[dict], chave: str, forma: str, tipo: str | None, piso: bo
     return fmt(media)
 
 
-# Diz onde o intervalo de 95% fica em relação ao zero (a leitura da diferença do primeiro menos o segundo).
-def posicao_intervalo(ic: tuple) -> str:
-    if ic[0] > 0:
-        return "acima de zero"
-    if ic[1] < 0:
-        return "abaixo de zero"
-    return "inclui zero"
-
-
 COMANDO_PADRAO = "python pipeline/avaliacao/executar_experimentos.py {nome}"
 
 
@@ -681,22 +665,6 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
         t += [f"## {n_secao}. Perguntas {PLURAL[tipo]} (contagens \"x/n\" e médias)", ""]
         corpo = [[nome] + [celula(lista, c, f, tipo, nome == NOME_PISO) for c, _, f in medidas] for nome, lista in resultados.items()]
         t += tabela_md(["Configuração"] + [rotulo for _, rotulo, _ in medidas], corpo)
-        n_secao += 1
-    if exp.get("comparacoes"):
-        t += [f"## {n_secao}. Comparação pareada (primeira configuração menos a segunda)", ""]
-        t += ["Diferença média pergunta a pergunta (0,10 equivale a 2 perguntas de 20), intervalo de 95% por bootstrap (10.000 reamostragens, semente 42) e vitórias, derrotas e empates da primeira. A última coluna só diz onde o intervalo fica em relação ao zero.", ""]
-        rng = np.random.default_rng(SEMENTE)
-        corpo = []
-        for a, b in exp["comparacoes"]:
-            for tipo in TIPOS:
-                for chave, rotulo, _ in METRICAS_POR_TIPO[tipo]:
-                    la = [r for r in resultados[a] if r["tipo"] == tipo]
-                    lb = [r for r in resultados[b] if r["tipo"] == tipo]
-                    c = comparar(la, lb, chave, rng) if la else None
-                    if c:
-                        corpo.append([f"{a} contra {b}", tipo, rotulo, str(c["n"]), fmt(c["dif"]), f"[{fmt(c['ic'][0])}; {fmt(c['ic'][1])}]",
-                                      f"{c['vitorias']}/{c['derrotas']}/{c['empates']}", posicao_intervalo(c["ic"])])
-        t += tabela_md(["Comparação", "Tipo", "Métrica", "n", "Diferença média", "IC 95%", "V/D/E", "Intervalo"], corpo)
         n_secao += 1
     modelos = {c["modelo_embedding"] for c in exp["configs"].values()}
     if len(modelos) > 1:
@@ -793,7 +761,7 @@ def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str) -> l
     t += [f"| {nome} | {escala} | {texto} |" for nome, escala, texto in DESCRICAO_METRICAS]
     t += ["", f"## {n + 1}. Ressalvas", ""]
     t += [
-        "- Amostra pequena: com 20 perguntas por tipo, diferenças de uma ou duas perguntas são ruído. Atravessar o zero não prova que os métodos são iguais.",
+        "- Amostra pequena: com 20 perguntas por tipo, cada pergunta vale 5 pontos percentuais. Os números comparam as configurações nesta amostra, sem teste estatístico, e não permitem afirmar superioridade estatística de uma sobre outra.",
         "- O critério de relevância dos trechos é a evidência literal; um trecho útil sem essa frase conta como erro.",
         "- Nas tabelas, a regra de pontuação (melhor registro de resumo ou entidades) e a expansão por chave estrangeira são as mesmas em todos os métodos; o RRF nas tabelas é uma extensão exploratória do que o MimirRAG faz com trechos.",
     ]
