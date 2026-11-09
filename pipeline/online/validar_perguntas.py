@@ -7,44 +7,46 @@ Descrição geral do funcionamento:
 - Cada pergunta tem os campos id, pergunta, tipo (quantitativa, conceitual ou hibrida),
   tabelas_esperadas (lista de nomes de tabela) e evidencia (lista de textos copiados dos normativos).
   O campo sql_referencia é opcional (só serve à avaliação do SQL).
-- Erros: campo faltando, tipo desconhecido, id repetido ou já usado nos outros conjuntos, pergunta igual
-  a uma dos outros conjuntos, tabela que não existe em embeddings/esquema.json, evidência que não
+- Erros: campo faltando, tipo desconhecido, id ou pergunta repetidos no arquivo, tabela que não existe em embeddings/esquema.json, evidência que não
   aparece em nenhum trecho de embeddings/index_glossario.json, e combinação errada com o tipo
   (quantitativa: só tabelas; conceitual: só evidência; híbrida: as duas).
-- Avisos: evidência que aparece em mais de 5 trechos (genérica demais, o Recall perde sentido),
-  pergunta que cita companhia já usada nos conjuntos existentes (para manter a independência, prefira
-  companhias novas) e conjunto muito desequilibrado entre os tipos.
+- Avisos: evidência que aparece em mais de 5 trechos (genérica demais, o Recall perde sentido) e
+  conjunto muito desequilibrado entre os tipos.
 - A evidência é comparada com os trechos como em avaliar_recuperacao.py: espaços normalizados, sem
   ignorar maiúsculas.
 - Nenhuma busca por embeddings ou BM25 é feita aqui, então a conferência não depende dos métodos
   avaliados (a evidência deve ser escolhida lendo os normativos, e não olhando o que a busca devolve).
+- Com a opção --base, confere também os campos de base do conjunto final: base_dados (companhia, cd_cvm,
+  tabela e cd_conta existem em dados/dfp.db) e sql_referencia (executa e devolve valor), nas perguntas
+  quantitativas e híbridas; base_normativo (arquivo, pagina, trecho_id, dispositivo, e os trechos
+  listados são exatamente os que contêm a evidência, ou qualquer pedaço dela quando a frase cruza o limite entre dois
+  trechos), nas conceituais e híbridas.
 
-Dependências: embeddings/esquema.json e embeddings/index_glossario.json; dados/perguntas_dfp.json e
-dados/perguntas_validacao.json (para as comparações). Só biblioteca padrão.
+Dependências: embeddings/esquema.json e embeddings/index_glossario.json; dados/dfp.db (só com --base).
+Só biblioteca padrão.
 
-Parâmetros: caminho do arquivo de perguntas a conferir, como primeiro argumento.
+Parâmetros: caminho do arquivo de perguntas a conferir (o conjunto oficial é dados/perguntas_validacao.json),
+como primeiro argumento; --base é opcional.
 
 Resultado: imprime os erros, os avisos e a contagem por tipo; termina com código 1 se houver erro.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/online/validar_perguntas.py dados/perguntas_novas.json
+    python pipeline/online/validar_perguntas.py dados/perguntas_validacao.json --base
 """
 
 import json
-import os
 import re
+import sqlite3
 import sys
 
-CAMINHOS_EXISTENTES = ("dados/perguntas_dfp.json", "dados/perguntas_validacao.json")
 CAMINHO_ESQUEMA = "embeddings/esquema.json"
 CAMINHO_GLOSSARIO = "embeddings/index_glossario.json"
+CAMINHO_BANCO = "dados/dfp.db"
 TIPOS = ("quantitativa", "conceitual", "hibrida")
 CAMPOS = ("id", "pergunta", "tipo", "tabelas_esperadas", "evidencia")
+CAMPOS_BASE_DADOS = ("companhia", "cd_cvm", "tabela", "cd_conta")
+CAMPOS_BASE_NORMATIVO = ("arquivo", "pagina", "trecho_id", "dispositivo")
 MAX_TRECHOS_POR_EVIDENCIA = 5
-EMPRESAS_JA_USADAS = (
-    "Ambev", "Alpargatas", "JBS", "Petrobras", "Vale", "WEG", "Natura", "Suzano",
-    "Raia Drogasil", "Klabin", "Lojas Renner", "Gerdau",
-)
 
 
 # Troca qualquer sequência de espaços e quebras de linha por um espaço.
@@ -64,15 +66,7 @@ def conferir(perguntas: list[dict], caminho: str) -> tuple[list[str], list[str]]
     tabelas = {e["tabela"] for e in ler(CAMINHO_ESQUEMA)}
     trechos = [normalizar(r["conteudo"]) for r in ler(CAMINHO_GLOSSARIO)]
 
-    # Os outros conjuntos servem de comparação; o próprio arquivo, se for um deles, fica de fora.
-    outros = [c for c in CAMINHOS_EXISTENTES if os.path.abspath(c) != os.path.abspath(caminho)]
-    ids_usados, perguntas_usadas = set(), set()
-    for outro in outros:
-        for p in ler(outro):
-            ids_usados.add(p["id"])
-            perguntas_usadas.add(normalizar(p["pergunta"]).lower())
-
-    vistos = set()
+    vistos, perguntas_vistas = set(), set()
     for i, p in enumerate(perguntas, start=1):
         nome = p.get("id", f"#{i}")
         faltando = [c for c in CAMPOS if c not in p]
@@ -85,10 +79,9 @@ def conferir(perguntas: list[dict], caminho: str) -> tuple[list[str], list[str]]
         if p["id"] in vistos:
             erros.append(f"{nome}: id repetido neste arquivo")
         vistos.add(p["id"])
-        if p["id"] in ids_usados:
-            erros.append(f"{nome}: id já usado em outro conjunto")
-        if normalizar(p["pergunta"]).lower() in perguntas_usadas:
-            erros.append(f"{nome}: pergunta igual a uma de outro conjunto")
+        if normalizar(p["pergunta"]).lower() in perguntas_vistas:
+            erros.append(f"{nome}: pergunta repetida neste arquivo")
+        perguntas_vistas.add(normalizar(p["pergunta"]).lower())
 
         tem_tabelas, tem_evidencia = bool(p["tabelas_esperadas"]), bool(p["evidencia"])
         if p["tipo"] == "quantitativa" and (not tem_tabelas or tem_evidencia):
@@ -108,24 +101,102 @@ def conferir(perguntas: list[dict], caminho: str) -> tuple[list[str], list[str]]
             elif achados > MAX_TRECHOS_POR_EVIDENCIA:
                 avisos.append(f"{nome}: evidência em {achados} trechos (genérica demais): {evidencia[:60]!r}")
 
-        citadas = [e for e in EMPRESAS_JA_USADAS if re.search(rf"\b{re.escape(e)}\b", p["pergunta"])]
-        if citadas and outros:
-            avisos.append(f"{nome}: cita companhia já usada nos outros conjuntos: {citadas}")
-
     por_tipo = {t: sum(1 for p in perguntas if p.get("tipo") == t) for t in TIPOS}
     if perguntas and min(por_tipo.values()) < len(perguntas) / 6:
         avisos.append(f"conjunto desequilibrado entre os tipos: {por_tipo}")
     return erros, avisos
 
 
+# Confere os campos de base do conjunto final e devolve a lista de erros.
+def conferir_base(perguntas: list[dict]) -> list[str]:
+    erros = []
+    tabelas = {e["tabela"] for e in ler(CAMINHO_ESQUEMA)}
+    registros = {r["id"]: r for r in ler(CAMINHO_GLOSSARIO)}
+    trechos = {rid: normalizar(r["conteudo"]) for rid, r in registros.items()}
+    # Modo somente leitura: a conferência nunca altera o banco.
+    banco = sqlite3.connect(f"file:{CAMINHO_BANCO}?mode=ro", uri=True)
+
+    for p in perguntas:
+        nome = p.get("id", "?")
+        tipo = p.get("tipo")
+        precisa_dados = tipo in ("quantitativa", "hibrida")
+        precisa_norma = tipo in ("conceitual", "hibrida")
+        dados, norma = p.get("base_dados"), p.get("base_normativo")
+
+        if precisa_dados:
+            if not dados:
+                erros.append(f"{nome}: base_dados faltando")
+            for b in dados or []:
+                faltando = [c for c in CAMPOS_BASE_DADOS if c not in b]
+                if faltando:
+                    erros.append(f"{nome}: base_dados sem {faltando}")
+                    continue
+                if b["tabela"] not in tabelas:
+                    erros.append(f"{nome}: base_dados com tabela inexistente: {b['tabela']}")
+                    continue
+                if b["tabela"] not in p["tabelas_esperadas"]:
+                    erros.append(f"{nome}: tabela da base ({b['tabela']}) fora de tabelas_esperadas")
+                linha = banco.execute("SELECT DENOM_CIA FROM companhias WHERE CD_CVM = ?", (b["cd_cvm"],)).fetchone()
+                if linha is None or linha[0] != b["companhia"]:
+                    erros.append(f"{nome}: companhia e cd_cvm não conferem com o banco: {b['companhia']!r}")
+                existe = banco.execute(
+                    f"SELECT 1 FROM {b['tabela']} WHERE CD_CVM = ? AND CD_CONTA = ? AND ORDEM_EXERC = 'ÚLTIMO'",
+                    (b["cd_cvm"], b["cd_conta"])).fetchone()
+                if existe is None:
+                    erros.append(f"{nome}: conta {b['cd_conta']} não existe em {b['tabela']} para {b['companhia']}")
+            sql = p.get("sql_referencia")
+            if not sql:
+                erros.append(f"{nome}: sql_referencia faltando")
+            else:
+                try:
+                    linhas = banco.execute(sql).fetchall()
+                    if not linhas or any(v is None for linha in linhas for v in linha):
+                        erros.append(f"{nome}: sql_referencia sem resultado ou com valor nulo")
+                except sqlite3.Error as e:
+                    erros.append(f"{nome}: sql_referencia não executa: {e}")
+        elif dados:
+            erros.append(f"{nome}: conceitual não deve ter base_dados")
+
+        if precisa_norma:
+            if not norma:
+                erros.append(f"{nome}: base_normativo faltando")
+                continue
+            faltando = [c for c in CAMPOS_BASE_NORMATIVO if c not in norma]
+            if faltando:
+                erros.append(f"{nome}: base_normativo sem {faltando}")
+                continue
+            if not isinstance(norma["pagina"], int) or norma["pagina"] < 1:
+                erros.append(f"{nome}: pagina inválida: {norma['pagina']!r}")
+            if not str(norma["dispositivo"]).strip():
+                erros.append(f"{nome}: dispositivo vazio")
+            ids = norma["trecho_id"]
+            if not ids or any(i not in registros for i in ids):
+                erros.append(f"{nome}: trecho_id inexistente no índice: {ids}")
+                continue
+            if any(registros[i]["fonte"] != norma["arquivo"] for i in ids):
+                erros.append(f"{nome}: arquivo da base não é a fonte dos trechos listados")
+            # Os trechos listados têm de ser exatamente os que contêm a evidência (ou qualquer um dos
+            # pedaços dela, quando a frase cruza o limite entre dois trechos).
+            evidencias = [normalizar(e) for e in p["evidencia"]]
+            com_evidencia = {rid for rid, t in trechos.items() if any(e in t for e in evidencias)}
+            if set(ids) != com_evidencia:
+                erros.append(f"{nome}: trecho_id difere dos trechos que contêm a evidência: {sorted(com_evidencia)}")
+        elif norma:
+            erros.append(f"{nome}: quantitativa não deve ter base_normativo")
+    return erros
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    if len(sys.argv) < 2:
-        print("Uso: python pipeline/online/validar_perguntas.py arquivo_de_perguntas.json")
+    argumentos = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if not argumentos:
+        print("Uso: python pipeline/online/validar_perguntas.py arquivo_de_perguntas.json [--base]")
         sys.exit(1)
-    caminho = sys.argv[1]
+    caminho = argumentos[0]
     perguntas = ler(caminho)
     erros, avisos = conferir(perguntas, caminho)
+    if "--base" in sys.argv:
+        erros += conferir_base(perguntas)
     por_tipo = {t: sum(1 for p in perguntas if p.get("tipo") == t) for t in TIPOS}
     print(f"{caminho}: {len(perguntas)} perguntas {por_tipo}")
     for e in erros:
