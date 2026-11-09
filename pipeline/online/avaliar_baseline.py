@@ -30,7 +30,7 @@ Dependências:
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento.
 
-Resultado: imprime o relatório e grava, em metricas/, um arquivo .md com as tabelas e um .csv com
+Resultado: imprime o relatório e grava, em metricas/rascunhos/ (pasta ignorada pelo git), um arquivo .md com as tabelas e um .csv com
 as métricas por pergunta e por método.
 
 Executar de dentro de rag-nl2sql-financas-br/:
@@ -72,7 +72,7 @@ from configuracao import carregar as carregar_configuracao
 from fusao_rrf import CONSTANTE_RRF, IndiceHibrido
 
 CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
-PASTA_SAIDA = "metricas"
+PASTA_SAIDA = os.path.join("metricas", "rascunhos")
 KS_TABELAS = (1, 3, 5)
 KS_TRECHOS = (1, 3, 5, 10, 20)
 KS_CONJUNTA = (3, 5)

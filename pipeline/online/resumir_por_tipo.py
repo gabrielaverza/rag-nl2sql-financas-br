@@ -5,7 +5,7 @@ Função: resume, por tipo de pergunta, as métricas de recuperação que avalia
 CSV, em contagens "x de n", para comparar os métodos sem reexecutar nenhuma busca.
 
 Descrição geral do funcionamento:
-- Lê o CSV de metricas/ do conjunto oficial (perguntas_validacao.json) e agrupa as perguntas por tipo (quantitativa, conceitual
+- Lê o CSV de metricas/rascunhos/ do conjunto oficial (perguntas_validacao.json) e agrupa as perguntas por tipo (quantitativa, conceitual
   e híbrida).
 - Para cada tipo, mostra os métodos lado a lado (E5-base, BM25, RRF, a política por tipo e o piso
   aleatório) nas métricas que fazem sentido para ele: tabelas nas quantitativas, trechos nas
@@ -13,12 +13,12 @@ Descrição geral do funcionamento:
 - Cada medida de 0 ou 1 aparece como contagem de perguntas; o MRR aparece como média. No piso
   aleatório, a contagem é o valor esperado.
 
-Dependências: metricas/baseline_recuperacao_perguntas_validacao.csv (gerado por
+Dependências: metricas/rascunhos/baseline_recuperacao_perguntas_validacao.csv (gerado por
 avaliar_baseline.py dados/perguntas_validacao.json). Só biblioteca padrão.
 
 Parâmetros: nenhum argumento.
 
-Resultado: grava metricas/resumo_por_tipo.md e imprime o mesmo texto.
+Resultado: grava metricas/rascunhos/resumo_por_tipo.md e imprime o mesmo texto.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/online/resumir_por_tipo.py
@@ -29,7 +29,7 @@ import os
 import sys
 from datetime import datetime
 
-PASTA = "metricas"
+PASTA = os.path.join("metricas", "rascunhos")
 CSVS = (("Perguntas", os.path.join(PASTA, "baseline_recuperacao_perguntas_validacao.csv")),)
 METODOS = [
     ("E5-base (embeddings)", "E5-base"),
@@ -115,6 +115,7 @@ def main():
         t += [f"## {titulo}", ""] + tabela_secao(dados, tipo, medidas)
     texto = "\n".join(t)
     print(texto)
+    os.makedirs(PASTA, exist_ok=True)
     with open(os.path.join(PASTA, "resumo_por_tipo.md"), "w", encoding="utf-8") as f:
         f.write(texto)
 

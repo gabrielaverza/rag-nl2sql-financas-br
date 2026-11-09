@@ -4,3 +4,5 @@ __pycache__/
 dados/*.db
 embeddings/modelos/
 dados/*_inativo.json
+metricas/*_inativo.*
+metricas/rascunhos/

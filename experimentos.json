@@ -22,7 +22,8 @@
       ]
     },
     "teste_equivalencia": {
-      "descricao": "Teste de aceitação da Fase 5: com o divisor e o stemmer desligados, o executor deve reproduzir os números de avaliar_baseline.py; a última configuração (divisor ligado) deve reproduzir a condição mista de avaliar_divisao_hibridas.py. Os resultados são de teste e não valem como resultado da Fase 6.",
+      "rascunho": true,
+      "descricao": "Teste de equivalência do executor: com o divisor e o stemmer desligados, o executor deve reproduzir os números de avaliar_baseline.py; a última configuração (divisor ligado) deve reproduzir a condição mista de avaliar_divisao_hibridas.py. Os resultados são de teste e não valem como resultado dos experimentos.",
       "nivel": "recuperacao",
       "configuracoes": [
         {"nome": "E5 (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=false", "bm25.radicalizar=false"]},
@@ -37,7 +38,8 @@
       ]
     },
     "teste_pipeline": {
-      "descricao": "Teste do nível pipeline completo da Fase 5, para rodar em poucas perguntas (use --ids). Mostra o funcionamento do cache de SQL, da passada de tabelas ideais e das rodadas. Não é resultado da Fase 6.",
+      "rascunho": true,
+      "descricao": "Teste do nível pipeline completo, para rodar em poucas perguntas (use --ids). Mostra o funcionamento do cache de SQL, da passada de tabelas ideais e das rodadas. Não é resultado dos experimentos.",
       "nivel": "pipeline",
       "rodadas": 1,
       "tabelas_ideais": true,

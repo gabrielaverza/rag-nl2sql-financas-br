@@ -18,7 +18,7 @@ Dependências: os índices e o esquema em embeddings/, dados/perguntas_validacao
 
 Parâmetros: nenhum argumento.
 
-Resultado: imprime o relatório e grava metricas/tempo_busca.md.
+Resultado: imprime o relatório e grava metricas/rascunhos/tempo_busca.md (pasta ignorada pelo git).
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/online/medir_tempo_busca.py
@@ -33,7 +33,7 @@ from datetime import datetime
 from statistics import mean, median
 
 CAMINHOS_PERGUNTAS = ("dados/perguntas_validacao.json",)
-PASTA_SAIDA = "metricas"
+PASTA_SAIDA = os.path.join("metricas", "rascunhos")
 RODADAS = 3
 
 

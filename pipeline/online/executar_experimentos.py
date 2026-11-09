@@ -35,13 +35,23 @@ Dependências:
 - servidor Ollama com o modelo qwen2.5-coder:7b (divisor e nível pipeline).
 
 Parâmetros: o nome do experimento, e opcionalmente --rodadas N (nível pipeline), --ids q01,c01,...
-(roda só essas perguntas; os arquivos ganham o sufixo _parcial), --refazer-divisoes, --listar e
---experimentos CAMINHO (outro arquivo de experimentos).
+(roda só essas perguntas, como rascunho), --refazer-divisoes, --listar e --experimentos CAMINHO (outro
+arquivo de experimentos).
 
-Resultado: em metricas/, com nomes fixos que são sobrescritos a cada execução: experimento_<nome>.csv
-(uma linha por rodada, configuração, pergunta e métrica), experimento_<nome>_resumo.csv (uma linha por
-configuração, tipo e métrica) e experimento_<nome>.md (tabelas, comparações, métricas e escalas,
-ressalvas e comandos); no nível pipeline, também experimento_<nome>_respostas.json.
+Resultado: uma pasta por experimento, metricas/<nome>/, com nomes fixos que são sobrescritos a cada
+execução: resultados.csv (uma linha por rodada, configuração, pergunta e métrica), resumo.csv (uma
+linha por configuração, tipo e métrica), relatorio.md (tabelas, comparações, métricas e escalas,
+ressalvas e comandos) e execucao.json, a ficha que identifica a execução; no nível pipeline, também
+respostas.json. Execuções de teste (--ids, ou "rascunho": true no experimento) vão para
+metricas/rascunhos/<nome>/, pasta ignorada pelo git, para não se misturarem com as oficiais.
+
+Identificação e versão. Cada execução recebe um identificador (data e hora, AAAAMMDD-HHMMSS) que aparece
+no relatorio.md e na coluna "execucao" dos CSV. A ficha execucao.json guarda o comando, o commit do
+código (com aviso de alterações não commitadas), a impressão digital (SHA-256) da configuração, dos
+experimentos, das perguntas e dos índices, os modelos, as versões das bibliotecas, as configurações
+efetivas, o número de rodadas e a duração. A versão de uma execução oficial é o commit que guarda a
+pasta, com o identificador na mensagem, e uma tag (<nome>-v1, <nome>-v2...); o executor imprime os
+comandos sugeridos no fim, mas não faz commit nem cria tag.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/online/executar_experimentos.py --listar
@@ -51,11 +61,15 @@ Executar de dentro de rag-nl2sql-financas-br/:
 
 import argparse
 import csv
+import hashlib
 import json
 import os
+import platform
+import subprocess
 import sys
 import time
 from datetime import datetime
+from importlib.metadata import PackageNotFoundError, version
 from statistics import mean
 
 import numpy as np
@@ -92,7 +106,8 @@ from modelos_embedding import MODELO_PADRAO
 CAMINHO_EXPERIMENTOS = "experimentos.json"
 CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 PASTA_SAIDA = "metricas"
-CAMINHO_DIVISOES = os.path.join(PASTA_SAIDA, "divisoes_hibridas.json")
+PASTA_RASCUNHOS = os.path.join(PASTA_SAIDA, "rascunhos")
+CAMINHO_DIVISOES = "/".join((PASTA_SAIDA, "divisoes_hibridas.json"))
 TIPOS = ("quantitativa", "conceitual", "hibrida")
 PLURAL = {"quantitativa": "quantitativas", "conceitual": "conceituais", "hibrida": "híbridas"}
 
@@ -420,7 +435,110 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# 5) Saídas
+# 5) Identificação da execução (ficha)
+# ---------------------------------------------------------------------------
+
+# Impressão digital (SHA-256) de um arquivo, lida em blocos.
+def sha256_arquivo(caminho: str) -> str:
+    h = hashlib.sha256()
+    with open(caminho, "rb") as f:
+        for bloco in iter(lambda: f.read(1 << 20), b""):
+            h.update(bloco)
+    return h.hexdigest()
+
+
+# Executa um comando do git e devolve a saída, ou None se o git não estiver disponível.
+def _git(*args) -> str | None:
+    try:
+        r = subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8", timeout=30)
+        return r.stdout.rstrip("\n") if r.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+# Commit do código e se há alterações não commitadas (os resultados em metricas/ não contam).
+def info_git() -> dict:
+    commit = _git("rev-parse", "HEAD")
+    if not commit:
+        return {"commit": None}
+    status = _git("status", "--porcelain", "--", ".", ":(exclude)metricas") or ""
+    alterados = [linha[3:] for linha in status.splitlines()]
+    return {
+        "commit": commit, "commit_curto": commit[:7], "ramo": _git("rev-parse", "--abbrev-ref", "HEAD"),
+        "alteracoes_nao_commitadas": bool(alterados), "arquivos_alterados": alterados[:20],
+    }
+
+
+# Versões do Python e das bibliotecas que influenciam os resultados.
+def versoes() -> dict:
+    saida = {"python": platform.python_version(), "sistema": platform.platform()}
+    for pacote in ("numpy", "sentence-transformers", "transformers", "torch", "rank-bm25", "nltk", "ollama"):
+        try:
+            saida[pacote] = version(pacote)
+        except PackageNotFoundError:
+            saida[pacote] = None
+    return saida
+
+
+# Identifica o modelo de linguagem no Ollama (nome e digest), se o servidor responder.
+def info_llm() -> dict:
+    from gerador_sql import MODELO_LLM
+
+    try:
+        import ollama
+
+        for m in ollama.list().models:
+            if m.model == MODELO_LLM:
+                return {"modelo": MODELO_LLM, "digest": m.digest, "tamanho_bytes": m.size}
+    except Exception:
+        pass
+    return {"modelo": MODELO_LLM, "digest": None}
+
+
+# Monta a ficha da execução com tudo o que identifica o teste, antes de rodá-lo.
+def iniciar_ficha(exp: dict, perguntas: list[dict], comando: str, ids: list[str] | None, rascunho: bool, rodadas: int) -> dict:
+    from modelos_embedding import MODELOS
+
+    modelos = sorted({c["modelo_embedding"] for c in exp["configs"].values()})
+    arquivos = ["configuracao.json", "experimentos.json", CAMINHO_PERGUNTAS, "embeddings/esquema.json", CAMINHO_DIVISOES,
+                "embeddings/index_esquema.json", "embeddings/index_glossario.json",
+                "embeddings/index_bm25_esquema.json", "embeddings/index_bm25_glossario.json"]
+    for modelo in modelos:
+        if modelo != MODELO_PADRAO:
+            arquivos += [caminho_indice("esquema", modelo), caminho_indice("glossario", modelo)]
+    usa_llm = exp["nivel"] == "pipeline" or any(c["divisor"]["ativo"] for c in exp["configs"].values())
+    agora = datetime.now()
+    return {
+        "execucao": agora.strftime("%Y%m%d-%H%M%S"),
+        "experimento": exp["nome"], "nivel": exp["nivel"], "descricao": exp.get("descricao", ""),
+        "comando": comando, "inicio": agora.isoformat(timespec="seconds"),
+        "rascunho": rascunho, "ids": ids, "n_perguntas": len(perguntas), "rodadas": rodadas,
+        "tabelas_ideais": bool(exp.get("tabelas_ideais")),
+        "git": info_git(),
+        "arquivos_sha256": {a: sha256_arquivo(a) for a in dict.fromkeys(arquivos) if os.path.exists(a)},
+        "modelos_embeddings": {m: MODELOS[m]["id"] for m in modelos},
+        "llm": info_llm() if usa_llm else None,
+        "bibliotecas": versoes(),
+        "configuracoes": exp["configs"], "comparacoes": exp.get("comparacoes", []),
+    }
+
+
+# Linha do relatório que identifica a execução.
+def linha_execucao(ficha: dict) -> str:
+    g = ficha["git"]
+    commit = f"commit `{g['commit_curto']}`" + (" **com alterações não commitadas**" if g["alteracoes_nao_commitadas"] else "") if g.get("commit") else "commit n/d"
+    return f"- Execução `{ficha['execucao']}`, {commit}. A ficha completa está em `execucao.json`."
+
+
+# Pasta de saída: metricas/<nome>/, ou metricas/rascunhos/<nome>/ para testes e execuções parciais.
+def pasta_de_saida(nome: str, rascunho: bool) -> str:
+    if nome == "rascunhos":
+        raise ValueError("'rascunhos' é nome reservado")
+    return os.path.join(PASTA_RASCUNHOS if rascunho else PASTA_SAIDA, nome)
+
+
+# ---------------------------------------------------------------------------
+# 6) Saídas
 # ---------------------------------------------------------------------------
 
 # Rótulos de cada configuração, para as colunas de contexto do CSV longo.
@@ -439,7 +557,7 @@ def descrever_config(config: dict, tipo: str) -> dict:
 
 
 # Junta os resultados de todas as rodadas em linhas (rodada, configuração, pergunta, métrica, valor).
-def linhas_longas(exp: dict, por_config: dict) -> list[dict]:
+def linhas_longas(exp: dict, por_config: dict, execucao: str) -> list[dict]:
     linhas = []
     for nome, rodadas in por_config.items():
         config = exp["configs"].get(nome)
@@ -451,7 +569,7 @@ def linhas_longas(exp: dict, por_config: dict) -> list[dict]:
                         continue
                     escala, _ = escala_e_sentido(chave)
                     linhas.append({
-                        "experimento": exp["nome"], "configuracao": nome, **contexto,
+                        "experimento": exp["nome"], "execucao": execucao, "configuracao": nome, **contexto,
                         "conjunto": os.path.splitext(os.path.basename(CAMINHO_PERGUNTAS))[0],
                         "id_pergunta": r["id"], "tipo": r["tipo"], "metrica": chave, "escala": escala,
                         "valor": r["m"][chave], "rodada": rodada,
@@ -459,7 +577,7 @@ def linhas_longas(exp: dict, por_config: dict) -> list[dict]:
     return linhas
 
 
-COLUNAS_LONGO = ["experimento", "configuracao", "modelo", "metodo_tabelas", "metodo_trechos", "divisor", "pronomes",
+COLUNAS_LONGO = ["experimento", "execucao", "configuracao", "modelo", "metodo_tabelas", "metodo_trechos", "divisor", "pronomes",
                  "stemmer", "conjunto", "id_pergunta", "tipo", "metrica", "escala", "valor", "rodada"]
 
 
@@ -484,7 +602,7 @@ def resumir(linhas: list[dict]) -> list[dict]:
     for (config, tipo, metrica, escala), rodadas in por_alvo.items():
         medias = [soma / n for _, n, soma in rodadas]
         saida.append({
-            "experimento": linhas[0]["experimento"], "configuracao": config, "tipo": tipo, "metrica": metrica, "escala": escala,
+            "experimento": linhas[0]["experimento"], "execucao": linhas[0]["execucao"], "configuracao": config, "tipo": tipo, "metrica": metrica, "escala": escala,
             "n_perguntas": rodadas[0][1], "rodadas": len(rodadas),
             "soma_media": f"{mean(s for _, _, s in rodadas):.4f}", "media": f"{mean(medias):.6f}",
             "minimo": f"{min(medias):.6f}", "maximo": f"{max(medias):.6f}",
@@ -493,7 +611,7 @@ def resumir(linhas: list[dict]) -> list[dict]:
 
 
 def gravar_csv_resumo(caminho: str, linhas: list[dict]):
-    campos = ["experimento", "configuracao", "tipo", "metrica", "escala", "n_perguntas", "rodadas", "soma_media", "media", "minimo", "maximo"]
+    campos = ["experimento", "execucao", "configuracao", "tipo", "metrica", "escala", "n_perguntas", "rodadas", "soma_media", "media", "minimo", "maximo"]
     with open(caminho, "w", encoding="utf-8", newline="") as f:
         escritor = csv.DictWriter(f, fieldnames=campos)
         escritor.writeheader()
@@ -529,13 +647,14 @@ COMANDO_PADRAO = "python pipeline/online/executar_experimentos.py {nome}"
 
 
 # Monta o relatório do nível recuperação.
-def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando: str, parcial: bool) -> str:
+def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando: str, parcial: bool, ficha: dict) -> str:
     resultados = saida["resultados"]
     t = [f"# Experimento {exp['nome']}: recuperação", ""]
     t += [
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `{comando}`.",
+        linha_execucao(ficha),
         f"- {exp.get('descricao', '')}",
-        f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas ({', '.join(f'{sum(1 for p in perguntas if p['tipo'] == tp)} {PLURAL[tp]}' for tp in TIPOS)})." + (" **Execução parcial (só alguns ids): não use como resultado.**" if parcial else ""),
+        f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas ({', '.join(f'{sum(1 for p in perguntas if p['tipo'] == tp)} {PLURAL[tp]}' for tp in TIPOS)})." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
         f"- Os índices têm {saida['n_tabelas']} tabelas e {saida['n_trechos']} trechos.",
         "- Nas perguntas híbridas, as tabelas são buscadas com a pergunta inteira e os trechos com a parte conceitual quando o divisor está ligado (configuração `divisor.ativo`); as divisões ficam em `metricas/divisoes_hibridas.json`.",
         "",
@@ -589,13 +708,14 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
 
 
 # Monta o relatório do nível pipeline.
-def relatorio_pipeline(exp: dict, perguntas: list[dict], saida: dict, rodadas: int, comando: str, parcial: bool) -> str:
+def relatorio_pipeline(exp: dict, perguntas: list[dict], saida: dict, rodadas: int, comando: str, parcial: bool, ficha: dict) -> str:
     por_config = saida["resultados"]
     t = [f"# Experimento {exp['nome']}: pipeline completo", ""]
     t += [
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `{comando}`.",
+        linha_execucao(ficha),
         f"- {exp.get('descricao', '')}",
-        f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas; {rodadas} rodada(s)." + (" **Execução parcial (só alguns ids): não use como resultado.**" if parcial else ""),
+        f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas; {rodadas} rodada(s)." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
         "- O cache de SQL vale entre as configurações da mesma rodada e é refeito a cada rodada." + (" A passada de tabelas ideais gera o SQL só com as tabelas de `tabelas_esperadas`." if exp.get("tabelas_ideais") else ""),
         "",
     ]
@@ -660,7 +780,7 @@ def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str) -> l
 
 
 # ---------------------------------------------------------------------------
-# 6) Principal
+# 7) Principal
 # ---------------------------------------------------------------------------
 
 def main():
@@ -684,32 +804,47 @@ def main():
     exp = carregar_experimento(args.experimentos, args.experimento)
     ids = [i.strip() for i in args.ids.split(",")] if args.ids else None
     perguntas = carregar_perguntas(ids)
-    parcial = bool(ids)
+    rascunho = bool(ids) or bool(exp.get("rascunho"))
+    rodadas = (args.rodadas or exp.get("rodadas", 1)) if exp["nivel"] == "pipeline" else 1
     comando = COMANDO_PADRAO.format(nome=exp["nome"]) + (f" --ids {args.ids}" if ids else "") + (f" --rodadas {args.rodadas}" if args.rodadas else "")
-    sufixo = "_parcial" if parcial else ""
-    base = os.path.join(PASTA_SAIDA, f"experimento_{exp['nome']}{sufixo}")
-    os.makedirs(PASTA_SAIDA, exist_ok=True)
+    pasta = pasta_de_saida(exp["nome"], rascunho)
+    os.makedirs(pasta, exist_ok=True)
+    ficha = iniciar_ficha(exp, perguntas, comando, ids, rascunho, rodadas)
+    inicio = time.perf_counter()
 
     if exp["nivel"] == "recuperacao":
         saida = rodar_recuperacao(exp, perguntas, args.refazer_divisoes)
         por_config = {nome: {1: lista} for nome, lista in saida["resultados"].items()}
-        relatorio = relatorio_recuperacao(exp, perguntas, saida, comando, parcial)
+        relatorio = relatorio_recuperacao(exp, perguntas, saida, comando, rascunho, ficha)
     else:
-        rodadas = args.rodadas or exp.get("rodadas", 1)
         saida = rodar_pipeline(exp, perguntas, rodadas)
         por_config = saida["resultados"]
-        relatorio = relatorio_pipeline(exp, perguntas, saida, rodadas, comando, parcial)
-        with open(base + "_respostas.json", "w", encoding="utf-8") as f:
+        relatorio = relatorio_pipeline(exp, perguntas, saida, rodadas, comando, rascunho, ficha)
+        with open(os.path.join(pasta, "respostas.json"), "w", encoding="utf-8") as f:
             json.dump(saida["respostas"], f, ensure_ascii=False, indent=2)
 
-    linhas = linhas_longas(exp, por_config)
-    gravar_csv_longo(base + ".csv", linhas)
-    gravar_csv_resumo(base + "_resumo.csv", resumir(linhas))
-    with open(base + ".md", "w", encoding="utf-8") as f:
+    linhas = linhas_longas(exp, por_config, ficha["execucao"])
+    gravar_csv_longo(os.path.join(pasta, "resultados.csv"), linhas)
+    gravar_csv_resumo(os.path.join(pasta, "resumo.csv"), resumir(linhas))
+    with open(os.path.join(pasta, "relatorio.md"), "w", encoding="utf-8") as f:
         f.write(relatorio)
+    # O cache das divisões pode ter sido criado ou atualizado durante a execução.
+    if os.path.exists(CAMINHO_DIVISOES):
+        ficha["arquivos_sha256"][CAMINHO_DIVISOES] = sha256_arquivo(CAMINHO_DIVISOES)
+    ficha["fim"] = datetime.now().isoformat(timespec="seconds")
+    ficha["duracao_s"] = round(time.perf_counter() - inicio, 1)
+    with open(os.path.join(pasta, "execucao.json"), "w", encoding="utf-8") as f:
+        json.dump(ficha, f, ensure_ascii=False, indent=2)
+        f.write("\n")
     print(relatorio)
-    print(f"Arquivos gravados: {base}.md, {base}.csv e {base}_resumo.csv", file=sys.stderr)
-
+    print(f"Execução {ficha['execucao']} gravada em {pasta}/ (relatorio.md, resultados.csv, resumo.csv, execucao.json).", file=sys.stderr)
+    if not rascunho:
+        existentes = (_git("tag", "-l", f"{exp['nome']}-v*") or "").split()
+        proxima = f"{exp['nome']}-v{len(existentes) + 1}"
+        print("Para registrar esta execução como versão oficial:\n"
+              f"  git add {pasta}\n"
+              f"  git commit -m \"data: resultados do experimento {exp['nome']} (execução {ficha['execucao']})\"\n"
+              f"  git tag {proxima}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()

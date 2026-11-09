@@ -31,7 +31,10 @@ rag-nl2sql-financas-br/
 │   ├── index_bm25_esquema.json         # índice de palavras (BM25) do esquema
 │   ├── index_bm25_glossario.json       # índice de palavras (BM25) dos normativos
 │   └── modelos/<chave>/                # índices vetoriais dos outros modelos (gerados, fora do git)
-├── metricas/                           # relatórios e CSVs gerados pelos scripts de avaliação
+├── metricas/                           # resultados dos experimentos
+│   ├── <experimento>/                  # uma pasta por experimento: relatorio.md, resultados.csv, resumo.csv, execucao.json
+│   ├── rascunhos/                      # execuções de teste e relatórios de apoio (fora do git)
+│   └── divisoes_hibridas.json          # divisões das perguntas híbridas, reaproveitadas por todas as configurações
 └── pipeline/
     ├── modelos_embedding.py            # registro dos modelos de embeddings (usado pelos dois estágios)
     ├── offline/
@@ -328,11 +331,33 @@ por tipo, `k`, divisor, pronomes, stemmer).
   aprovação e tempo por passo. Com `"tabelas_ideais": true`, uma passada extra gera o SQL só com as
   tabelas esperadas, para separar o erro da busca do erro da geração.
 
-Os resultados vão para `metricas/`, com nomes fixos que são sobrescritos a cada execução:
-`experimento_<nome>.csv` (uma linha por rodada, configuração, pergunta e métrica),
-`experimento_<nome>_resumo.csv`, `experimento_<nome>.md` (tabelas, comparações, métricas e escalas,
-ressalvas e comandos) e, no nível `pipeline`, `experimento_<nome>_respostas.json`. Com `--ids` o
-executor roda só algumas perguntas e os arquivos ganham o sufixo `_parcial`.
+**Resultados e versão.** Cada experimento tem a sua pasta, `metricas/<nome>/`, com nomes fixos que são
+sobrescritos a cada execução:
+
+| Arquivo | Conteúdo |
+|---|---|
+| `relatorio.md` | Tabelas por tipo, comparações pareadas, métricas e escalas, ressalvas e comandos |
+| `resultados.csv` | Uma linha por rodada, configuração, pergunta e métrica |
+| `resumo.csv` | Uma linha por configuração, tipo e métrica (soma, média, mínimo e máximo entre rodadas) |
+| `respostas.json` | Só no nível `pipeline`: respostas, SQL e divisões de cada pergunta |
+| `execucao.json` | A ficha que identifica o teste: comando, commit do código (com aviso de alterações não commitadas), impressão digital (SHA-256) da configuração, dos experimentos, das perguntas e dos índices, modelos, versões das bibliotecas, configurações efetivas, rodadas e duração |
+
+Cada execução recebe um identificador (data e hora, `AAAAMMDD-HHMMSS`) que aparece no cabeçalho do
+`relatorio.md` e na coluna `execucao` dos CSV. A versão de uma execução oficial é o commit que guarda
+a pasta, com o identificador na mensagem, e uma tag `<nome>-v1`, `<nome>-v2`...; o executor imprime os
+comandos sugeridos no fim, e o resultado antigo continua acessível pelo git:
+
+```bash
+git add metricas/metodos
+git commit -m "data: resultados do experimento metodos (execução 20261112-103000)"
+git tag metodos-v1
+git show metodos-v1:metricas/metodos/relatorio.md
+```
+
+Execuções de teste (`--ids`, ou `"rascunho": true` no experimento) vão para `metricas/rascunhos/<nome>/`,
+pasta ignorada pelo git, e o relatório as marca como rascunho. `avaliar_baseline.py`,
+`avaliar_divisao_hibridas.py`, `medir_tempo_busca.py` e `resumir_por_tipo.py` gravam os relatórios deles
+nessa mesma pasta.
 
 ```bash
 python pipeline/online/executar_experimentos.py metodos

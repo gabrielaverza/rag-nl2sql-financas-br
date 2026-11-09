@@ -25,8 +25,8 @@ Dependências:
 
 Parâmetros: nenhum argumento.
 
-Resultado: imprime o relatório e grava metricas/divisao_hibridas.md, metricas/divisao_hibridas.csv e
-metricas/divisoes_geradas_pelo_llm.json.
+Resultado: imprime o relatório e grava, em metricas/rascunhos/ (pasta ignorada pelo git),
+divisao_hibridas.md, divisao_hibridas.csv e divisoes_geradas_pelo_llm.json.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/online/avaliar_divisao_hibridas.py
