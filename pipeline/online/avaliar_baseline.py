@@ -59,7 +59,15 @@ from busca import (
     carregar_tabelas_referenciadas,
     vetorizar,
 )
-from busca_bm25 import B_BIBLIOTECA, B_REFERENCIA, K1_BIBLIOTECA, K1_REFERENCIA, IndiceBM25
+from busca_bm25 import (
+    B_BIBLIOTECA,
+    B_REFERENCIA,
+    CAMINHO_BM25_ESQUEMA,
+    CAMINHO_BM25_GLOSSARIO,
+    K1_BIBLIOTECA,
+    K1_REFERENCIA,
+    IndiceBM25,
+)
 from busca_roteada import POLITICA_HIBRIDA_RRF, POLITICA_PADRAO
 from fusao_rrf import CONSTANTE_RRF, IndiceHibrido
 
@@ -115,8 +123,8 @@ def criar_metodos() -> list[Metodo]:
         (NOME_BM25_BIBLIOTECA, False, K1_BIBLIOTECA, B_BIBLIOTECA),
     )
     for nome, radicalizar, k1, b in variantes:
-        esquema = IndiceBM25(CAMINHO_INDICE_ESQUEMA, radicalizar, SECOES_FORA_DA_PONTUACAO, k1, b)
-        glossario = IndiceBM25(CAMINHO_INDICE_GLOSSARIO, radicalizar, k1=k1, b=b)
+        esquema = IndiceBM25(CAMINHO_BM25_ESQUEMA, radicalizar, SECOES_FORA_DA_PONTUACAO, k1, b)
+        glossario = IndiceBM25(CAMINHO_BM25_GLOSSARIO, radicalizar, k1=k1, b=b)
         metodos.append(Metodo(nome, esquema, glossario, lambda texto: texto, True))
     # A fusão usa o BM25 sem stemmer, com os parâmetros da referência.
     bm25 = metodos[1]

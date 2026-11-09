@@ -69,7 +69,6 @@ def main():
 
     # Custos de partida do BM25 (medidos antes de importar as bibliotecas de embeddings).
     busca_bm25, t_import_bm25 = cronometrar(lambda: __import__("busca_bm25"))
-    _, t_stopwords = cronometrar(busca_bm25._carregar_stopwords)
 
     # As constantes dos caminhos vêm de busca.py, que importa as bibliotecas de embeddings.
     busca, t_import_busca = cronometrar(lambda: __import__("busca"))
@@ -77,8 +76,9 @@ def main():
 
     _, t_json = cronometrar(lambda: json.load(open(busca.CAMINHO_INDICE_GLOSSARIO, encoding="utf-8")))
     bm25_esquema, t_bm25_esquema = cronometrar(
-        lambda: busca_bm25.IndiceBM25(busca.CAMINHO_INDICE_ESQUEMA, False, busca.SECOES_FORA_DA_PONTUACAO))
-    bm25_glossario, t_bm25_glossario = cronometrar(lambda: busca_bm25.IndiceBM25(busca.CAMINHO_INDICE_GLOSSARIO, False))
+        lambda: busca_bm25.IndiceBM25(busca_bm25.CAMINHO_BM25_ESQUEMA, False, busca.SECOES_FORA_DA_PONTUACAO))
+    bm25_glossario, t_bm25_glossario = cronometrar(
+        lambda: busca_bm25.IndiceBM25(busca_bm25.CAMINHO_BM25_GLOSSARIO, False))
     _, t_modelo = cronometrar(busca.carregar_modelo)
     e5_esquema, t_e5_esquema = cronometrar(lambda: busca.Indice(busca.CAMINHO_INDICE_ESQUEMA))
     e5_glossario, t_e5_glossario = cronometrar(lambda: busca.Indice(busca.CAMINHO_INDICE_GLOSSARIO))
@@ -108,11 +108,10 @@ def main():
         "",
         "| Etapa | Tempo (s) |",
         "|---|---|",
-        f"| Importar nltk e rank-bm25 | {fmt(t_import_bm25)} |",
-        f"| Ler a lista de stopwords do NLTK | {fmt(t_stopwords)} |",
-        f"| Ler o JSON do índice do glossário (37 MB, usado pelo BM25 só pelo texto) | {fmt(t_json)} |",
-        f"| Montar o índice BM25 do esquema (26 registros) | {fmt(t_bm25_esquema)} |",
-        f"| Montar o índice BM25 do glossário (1.634 trechos, inclui ler o JSON) | {fmt(t_bm25_glossario)} |",
+        f"| Importar rank-bm25 (o nltk só é importado se houver radicalização) | {fmt(t_import_bm25)} |",
+        f"| Montar o índice BM25 do esquema ({len(bm25_esquema.registros)} registros, lê o índice de palavras) | {fmt(t_bm25_esquema)} |",
+        f"| Montar o índice BM25 do glossário ({f'{len(bm25_glossario.registros):,}'.replace(',', '.')} trechos, lê o índice de palavras) | {fmt(t_bm25_glossario)} |",
+        f"| Para comparar: ler o JSON do índice vetorial do glossário ({os.path.getsize(busca.CAMINHO_INDICE_GLOSSARIO) / 1e6:.1f} MB) | {fmt(t_json)} |",
         f"| Para comparar: importar as bibliotecas de embeddings | {fmt(t_import_busca)} |",
         f"| Para comparar: carregar o modelo E5-base | {fmt(t_modelo)} |",
         f"| Para comparar: ler o índice vetorial do glossário | {fmt(t_e5_glossario)} |",
@@ -128,7 +127,7 @@ def main():
         "",
         "## 3. Ressalvas",
         "",
-        "- O BM25 lê o mesmo JSON dos vetores (37 MB) só para usar o texto; guardar um arquivo só com o texto dos trechos reduziria esse custo, se ele pesar.",
+        "- O BM25 lê um índice de palavras próprio (sem vetores), gerado no estágio offline, por isso a partida é curta; com radicalização, o nltk é importado na primeira busca (cerca de 1,7 s a mais, medido à parte).",
         "- A primeira chamada ao E5-base depois de carregar o modelo é mais lenta; a medida por pergunta vem depois do aquecimento.",
         "- Em uso real, o custo de partida é pago uma vez por processo; `main.py` hoje roda uma pergunta por processo, então pagaria o custo de partida a cada pergunta (ponto já registrado como melhoria possível).",
         "",

@@ -36,7 +36,7 @@ from busca import (
     carregar_tabelas_referenciadas,
     vetorizar,
 )
-from busca_bm25 import IndiceBM25
+from busca_bm25 import CAMINHO_BM25_ESQUEMA, CAMINHO_BM25_GLOSSARIO, IndiceBM25
 from fusao_rrf import IndiceHibrido
 
 METODOS = ("embeddings", "bm25", "rrf")
@@ -89,7 +89,8 @@ class BuscaRoteada:
             if metodo == "embeddings":
                 indice = Indice(caminho)
             elif metodo == "bm25":
-                indice = IndiceBM25(caminho, False, SECOES_FORA_DA_PONTUACAO if esquema else ())
+                caminho_bm25 = CAMINHO_BM25_ESQUEMA if esquema else CAMINHO_BM25_GLOSSARIO
+                indice = IndiceBM25(caminho_bm25, False, SECOES_FORA_DA_PONTUACAO if esquema else ())
             else:
                 indice = IndiceHibrido(self._indice(onde, "embeddings"), self._indice(onde, "bm25"))
             self._indices[chave] = indice
