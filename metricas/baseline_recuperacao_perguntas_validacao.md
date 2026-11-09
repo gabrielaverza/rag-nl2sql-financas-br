@@ -1,6 +1,6 @@
 # Baseline BM25 e fusão RRF contra E5-base: recuperação (perguntas_validacao.json)
 
-- Gerado em 06/11/2026 19:13 por `python pipeline/online/avaliar_baseline.py dados/perguntas_validacao.json`.
+- Gerado em 08/11/2026 21:41 por `python pipeline/online/avaliar_baseline.py dados/perguntas_validacao.json`.
 - Perguntas: 13 no arquivo; 10 com tabelas esperadas, 6 com evidência, 3 híbridas com os dois.
 - Bibliotecas: rank-bm25 0.2.2, nltk 3.10.4, sentence-transformers 5.6.0, numpy 2.4.6.
 - BM25: Okapi BM25 da rank_bm25, sem ajuste nos dados. Parâmetros: BM25 sem stemmer: k1 = 2,00, b = 0,50; BM25 com stemmer (Snowball): k1 = 2,00, b = 0,50; BM25 sem stemmer (parâmetros da biblioteca): k1 = 1,50, b = 0,75; epsilon = 0,25 (padrão da biblioteca). Os valores k1 = 2 e b = 0,5 são a combinação comum citada por Robertson e Zaragoza (2009, p. 31); os da biblioteca (k1 = 1,5 e b = 0,75) ficam dentro das faixas 0,5 < b < 0,8 e 1,2 < k1 < 2 (p. 30) e entram só como verificação de sensibilidade.
@@ -10,7 +10,7 @@
 - Pré-processamento do BM25: minúsculas, palavras (letras e dígitos), stopwords do português do NLTK, stemmer Snowball do português só na variante com stemmer, acentos removidos no fim. O E5-base recebe a pergunta com o prefixo `query: `.
 - Premissas iguais em todos os métodos: mesmas perguntas, mesmos registros indexados, pontuação da tabela pelo melhor registro de resumo ou entidades, expansão por chave estrangeira, mesmos k.
 - Índice de esquema no BM25 (só resumo e entidades): 26 registros, 103 palavras, 4 em mais da metade dos registros (IDF negativo trocado por epsilon vezes o IDF médio = 0,420; IDF médio = 1,678), na variante sem stemmer.
-- Índice do glossário no BM25: 1634 trechos, 5418 palavras, 0 em mais da metade dos trechos, na variante sem stemmer.
+- Índice do glossário no BM25: 1283 trechos, 5219 palavras, 0 em mais da metade dos trechos, na variante sem stemmer.
 
 ## 1. Tabelas (esquema, 10 perguntas)
 
@@ -49,33 +49,33 @@ Perguntas sem nenhuma palavra em comum com os registros de esquema (BM25, todas 
 | Método | Hit@1 | Hit@3 | Hit@5 | Hit@10 | Hit@20 | MRR |
 |---|---|---|---|---|---|---|
 | E5-base (embeddings) | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 | 0,13 |
-| BM25 sem stemmer | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 | 0,13 |
-| BM25 com stemmer (Snowball) | 0,00 | 0,00 | 0,17 | 0,17 | 0,33 | 0,07 |
-| BM25 sem stemmer (parâmetros da biblioteca) | 0,00 | 0,00 | 0,33 | 0,50 | 0,67 | 0,12 |
+| BM25 sem stemmer | 0,00 | 0,33 | 0,33 | 0,50 | 0,67 | 0,15 |
+| BM25 com stemmer (Snowball) | 0,00 | 0,00 | 0,17 | 0,33 | 0,50 | 0,08 |
+| BM25 sem stemmer (parâmetros da biblioteca) | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 | 0,13 |
 | RRF (E5 + BM25) | 0,00 | 0,17 | 0,50 | 0,50 | 0,67 | 0,19 |
-| Por índice (tabelas E5, trechos BM25) | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 | 0,13 |
+| Por índice (tabelas E5, trechos BM25) | 0,00 | 0,33 | 0,33 | 0,50 | 0,67 | 0,15 |
 | Por tipo (híbrida com RRF) | 0,00 | 0,17 | 0,50 | 0,50 | 0,67 | 0,16 |
-| Piso aleatório | 0,00 | 0,00 | 0,00 | 0,01 | 0,01 | 0,00 |
+| Piso aleatório | 0,00 | 0,00 | 0,00 | 0,01 | 0,02 | 0,01 |
 
 | Método | Recall@1 | Recall@3 | Recall@5 | Recall@10 | Recall@20 |
 |---|---|---|---|---|---|
 | E5-base (embeddings) | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 |
-| BM25 sem stemmer | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 |
-| BM25 com stemmer (Snowball) | 0,00 | 0,00 | 0,17 | 0,17 | 0,33 |
-| BM25 sem stemmer (parâmetros da biblioteca) | 0,00 | 0,00 | 0,33 | 0,50 | 0,67 |
+| BM25 sem stemmer | 0,00 | 0,33 | 0,33 | 0,50 | 0,67 |
+| BM25 com stemmer (Snowball) | 0,00 | 0,00 | 0,17 | 0,33 | 0,50 |
+| BM25 sem stemmer (parâmetros da biblioteca) | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 |
 | RRF (E5 + BM25) | 0,00 | 0,17 | 0,50 | 0,50 | 0,67 |
-| Por índice (tabelas E5, trechos BM25) | 0,00 | 0,17 | 0,33 | 0,50 | 0,67 |
+| Por índice (tabelas E5, trechos BM25) | 0,00 | 0,33 | 0,33 | 0,50 | 0,67 |
 | Por tipo (híbrida com RRF) | 0,00 | 0,17 | 0,50 | 0,50 | 0,67 |
-| Piso aleatório | 0,00 | 0,00 | 0,00 | 0,01 | 0,01 |
+| Piso aleatório | 0,00 | 0,00 | 0,00 | 0,01 | 0,02 |
 
 | Método | nDCG@3 | nDCG@5 | nDCG@10 | Precision@1 | Precision@3 | Precision@5 |
 |---|---|---|---|---|---|---|
-| E5-base (embeddings) | 0,11 | 0,18 | 0,23 | 0,00 | 0,06 | 0,07 |
-| BM25 sem stemmer | 0,11 | 0,19 | 0,24 | 0,00 | 0,06 | 0,07 |
-| BM25 com stemmer (Snowball) | 0,00 | 0,08 | 0,08 | 0,00 | 0,00 | 0,03 |
-| BM25 sem stemmer (parâmetros da biblioteca) | 0,00 | 0,17 | 0,22 | 0,00 | 0,00 | 0,07 |
+| E5-base (embeddings) | 0,11 | 0,18 | 0,24 | 0,00 | 0,06 | 0,07 |
+| BM25 sem stemmer | 0,21 | 0,21 | 0,26 | 0,00 | 0,11 | 0,07 |
+| BM25 com stemmer (Snowball) | 0,00 | 0,08 | 0,13 | 0,00 | 0,00 | 0,03 |
+| BM25 sem stemmer (parâmetros da biblioteca) | 0,11 | 0,19 | 0,24 | 0,00 | 0,06 | 0,07 |
 | RRF (E5 + BM25) | 0,17 | 0,33 | 0,33 | 0,00 | 0,06 | 0,10 |
-| Por índice (tabelas E5, trechos BM25) | 0,11 | 0,19 | 0,24 | 0,00 | 0,06 | 0,07 |
+| Por índice (tabelas E5, trechos BM25) | 0,21 | 0,21 | 0,26 | 0,00 | 0,11 | 0,07 |
 | Por tipo (híbrida com RRF) | 0,11 | 0,27 | 0,27 | 0,00 | 0,06 | 0,10 |
 | Piso aleatório | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 |
 
@@ -86,11 +86,11 @@ Perguntas sem nenhuma palavra em comum com os trechos (BM25): BM25 sem stemmer: 
 | Método | Tabelas completas@3 | Trecho@3 | Ambos@3 | Ambos (sem companhias)@3 | Tabelas completas@5 | Trecho@5 | Ambos@5 | Ambos (sem companhias)@5 |
 |---|---|---|---|---|---|---|---|---|
 | E5-base (embeddings) | 2/3 | 0/3 | 0/3 | 0/3 | 2/3 | 1/3 | 0/3 | 0/3 |
-| BM25 sem stemmer | 3/3 | 0/3 | 0/3 | 0/3 | 3/3 | 1/3 | 1/3 | 1/3 |
+| BM25 sem stemmer | 3/3 | 1/3 | 1/3 | 1/3 | 3/3 | 1/3 | 1/3 | 1/3 |
 | BM25 com stemmer (Snowball) | 2/3 | 0/3 | 0/3 | 0/3 | 3/3 | 1/3 | 1/3 | 1/3 |
-| BM25 sem stemmer (parâmetros da biblioteca) | 3/3 | 0/3 | 0/3 | 0/3 | 3/3 | 1/3 | 1/3 | 1/3 |
+| BM25 sem stemmer (parâmetros da biblioteca) | 3/3 | 1/3 | 1/3 | 1/3 | 3/3 | 1/3 | 1/3 | 1/3 |
 | RRF (E5 + BM25) | 2/3 | 0/3 | 0/3 | 0/3 | 3/3 | 2/3 | 2/3 | 2/3 |
-| Por índice (tabelas E5, trechos BM25) | 2/3 | 0/3 | 0/3 | 0/3 | 2/3 | 1/3 | 1/3 | 1/3 |
+| Por índice (tabelas E5, trechos BM25) | 2/3 | 1/3 | 1/3 | 1/3 | 2/3 | 1/3 | 1/3 | 1/3 |
 | Por tipo (híbrida com RRF) | 2/3 | 0/3 | 0/3 | 0/3 | 3/3 | 2/3 | 2/3 | 2/3 |
 | Piso aleatório | 0,69/3 | 0,01/3 | 0,00/3 | 0,00/3 | 1,15/3 | 0,01/3 | 0,00/3 | 0,00/3 |
 
@@ -105,39 +105,39 @@ Diferença média (primeiro método menos o segundo), intervalo de 95% por boots
 | E5-base (embeddings) contra BM25 sem stemmer | Tabelas: todas no top-3 | 10 | 0,00 | [-0,40; 0,40] | 2/2/6 |
 | E5-base (embeddings) contra BM25 sem stemmer | Demonstração no top-3 (sem companhias) | 10 | 0,00 | [-0,40; 0,40] | 2/2/6 |
 | E5-base (embeddings) contra BM25 sem stemmer | Tabelas: MRR | 10 | 0,01 | [-0,22; 0,26] | 3/3/4 |
-| E5-base (embeddings) contra BM25 sem stemmer | Trechos: Hit@3 | 6 | 0,00 | [0,00; 0,00] | 0/0/6 |
+| E5-base (embeddings) contra BM25 sem stemmer | Trechos: Hit@3 | 6 | -0,17 | [-0,50; 0,00] | 0/1/5 |
 | E5-base (embeddings) contra BM25 sem stemmer | Trechos: Hit@5 | 6 | 0,00 | [-0,50; 0,50] | 1/1/4 |
-| E5-base (embeddings) contra BM25 sem stemmer | Trechos: MRR | 6 | -0,01 | [-0,06; 0,04] | 2/3/1 |
-| E5-base (embeddings) contra BM25 sem stemmer | Trechos: nDCG@10 | 6 | -0,01 | [-0,08; 0,06] | 1/1/4 |
-| E5-base (embeddings) contra BM25 sem stemmer | Híbridas: tabelas e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
-| E5-base (embeddings) contra BM25 sem stemmer | Híbridas: demonstração e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
+| E5-base (embeddings) contra BM25 sem stemmer | Trechos: MRR | 6 | -0,02 | [-0,10; 0,04] | 2/3/1 |
+| E5-base (embeddings) contra BM25 sem stemmer | Trechos: nDCG@10 | 6 | -0,03 | [-0,14; 0,06] | 1/1/4 |
+| E5-base (embeddings) contra BM25 sem stemmer | Híbridas: tabelas e trecho no top-3 | 3 | -0,33 | [-1,00; 0,00] | 0/1/2 |
+| E5-base (embeddings) contra BM25 sem stemmer | Híbridas: demonstração e trecho no top-3 | 3 | -0,33 | [-1,00; 0,00] | 0/1/2 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Tabelas: todas no top-3 | 10 | -0,10 | [-0,30; 0,00] | 0/1/9 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Demonstração no top-3 (sem companhias) | 10 | -0,10 | [-0,30; 0,00] | 0/1/9 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Tabelas: MRR | 10 | 0,07 | [-0,15; 0,29] | 5/2/3 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Trechos: Hit@3 | 6 | 0,00 | [0,00; 0,00] | 0/0/6 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Trechos: Hit@5 | 6 | 0,17 | [0,00; 0,50] | 1/0/5 |
-| RRF (E5 + BM25) contra E5-base (embeddings) | Trechos: MRR | 6 | 0,07 | [0,02; 0,11] | 6/0/0 |
+| RRF (E5 + BM25) contra E5-base (embeddings) | Trechos: MRR | 6 | 0,06 | [0,02; 0,11] | 6/0/0 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Trechos: nDCG@10 | 6 | 0,10 | [0,01; 0,22] | 3/0/3 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Híbridas: tabelas e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
 | RRF (E5 + BM25) contra E5-base (embeddings) | Híbridas: demonstração e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
 | RRF (E5 + BM25) contra BM25 sem stemmer | Tabelas: todas no top-3 | 10 | -0,10 | [-0,40; 0,20] | 1/2/7 |
 | RRF (E5 + BM25) contra BM25 sem stemmer | Demonstração no top-3 (sem companhias) | 10 | -0,10 | [-0,40; 0,20] | 1/2/7 |
 | RRF (E5 + BM25) contra BM25 sem stemmer | Tabelas: MRR | 10 | 0,08 | [-0,04; 0,25] | 4/3/3 |
-| RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: Hit@3 | 6 | 0,00 | [0,00; 0,00] | 0/0/6 |
+| RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: Hit@3 | 6 | -0,17 | [-0,50; 0,00] | 0/1/5 |
 | RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: Hit@5 | 6 | 0,17 | [0,00; 0,50] | 1/0/5 |
-| RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: MRR | 6 | 0,06 | [0,00; 0,11] | 3/1/2 |
-| RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: nDCG@10 | 6 | 0,09 | [0,00; 0,22] | 2/0/4 |
-| RRF (E5 + BM25) contra BM25 sem stemmer | Híbridas: tabelas e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
-| RRF (E5 + BM25) contra BM25 sem stemmer | Híbridas: demonstração e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
+| RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: MRR | 6 | 0,04 | [-0,03; 0,11] | 4/2/0 |
+| RRF (E5 + BM25) contra BM25 sem stemmer | Trechos: nDCG@10 | 6 | 0,07 | [-0,04; 0,22] | 2/1/3 |
+| RRF (E5 + BM25) contra BM25 sem stemmer | Híbridas: tabelas e trecho no top-3 | 3 | -0,33 | [-1,00; 0,00] | 0/1/2 |
+| RRF (E5 + BM25) contra BM25 sem stemmer | Híbridas: demonstração e trecho no top-3 | 3 | -0,33 | [-1,00; 0,00] | 0/1/2 |
 | BM25 com stemmer (Snowball) contra BM25 sem stemmer | Tabelas: todas no top-3 | 10 | -0,20 | [-0,50; 0,00] | 0/2/8 |
 | BM25 com stemmer (Snowball) contra BM25 sem stemmer | Demonstração no top-3 (sem companhias) | 10 | -0,20 | [-0,50; 0,00] | 0/2/8 |
 | BM25 com stemmer (Snowball) contra BM25 sem stemmer | Tabelas: MRR | 10 | -0,11 | [-0,21; -0,03] | 0/5/5 |
-| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: Hit@3 | 6 | -0,17 | [-0,50; 0,00] | 0/1/5 |
+| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: Hit@3 | 6 | -0,33 | [-0,67; 0,00] | 0/2/4 |
 | BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: Hit@5 | 6 | -0,17 | [-0,67; 0,33] | 1/2/3 |
-| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: MRR | 6 | -0,06 | [-0,18; 0,04] | 1/5/0 |
-| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: nDCG@10 | 6 | -0,16 | [-0,40; 0,06] | 1/2/3 |
-| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Híbridas: tabelas e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
-| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Híbridas: demonstração e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
+| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: MRR | 6 | -0,07 | [-0,19; 0,04] | 1/5/0 |
+| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Trechos: nDCG@10 | 6 | -0,13 | [-0,37; 0,06] | 1/2/3 |
+| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Híbridas: tabelas e trecho no top-3 | 3 | -0,33 | [-1,00; 0,00] | 0/1/2 |
+| BM25 com stemmer (Snowball) contra BM25 sem stemmer | Híbridas: demonstração e trecho no top-3 | 3 | -0,33 | [-1,00; 0,00] | 0/1/2 |
 | BM25 sem stemmer (parâmetros da biblioteca) contra BM25 sem stemmer | Tabelas: todas no top-3 | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
 | BM25 sem stemmer (parâmetros da biblioteca) contra BM25 sem stemmer | Demonstração no top-3 (sem companhias) | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
 | BM25 sem stemmer (parâmetros da biblioteca) contra BM25 sem stemmer | Tabelas: MRR | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
@@ -150,21 +150,21 @@ Diferença média (primeiro método menos o segundo), intervalo de 95% por boots
 | Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Tabelas: todas no top-3 | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
 | Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Demonstração no top-3 (sem companhias) | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
 | Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Tabelas: MRR | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
-| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: Hit@3 | 6 | 0,00 | [0,00; 0,00] | 0/0/6 |
+| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: Hit@3 | 6 | 0,17 | [0,00; 0,50] | 1/0/5 |
 | Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: Hit@5 | 6 | 0,00 | [-0,50; 0,50] | 1/1/4 |
-| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: MRR | 6 | 0,01 | [-0,04; 0,06] | 3/2/1 |
-| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: nDCG@10 | 6 | 0,01 | [-0,06; 0,08] | 1/1/4 |
-| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Híbridas: tabelas e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
-| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Híbridas: demonstração e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
+| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: MRR | 6 | 0,02 | [-0,04; 0,09] | 3/2/1 |
+| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Trechos: nDCG@10 | 6 | 0,03 | [-0,06; 0,14] | 1/1/4 |
+| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Híbridas: tabelas e trecho no top-3 | 3 | 0,33 | [0,00; 1,00] | 1/0/2 |
+| Por índice (tabelas E5, trechos BM25) contra E5-base (embeddings) | Híbridas: demonstração e trecho no top-3 | 3 | 0,33 | [0,00; 1,00] | 1/0/2 |
 | Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Tabelas: todas no top-3 | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
 | Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Demonstração no top-3 (sem companhias) | 10 | 0,00 | [0,00; 0,00] | 0/0/10 |
 | Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Tabelas: MRR | 10 | -0,02 | [-0,05; 0,00] | 0/1/9 |
-| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: Hit@3 | 6 | 0,00 | [0,00; 0,00] | 0/0/6 |
+| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: Hit@3 | 6 | 0,17 | [0,00; 0,50] | 1/0/5 |
 | Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: Hit@5 | 6 | -0,17 | [-0,50; 0,00] | 0/1/5 |
-| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: MRR | 6 | -0,02 | [-0,07; 0,00] | 1/1/4 |
-| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: nDCG@10 | 6 | -0,03 | [-0,09; 0,00] | 0/1/5 |
-| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Híbridas: tabelas e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
-| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Híbridas: demonstração e trecho no top-3 | 3 | 0,00 | [0,00; 0,00] | 0/0/3 |
+| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: MRR | 6 | -0,01 | [-0,07; 0,04] | 2/1/3 |
+| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Trechos: nDCG@10 | 6 | -0,01 | [-0,09; 0,07] | 1/1/4 |
+| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Híbridas: tabelas e trecho no top-3 | 3 | 0,33 | [0,00; 1,00] | 1/0/2 |
+| Por índice (tabelas E5, trechos BM25) contra Por tipo (híbrida com RRF) | Híbridas: demonstração e trecho no top-3 | 3 | 0,33 | [0,00; 1,00] | 1/0/2 |
 
 ## 5. Ressalvas
 
