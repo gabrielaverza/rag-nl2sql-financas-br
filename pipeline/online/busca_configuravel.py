@@ -19,8 +19,6 @@ Descrição geral do funcionamento:
   para a primeira pergunta não pagar o custo de partida.
 - obter_busca() devolve a busca única do processo, criada com a configuração do arquivo; o
   orquestrador pode trocá-la com definir_configuracao() (por exemplo, com sobrescritas de --set).
-- politica() converte uma configuração em um quadro "tipo -> método das tabelas e dos trechos",
-  disponível para quem precisa consultar o método de cada tipo (o fluxo usa obter_busca()).
 
 Dependências:
 - pipeline/online/busca.py, busca_bm25.py, fusao_rrf.py e configuracao.py, e os índices e o esquema
@@ -30,8 +28,8 @@ Dependências:
 
 Parâmetros: nenhum argumento. É um módulo importado.
 
-Resultado: fornece BuscaConfiguravel (tabelas, trechos e preaquecer), obter_busca(),
-definir_configuracao() e politica().
+Resultado: fornece BuscaConfiguravel (tabelas, trechos e preaquecer), obter_busca() e
+definir_configuracao().
 """
 
 import os
@@ -47,7 +45,7 @@ from busca import (
     vetorizar,
 )
 from busca_bm25 import CAMINHO_BM25_ESQUEMA, CAMINHO_BM25_GLOSSARIO, IndiceBM25
-from configuracao import INDICES, TIPOS, carregar, metodo_de_busca
+from configuracao import INDICES, carregar, metodo_de_busca
 from fusao_rrf import IndiceHibrido
 
 
@@ -136,14 +134,3 @@ def definir_configuracao(config: dict) -> BuscaConfiguravel:
     global _busca
     _busca = BuscaConfiguravel(config)
     return _busca
-
-
-# Converte uma configuração em "tipo -> {tabelas: método, trechos: método}", para a avaliação.
-def politica(config: dict) -> dict:
-    return {
-        tipo: {
-            "tabelas": metodo_de_busca(config, "esquema", tipo),
-            "trechos": metodo_de_busca(config, "glossario", tipo),
-        }
-        for tipo in TIPOS
-    }
