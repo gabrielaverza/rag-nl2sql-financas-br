@@ -6,6 +6,6 @@
   },
   "k_tabelas": 3,
   "k_trechos": 3,
-  "divisor": {"ativo": false, "bloquear_pronomes": true},
-  "bm25": {"radicalizar": false}
+  "divisor": {"ativo": true, "bloquear_pronomes": true},
+  "bm25": {"radicalizar": true}
 }

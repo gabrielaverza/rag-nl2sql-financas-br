@@ -17,8 +17,11 @@ Descrição geral do funcionamento:
   - divisor.ativo: se a pergunta híbrida é dividida em parte de dados e parte conceitual.
   - divisor.bloquear_pronomes: se a parte conceitual com pronome é recusada.
   - bm25.radicalizar: se o BM25 usa o radicalizador (stemmer) nas palavras.
-- Os valores do arquivo são o comportamento do pipeline antes dos experimentos (a
-  configuração A: E5-base nos dois índices, sem divisor, BM25 sem radicalizador).
+- Os valores do arquivo são o padrão do pipeline: E5-base nos dois índices, divisor das
+  perguntas híbridas ligado, com recusa de pronomes, e BM25 com radicalizador. O divisor e o
+  radicalizador são decisões de arquitetura da autora (09/11/2026); as chaves continuam
+  existindo para os experimentos. O comportamento anterior (divisor e radicalizador desligados)
+  se obtém com --set divisor.ativo=false --set bm25.radicalizar=false.
 - Uma sobrescrita é um texto "chave=valor", com a chave separada por pontos (por exemplo,
   busca.glossario.metodo=bm25). O valor é lido como JSON quando possível (true, 3) e, se
   não for, vale como texto. Só chaves que já existem podem ser sobrescritas (a exceção é
