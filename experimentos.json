@@ -1,0 +1,50 @@
+{
+  "experimentos": {
+    "metodos": {
+      "descricao": "Experimento 6.1: impacto do método de busca (embeddings, BM25 e RRF, o BM25 com e sem stemmer), com o divisor das perguntas híbridas ligado e o bloqueio de pronomes, só no nível de recuperação. Modelo de embeddings: e5-base.",
+      "nivel": "recuperacao",
+      "configuracoes": [
+        {"nome": "Embeddings", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "BM25 com stemmer", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=true", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "BM25 sem stemmer", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "RRF com stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=true", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "RRF sem stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
+      ],
+      "comparacoes": [
+        ["Embeddings", "BM25 com stemmer"],
+        ["Embeddings", "BM25 sem stemmer"],
+        ["Embeddings", "RRF com stemmer"],
+        ["Embeddings", "RRF sem stemmer"],
+        ["BM25 com stemmer", "BM25 sem stemmer"],
+        ["RRF com stemmer", "RRF sem stemmer"],
+        ["RRF com stemmer", "BM25 com stemmer"],
+        ["RRF sem stemmer", "BM25 sem stemmer"]
+      ]
+    },
+    "teste_equivalencia": {
+      "descricao": "Teste de aceitação da Fase 5: com o divisor e o stemmer desligados, o executor deve reproduzir os números de avaliar_baseline.py; a última configuração (divisor ligado) deve reproduzir a condição mista de avaliar_divisao_hibridas.py. Os resultados são de teste e não valem como resultado da Fase 6.",
+      "nivel": "recuperacao",
+      "configuracoes": [
+        {"nome": "E5 (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=false", "bm25.radicalizar=false"]},
+        {"nome": "BM25 sem stemmer (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "divisor.ativo=false", "bm25.radicalizar=false"]},
+        {"nome": "RRF (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "divisor.ativo=false", "bm25.radicalizar=false"]},
+        {"nome": "E5 (mista, divisor ligado)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=true", "bm25.radicalizar=false"]},
+        {"nome": "RRF (mista, divisor ligado)", "sobrescritas": ["busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "divisor.ativo=true", "bm25.radicalizar=false"]}
+      ],
+      "comparacoes": [
+        ["E5 (mista, divisor ligado)", "E5 (pergunta inteira)"],
+        ["E5 (pergunta inteira)", "BM25 sem stemmer (pergunta inteira)"]
+      ]
+    },
+    "teste_pipeline": {
+      "descricao": "Teste do nível pipeline completo da Fase 5, para rodar em poucas perguntas (use --ids). Mostra o funcionamento do cache de SQL, da passada de tabelas ideais e das rodadas. Não é resultado da Fase 6.",
+      "nivel": "pipeline",
+      "rodadas": 1,
+      "tabelas_ideais": true,
+      "configuracoes": [
+        {"nome": "Padrão", "sobrescritas": []},
+        {"nome": "Sem divisor", "sobrescritas": ["divisor.ativo=false"]}
+      ]
+    }
+  }
+}
