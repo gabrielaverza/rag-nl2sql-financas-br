@@ -39,7 +39,7 @@ Parâmetros:
 - --configuracao CAMINHO: outro arquivo de configuração no lugar de configuracao.json;
 - --set chave=valor: sobrescreve um valor da configuração (pode repetir).
 
-Resultado: fornece executar(pergunta), que devolve a classe, a divisão da pergunta (ou None), o
+Resultado: fornece executar(pergunta, cache_sql), que devolve a classe, a divisão da pergunta (ou None), o
 resultado do SQL, a resposta final formatada, a validação e o tempo de cada passo, e preaquecer().
 Pela linha de comando, imprime a resposta.
 
@@ -76,7 +76,9 @@ VALIDACAO_NEUTRA = {
 }
 
 
-def executar(pergunta: str) -> dict:
+# cache_sql (opcional) é um dicionário que o executor de experimentos passa para reaproveitar o SQL já
+# gerado para a mesma pergunta e as mesmas tabelas; no uso normal, fica vazio.
+def executar(pergunta: str, cache_sql: dict | None = None) -> dict:
     config = obter_busca().config
     tempos = {}
     inicio = time.time()
@@ -97,7 +99,7 @@ def executar(pergunta: str) -> dict:
     resultado_sql = None
     if classe in ("quantitativa", "hibrida"):
         inicio = time.time()
-        resultado_sql = gerar_sql(pergunta, tipo=classe)
+        resultado_sql = gerar_sql(pergunta, tipo=classe, cache=cache_sql)
         tempos["sql"] = time.time() - inicio
 
     inicio = time.time()

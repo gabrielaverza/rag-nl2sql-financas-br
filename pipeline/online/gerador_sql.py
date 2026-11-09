@@ -15,6 +15,8 @@ Descrição geral do funcionamento:
 - O LLM gera o SQL. O código só aceita um único SELECT e executa em modo somente leitura.
 - Se der erro ou o resultado vier vazio, o LLM recebe o problema e gera outro SQL, até o
   limite de tentativas.
+- Opcionalmente, um dicionário de cache (parâmetro cache) guarda o SQL por (pergunta, tabelas do
+  contexto) e o reaproveita em chamadas seguintes; sem ele, nada é guardado.
 
 Dependências:
 - pipeline/online/busca_configuravel.py e busca.py, os índices e o esquema.json em embeddings/,
@@ -26,6 +28,7 @@ Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do es
 Resultado: fornece gerar_sql(), executar_sql() e validar_sql().
 """
 
+import copy
 import json
 import re
 import sqlite3
@@ -170,10 +173,24 @@ def executar_sql(sql: str, limite_linhas: int | None = LIMITE_LINHAS) -> tuple[l
         conn.close()
 
 
-# Gera o SQL da pergunta e o executa, devolvendo o problema ao LLM para corrigir
-# a consulta até o limite de tentativas.
-def gerar_sql(pergunta: str, k: int | None = None, tabelas: list[str] | None = None, tipo: str | None = None) -> dict:
+# Gera o SQL da pergunta e o executa. Com um dicionário em cache, o SQL de um par (pergunta, lista de
+# tabelas do contexto) já gerado nele é reaproveitado, sem nova chamada ao LLM; o executor de
+# experimentos usa isso para comparar configurações que recuperam as mesmas tabelas.
+def gerar_sql(pergunta: str, k: int | None = None, tabelas: list[str] | None = None, tipo: str | None = None,
+              cache: dict | None = None) -> dict:
     entradas = selecionar_contexto(pergunta, k, tabelas, tipo)
+    chave = (pergunta, tuple(e["tabela"] for e in entradas))
+    if cache is not None and chave in cache:
+        return copy.deepcopy(cache[chave])
+    resultado = _gerar_e_executar(pergunta, entradas)
+    if cache is not None:
+        cache[chave] = copy.deepcopy(resultado)
+    return resultado
+
+
+# Pede o SQL ao LLM e o executa, devolvendo o problema ao LLM para corrigir a consulta até o limite
+# de tentativas.
+def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
     resultado = {
         "pergunta": pergunta,
         "tabelas_contexto": [e["tabela"] for e in entradas],
