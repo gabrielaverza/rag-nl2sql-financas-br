@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 dados/*.db
 embeddings/modelos/
+dados/*_inativo.json
