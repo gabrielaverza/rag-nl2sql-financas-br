@@ -7,7 +7,7 @@ base para comparar com a busca por embeddings de busca.py.
 Descrição geral do funcionamento:
 - Os registros vêm dos índices de palavras embeddings/index_bm25_esquema.json e
   embeddings/index_bm25_glossario.json, gerados pelo estágio offline
-  (pipeline/offline/gerar_indice_bm25.py) a partir dos mesmos registros dos índices vetoriais.
+  (pipeline/offline/gerar_indice_bm25.py) a partir do mesmo corpus dos índices vetoriais.
   Cada registro traz o texto ("conteudo") e as palavras já limpas, com e sem radicalização; os
   vetores não são usados.
 - O pré-processamento é o mesmo para os registros (feito no offline) e para a pergunta (feito

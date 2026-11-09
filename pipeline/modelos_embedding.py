@@ -25,9 +25,9 @@ Dependências:
 Parâmetros: nenhum argumento para importar. Executado como script, imprime a tabela dos
 modelos e diz quais já estão no cache.
 
-Resultado: fornece MODELOS, MODELO_PADRAO, obter_ficha(), limite_aplicado(), esta_em_cache(),
-garantir_modelos(), carregar_modelo(), carregar_tokenizador(), vetorizar_pergunta() e
-vetorizar_trechos().
+Resultado: fornece MODELOS, MODELO_PADRAO, MODELO_FRAGMENTACAO, obter_ficha(), limite_aplicado(),
+esta_em_cache(), garantir_modelos(), carregar_modelo(), carregar_tokenizador(),
+vetorizar_pergunta(), vetorizar_trechos() e registros_com_vetores().
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/modelos_embedding.py
@@ -36,6 +36,10 @@ Executar de dentro de rag-nl2sql-financas-br/:
 import numpy as np
 
 MODELO_PADRAO = "e5-base"
+
+# O tamanho dos registros do corpus (trechos dos normativos e textos do esquema) é medido sempre
+# com o tokenizador deste modelo, para o corpus ser o mesmo qualquer que seja o modelo de embeddings.
+MODELO_FRAGMENTACAO = "e5-base"
 
 # Teto do tamanho de entrada aplicado ao carregar. Cada modelo usa o seu limite nativo
 # (campo limite_tokens), mas nunca mais que este teto. Com os textos de hoje (no máximo 124
@@ -186,6 +190,28 @@ def vetorizar_pergunta(texto: str, chave: str = MODELO_PADRAO) -> np.ndarray:
 def vetorizar_trechos(textos: list[str], chave: str = MODELO_PADRAO) -> np.ndarray:
     ficha = obter_ficha(chave)
     return carregar_modelo(chave).encode([ficha["prefixo_trecho"] + t for t in textos])
+
+
+# Junta ao corpus (registros com id, fonte e conteudo) o vetor de cada registro, no formato do índice.
+# A codificação é feita por fonte (uma tabela ou um PDF de cada vez), como sempre foi, para os vetores
+# saírem idênticos aos já versionados. Avisa se algum registro passa do limite de entrada do modelo.
+def registros_com_vetores(corpus: list[dict], chave: str = MODELO_PADRAO) -> list[dict]:
+    from itertools import groupby
+
+    tokenizador = carregar_tokenizador(MODELO_FRAGMENTACAO)
+    limite = limite_aplicado(chave) - 2
+    maior = max(len(tokenizador.tokenize(r["conteudo"])) for r in corpus)
+    if maior > limite:
+        print(f"ATENÇÃO: registro com {maior} tokens (limite do modelo {chave}: {limite})")
+    registros = []
+    for _, grupo in groupby(corpus, key=lambda r: r["fonte"]):
+        grupo = list(grupo)
+        vetores = vetorizar_trechos([r["conteudo"] for r in grupo], chave)
+        registros += [
+            {"id": r["id"], "fonte": r["fonte"], "conteudo": r["conteudo"], "embedding": v.tolist()}
+            for r, v in zip(grupo, vetores)
+        ]
+    return registros
 
 
 # Imprime a tabela dos modelos registrados e se cada um está no cache.

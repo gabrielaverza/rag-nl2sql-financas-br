@@ -5,20 +5,22 @@ Função: constrói os índices de palavras (BM25) do esquema e do glossário, u
 palavras.
 
 Descrição geral do funcionamento:
-- Lê o texto dos registros dos índices vetoriais do modelo padrão (embeddings/index_esquema.json
-  e embeddings/index_glossario.json). Os registros são os mesmos para todos os modelos de
-  embeddings, então um só índice de palavras serve a todos.
+- Lê o texto dos registros do corpus (embeddings/corpus_esquema.json e
+  embeddings/corpus_glossario.json, gerados por gerar_corpus.py), o mesmo que os índices vetoriais
+  indexam. Como o corpus é igual para todos os modelos de embeddings, um só índice de palavras
+  serve a todos, e este script não depende dos arquivos de vetores.
 - Limpa o texto com as mesmas regras da busca (preprocessar, de busca_bm25.py): minúsculas,
   separação em palavras, sem stopwords do português, sem acentos, com e sem radicalização pelo
   stemmer Snowball do português.
 - Grava, para cada índice, a lista de stopwords usada e, por registro, o id, a fonte, o texto e as
   palavras limpas (com e sem radicalização). Não há vetores nem modelo de embeddings. Assim, a
   busca não precisa montar o índice a cada partida e, sem radicalização, nem carrega o NLTK.
-- Rode depois dos índices vetoriais: se eles mudarem (por exemplo, ao regerar o glossário),
-  este índice também precisa ser regerado.
+- Rode depois do corpus: se ele mudar (por exemplo, ao regerar o glossário), este índice também
+  precisa ser regerado.
 
 Dependências:
-- embeddings/index_esquema.json e embeddings/index_glossario.json (gerados por pipeline/offline/);
+- embeddings/corpus_esquema.json e embeddings/corpus_glossario.json (gerados por
+  pipeline/offline/gerar_corpus.py);
 - bibliotecas nltk e rank-bm25 (esta, porque busca_bm25.py a importa) e o corpus de stopwords do
   NLTK (python -m nltk.downloader stopwords);
 - pipeline/online/busca_bm25.py (as regras de limpeza ficam lá, para o offline e a busca nunca
@@ -42,19 +44,19 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "online"))
 import busca_bm25  # noqa: E402
 
-# (índice vetorial de onde vem o texto, índice de palavras que será gravado)
+# (corpus de onde vem o texto, índice de palavras que será gravado)
 INDICES = (
-    ("embeddings/index_esquema.json", busca_bm25.CAMINHO_BM25_ESQUEMA),
-    ("embeddings/index_glossario.json", busca_bm25.CAMINHO_BM25_GLOSSARIO),
+    ("embeddings/corpus_esquema.json", busca_bm25.CAMINHO_BM25_ESQUEMA),
+    ("embeddings/corpus_glossario.json", busca_bm25.CAMINHO_BM25_GLOSSARIO),
 )
 
 
-# Monta o índice de palavras a partir do texto dos registros de um índice vetorial.
-def montar_indice_de_palavras(caminho_vetorial: str, stopwords: set[str]) -> dict:
-    with open(caminho_vetorial, encoding="utf-8") as f:
+# Monta o índice de palavras a partir do texto dos registros de um corpus.
+def montar_indice_de_palavras(caminho_corpus: str, stopwords: set[str]) -> dict:
+    with open(caminho_corpus, encoding="utf-8") as f:
         registros = json.load(f)
     return {
-        "origem": os.path.basename(caminho_vetorial),
+        "origem": os.path.basename(caminho_corpus),
         "stemmer": "Snowball do português (NLTK)",
         "stopwords": sorted(stopwords),
         "registros": [
@@ -88,8 +90,8 @@ def main():
     except RuntimeError as erro:
         print(erro)
         sys.exit(1)
-    for caminho_vetorial, caminho_saida in INDICES:
-        indice = montar_indice_de_palavras(caminho_vetorial, stopwords)
+    for caminho_corpus, caminho_saida in INDICES:
+        indice = montar_indice_de_palavras(caminho_corpus, stopwords)
         gravar_indice(indice, caminho_saida)
         tamanho = os.path.getsize(caminho_saida) / 1e6
         print(f"{caminho_saida}: {len(indice['registros'])} registros, {len(stopwords)} stopwords, {tamanho:.1f} MB")
