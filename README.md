@@ -316,8 +316,9 @@ por tipo, `k`, divisor, pronomes, stemmer).
   configurações usarem as mesmas.
 - **Nível `pipeline`** (com LLM): roda `main.py` em cada pergunta, por rodada e configuração, e mede
   classe, EX (estrito e aceitando outras companhias que combinam com o nome), fidelidade, relevância,
-  aprovação e tempo por passo. Com `"tabelas_ideais": true`, uma passada extra gera o SQL só com as
-  tabelas esperadas, para separar o erro da busca do erro da geração.
+  aprovação e tempo por passo; o relatório traz também a matriz de confusão do classificador (tipo
+  real contra tipo previsto, uma por configuração). Com `"tabelas_ideais": true`, uma passada extra
+  gera o SQL só com as tabelas esperadas, para separar o erro da busca do erro da geração.
 
 **Resultados e versão.** Cada experimento tem a sua pasta, `metricas/<nome>/`, com nomes fixos que são
 sobrescritos a cada execução:

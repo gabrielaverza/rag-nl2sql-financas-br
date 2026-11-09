@@ -714,6 +714,22 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
 
 
 # Monta o relatório do nível pipeline.
+# Monta a matriz de confusão do classificador de uma configuração: linhas = tipo real, colunas = tipo previsto.
+# Soma as rodadas; uma classe fora de TIPOS (se o classificador devolver algo inesperado) ganha coluna própria.
+def matriz_confusao(respostas: list[dict], configuracao: str) -> list[str]:
+    contagem = {}
+    for r in respostas:
+        if r["configuracao"] == configuracao:
+            contagem[(r["tipo"], r["classe"])] = contagem.get((r["tipo"], r["classe"]), 0) + 1
+    previstas = list(TIPOS) + sorted({c for _, c in contagem if c not in TIPOS})
+    linhas = []
+    for real in TIPOS:
+        total = sum(contagem.get((real, c), 0) for c in previstas)
+        if total:
+            linhas.append([real] + [str(contagem.get((real, c), 0)) for c in previstas] + [str(total)])
+    return tabela_md(["Real / previsto"] + previstas + ["Total"], linhas)
+
+
 def relatorio_pipeline(exp: dict, perguntas: list[dict], saida: dict, rodadas: int, comando: str, parcial: bool, ficha: dict) -> str:
     por_config = saida["resultados"]
     t = [f"# Experimento {exp['nome']}: pipeline completo", ""]
@@ -754,6 +770,11 @@ def relatorio_pipeline(exp: dict, perguntas: list[dict], saida: dict, rodadas: i
             corpo.append(linha)
         t += tabela_md(["Configuração"] + [rotulo for _, rotulo, _ in medidas], corpo)
         n_secao += 1
+    t += [f"## {n_secao}. Matriz de confusão do classificador", ""]
+    t += ["Cada linha é o tipo real da pergunta e cada coluna, o tipo que o classificador previu; a diagonal são os acertos. Com mais de uma rodada, as contagens somam as rodadas.", ""]
+    for nome in por_config:
+        t += [f"**{nome}**", ""] + matriz_confusao(saida["respostas"], nome)
+    n_secao += 1
     t += [f"## {n_secao}. Tempo médio por passo (s)", ""]
     corpo = []
     for nome, rs in por_config.items():
