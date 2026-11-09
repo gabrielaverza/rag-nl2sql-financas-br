@@ -43,32 +43,25 @@ rag-nl2sql-financas-br/
     │   ├── gerar_indice_glossario.py   # normativos/*.pdf -> index_glossario.json
     │   ├── gerar_indice_bm25.py        # índices vetoriais -> índices de palavras (BM25)
     │   └── rodar_offline.py            # gera os três índices acima, para um ou mais modelos
-    └── online/
-        ├── configuracao.py             # lê, confere e sobrescreve o configuracao.json
-        ├── busca.py                    # busca por embeddings nos dois índices
-        ├── busca_bm25.py               # busca por palavras (BM25)
-        ├── fusao_rrf.py                # fusão por posição (RRF) de embeddings e BM25
-        ├── busca_configuravel.py       # ponto único de busca: escolhe o método pela configuração
-        ├── classificador.py            # classifica a pergunta em conceitual, quantitativa ou híbrida
-        ├── divisor.py                  # divide a pergunta híbrida em parte de dados e parte conceitual
-        ├── gerador_sql.py              # gera e executa o SQL das perguntas quantitativas e híbridas
-        ├── sintetizador.py             # escreve a resposta em linguagem natural
-        ├── validador.py                # relevância do contexto e fidelidade da resposta
-        ├── formatador.py               # resposta final com proveniência
-        ├── main.py                     # orquestrador: pergunta -> resposta final
-        ├── validar_perguntas.py        # confere o arquivo de perguntas e a base de cada uma
+    ├── online/
+    │   ├── configuracao.py             # lê, confere e sobrescreve o configuracao.json
+    │   ├── busca.py                    # busca por embeddings nos dois índices
+    │   ├── busca_bm25.py               # busca por palavras (BM25)
+    │   ├── fusao_rrf.py                # fusão por posição (RRF) de embeddings e BM25
+    │   ├── busca_configuravel.py       # ponto único de busca: escolhe o método pela configuração
+    │   ├── classificador.py            # classifica a pergunta em conceitual, quantitativa ou híbrida
+    │   ├── divisor.py                  # divide a pergunta híbrida em parte de dados e parte conceitual
+    │   ├── gerador_sql.py              # gera e executa o SQL das perguntas quantitativas e híbridas
+    │   ├── sintetizador.py             # escreve a resposta em linguagem natural
+    │   ├── validador.py                # relevância do contexto e fidelidade da resposta
+    │   ├── formatador.py               # resposta final com proveniência
+    │   └── main.py                     # orquestrador: pergunta -> resposta final
+    └── avaliacao/
         ├── executar_experimentos.py    # executor dos experimentos (recuperação e pipeline completo)
-        ├── avaliar_recuperacao.py      # Recall@k e MRR da busca por embeddings
-        ├── avaliar_baseline.py         # embeddings, BM25 e RRF nas mesmas perguntas
-        ├── avaliar_divisao_hibridas.py # efeito de dividir a pergunta híbrida na recuperação
-        ├── avaliar_classificador.py    # acurácia e matriz de confusão do classificador
-        ├── avaliar_sql.py              # EX do gerador de SQL
-        ├── avaliar_sintese.py          # inspeciona a síntese
-        ├── avaliar_validador.py        # inspeciona a validação
-        ├── avaliar_formatador.py       # inspeciona o formatador
-        ├── avaliar_pipeline.py         # mede o fluxo completo (classe, EX, fidelidade, tempo)
-        ├── medir_tempo_busca.py        # tempo de partida e por pergunta de cada busca
-        └── resumir_por_tipo.py         # resume por tipo as métricas de recuperação já gravadas
+        ├── metricas.py                 # fórmulas de métrica, piso aleatório, comparação pareada e EX
+        ├── verificacoes.py             # testes de sanidade da síntese, do validador e do formatador
+        ├── validar_perguntas.py        # confere o arquivo de perguntas e a base de cada uma
+        └── medir_tempo_busca.py        # tempo de partida e por pergunta de cada busca
 ```
 
 ---
@@ -124,10 +117,10 @@ python pipeline/online/main.py "pergunta" --set divisor.ativo=false   # troca um
 **3. Avaliação**
 
 ```bash
-python pipeline/online/validar_perguntas.py dados/perguntas_validacao.json --base   # confere o conjunto
-python pipeline/online/executar_experimentos.py --listar                            # experimentos disponíveis
-python pipeline/online/executar_experimentos.py metodos                             # embeddings, BM25 e RRF
-python pipeline/online/avaliar_pipeline.py                                          # fluxo completo, resumo
+python pipeline/avaliacao/validar_perguntas.py dados/perguntas_validacao.json --base   # confere o conjunto
+python pipeline/avaliacao/executar_experimentos.py --listar                            # experimentos disponíveis
+python pipeline/avaliacao/executar_experimentos.py metodos                             # embeddings, BM25 e RRF
+python pipeline/avaliacao/verificacoes.py todas                                        # testes de sanidade (usam o LLM)
 ```
 
 Os demais scripts de avaliação estão descritos na seção "Avaliação e experimentos".
@@ -177,7 +170,7 @@ adicionado) e CPC 26 (R1, apresentação das demonstrações), em `dados/normati
 quantitativas e híbridas), `evidencia` (frase literal do normativo, nas conceituais e híbridas) e os
 campos de base: `base_dados` (companhia, código CVM, tabela e conta) e `base_normativo` (arquivo,
 página, trechos do índice e dispositivo). `perguntas_validacao_ficha.md` registra a conferência de
-cada pergunta contra os dados e os normativos, e `validar_perguntas.py --base` repete as conferências
+cada pergunta contra os dados e os normativos, e `pipeline/avaliacao/validar_perguntas.py --base` repete as conferências
 automáticas.
 
 ---
@@ -296,24 +289,19 @@ respondem várias perguntas, `--configuracao` troca o arquivo de configuração 
 
 ## Avaliação e experimentos
 
+Ficam em `pipeline/avaliacao/`, separados do fluxo de uma pergunta (`pipeline/online/`), que não depende
+deles.
+
 | Arquivo | Função |
 |---|---|
+| `executar_experimentos.py` | Executor dos experimentos descritos em `experimentos.json`, em dois níveis (abaixo); é o ponto de entrada de todas as medições |
+| `metricas.py` | Fórmulas usadas pelo executor: Recall, MRR, Hit, nDCG e Precision, piso aleatório, comparação pareada por bootstrap, EX (estrito e aceitando outras companhias que combinam com o nome) e formatação dos relatórios |
+| `verificacoes.py` | Testes de sanidade com o LLM: `sintese` (respostas com o SQL de referência e recusas fora do escopo), `validador` (número trocado e fato inventado devem ser reprovados, resposta correta aprovada) e `formatador` (proveniência, aviso de fidelidade baixa e recusa) |
 | `validar_perguntas.py` | Confere o arquivo de perguntas (campos, tabelas, evidência nos trechos); com `--base`, confere também `base_dados`, `sql_referencia` e `base_normativo` |
-| `executar_experimentos.py` | Executor dos experimentos descritos em `experimentos.json`, em dois níveis (abaixo) |
-| `avaliar_recuperacao.py` | Recall@k e MRR da busca por embeddings nos dois índices |
-| `avaliar_baseline.py` | Compara embeddings, BM25 (com e sem stemmer) e RRF nas mesmas perguntas, com piso aleatório e comparação pareada |
-| `avaliar_divisao_hibridas.py` | Mede o efeito de dividir a pergunta híbrida na recuperação (pergunta inteira, dividida e mista) |
-| `avaliar_classificador.py` | Acurácia geral e por classe, matriz de confusão e tempo do classificador |
-| `avaliar_sql.py` | Acurácia de execução (EX) do gerador de SQL; aceita `--k N` e `--tabelas-ideais` |
-| `avaliar_sintese.py` | Imprime as respostas da síntese usando o SQL de referência e confere recusas fora do escopo |
-| `avaliar_validador.py` | Aplica a validação a respostas geradas e a casos conhecidos (número trocado, fato inventado, resposta correta) |
-| `avaliar_formatador.py` | Mostra a resposta formatada de casos de cada tipo e de fidelidade baixa |
-| `avaliar_pipeline.py` | Roda o fluxo completo e resume classe, EX, fidelidade, relevância, aprovação e tempo; `--saida` grava as respostas |
 | `medir_tempo_busca.py` | Tempo de partida e por pergunta de cada busca |
-| `resumir_por_tipo.py` | Resume por tipo de pergunta as métricas de recuperação gravadas por `avaliar_baseline.py` |
 
-Todos usam o conjunto oficial (`dados/perguntas_validacao.json`) e aceitam outro arquivo de perguntas
-como argumento, quando o script o prevê.
+Todos usam o conjunto oficial (`dados/perguntas_validacao.json`) e rodam de dentro de
+`rag-nl2sql-financas-br/`.
 
 **Executor de experimentos.** `experimentos.json` descreve cada experimento: nível, configurações
 nomeadas e pares a comparar. Cada configuração é uma lista de trocas `chave=valor` sobre o
@@ -355,11 +343,14 @@ git show metodos-v1:metricas/metodos/relatorio.md
 ```
 
 Execuções de teste (`--ids`, ou `"rascunho": true` no experimento) vão para `metricas/rascunhos/<nome>/`,
-pasta ignorada pelo git, e o relatório as marca como rascunho. `avaliar_baseline.py`,
-`avaliar_divisao_hibridas.py`, `medir_tempo_busca.py` e `resumir_por_tipo.py` gravam os relatórios deles
-nessa mesma pasta.
+pasta ignorada pelo git, e o relatório as marca como rascunho. `medir_tempo_busca.py` grava o relatório
+dele nessa mesma pasta.
+
+O experimento `teste_equivalencia` serve para conferir que uma mudança no código não alterou as
+métricas de recuperação: rode-o antes e depois, e compare os `resultados.csv` (a coluna `execucao` é a
+única que muda).
 
 ```bash
-python pipeline/online/executar_experimentos.py metodos
-python pipeline/online/executar_experimentos.py teste_pipeline --ids q01,c01,h01 --rodadas 1
+python pipeline/avaliacao/executar_experimentos.py metodos
+python pipeline/avaliacao/executar_experimentos.py teste_pipeline --ids q01,c01,h01 --rodadas 1
 ```
