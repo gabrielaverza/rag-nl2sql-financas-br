@@ -1,0 +1,142 @@
+{
+  "h01|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o lucro líquido consolidado da Equatorial em 2025, e em quanto tempo após o fim do exercício a companhia deve entregar o formulário de referência atualizado?",
+    "parte_dados": "Qual foi o lucro líquido consolidado da Equatorial em 2025?",
+    "parte_conceitual": "Em quanto tempo após o fim do exercício a companhia deve entregar o formulário de referência atualizado?",
+    "dividida": true,
+    "segundos": 10.45
+  },
+  "h02|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o ativo total consolidado da Usiminas em 2025, e a entidade precisa divulgar informação comparativa do período anterior?",
+    "parte_dados": "Qual foi o ativo total consolidado da Usiminas em 2025?",
+    "parte_conceitual": "A entidade precisa divulgar informação comparativa do período anterior?",
+    "dividida": true,
+    "segundos": 1.46
+  },
+  "h03|bloquear_pronomes=True": {
+    "pergunta": "Quanto a Cyrela registrou de resultado financeiro em 2025, e o que são os outros resultados abrangentes?",
+    "parte_dados": "Quanto a Cyrela registrou de resultado financeiro em 2025?",
+    "parte_conceitual": "O que são os outros resultados abrangentes?",
+    "dividida": true,
+    "segundos": 1.36
+  },
+  "h04|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o custo dos produtos vendidos consolidado da Randon em 2025, e o que a demonstração do valor adicionado inclui nesse custo?",
+    "parte_dados": "Qual foi o custo dos produtos vendidos consolidado da Randon em 2025, e o que a demonstração do valor adicionado inclui nesse custo?",
+    "parte_conceitual": "Qual foi o custo dos produtos vendidos consolidado da Randon em 2025, e o que a demonstração do valor adicionado inclui nesse custo?",
+    "dividida": false,
+    "segundos": 3.2
+  },
+  "h05|bloquear_pronomes=True": {
+    "pergunta": "Qual o saldo de empréstimos e financiamentos de curto prazo da Azul no fim de 2025, e como os empréstimos bancários costumam ser classificados no fluxo de caixa?",
+    "parte_dados": "Qual o saldo de empréstimos e financiamentos de curto prazo da Azul no fim de 2025?",
+    "parte_conceitual": "Como os empréstimos bancários costumam ser classificados no fluxo de caixa?",
+    "dividida": true,
+    "segundos": 1.95
+  },
+  "h06|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o caixa líquido das atividades de financiamento da Minerva em 2025, e como podem ser classificados os dividendos pagos?",
+    "parte_dados": "Qual foi o caixa líquido das atividades de financiamento da Minerva em 2025?",
+    "parte_conceitual": "Como podem ser classificados os dividendos pagos?",
+    "dividida": true,
+    "segundos": 1.57
+  },
+  "h07|bloquear_pronomes=True": {
+    "pergunta": "Qual era o patrimônio líquido consolidado da Smartfit ao fim de 2025, e que declaração os diretores devem dar sobre as demonstrações financeiras?",
+    "parte_dados": "Qual era o patrimônio líquido consolidado da Smartfit ao fim de 2025?",
+    "parte_conceitual": "Que declaração os diretores devem dar sobre as demonstrações financeiras?",
+    "dividida": true,
+    "segundos": 1.73
+  },
+  "h08|bloquear_pronomes=True": {
+    "pergunta": "Qual foi a receita líquida consolidada da Movida em 2025, e em que moeda devem ser registrados os fluxos de caixa de transações em moeda estrangeira?",
+    "parte_dados": "Qual foi a receita líquida consolidada da Movida em 2025?",
+    "parte_conceitual": "Em que moeda devem ser registrados os fluxos de caixa de transações em moeda estrangeira?",
+    "dividida": true,
+    "segundos": 1.81
+  },
+  "h09|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o lucro bruto consolidado da Lojas Quero-Quero em 2025, e a classificação dos itens pode mudar de um período para outro?",
+    "parte_dados": "Qual foi o lucro bruto consolidado da Lojas Quero-Quero em 2025?",
+    "parte_conceitual": "A classificação dos itens pode mudar de um período para outro?",
+    "dividida": true,
+    "segundos": 1.61
+  },
+  "h10|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o valor adicionado total a distribuir da Gol em 2025, e o que a DVA inclui como depreciação, amortização e exaustão?",
+    "parte_dados": "Qual foi o valor adicionado total a distribuir da Gol em 2025?",
+    "parte_conceitual": "O que a DVA inclui como depreciação, amortização e exaustão?",
+    "dividida": true,
+    "segundos": 1.65
+  },
+  "h11|bloquear_pronomes=True": {
+    "pergunta": "Quanto a BRF registrou de imposto de renda e contribuição social em 2025, e como os tributos sobre o lucro são classificados na demonstração dos fluxos de caixa?",
+    "parte_dados": "Quanto a BRF registrou de imposto de renda e contribuição social em 2025?",
+    "parte_conceitual": "Como os tributos sobre o lucro são classificados na demonstração dos fluxos de caixa?",
+    "dividida": true,
+    "segundos": 1.82
+  },
+  "h12|bloquear_pronomes=True": {
+    "pergunta": "Quanto a SLC Agrícola distribuiu em impostos, taxas e contribuições na DVA de 2025, e o que a DVA inclui nesse grupo?",
+    "parte_dados": "Quanto a SLC Agrícola distribuiu em impostos, taxas e contribuições na DVA de 2025, e o que a DVA inclui nesse grupo?",
+    "parte_conceitual": "Quanto a SLC Agrícola distribuiu em impostos, taxas e contribuições na DVA de 2025, e o que a DVA inclui nesse grupo?",
+    "dividida": false,
+    "segundos": 3.62
+  },
+  "h13|bloquear_pronomes=True": {
+    "pergunta": "Quanto a Cogna registrou de despesas com vendas em 2025, e de que depende a escolha entre apresentar despesas por função ou por natureza?",
+    "parte_dados": "Quanto a Cogna registrou de despesas com vendas em 2025?",
+    "parte_conceitual": "De que depende a escolha entre apresentar despesas por função ou por natureza?",
+    "dividida": true,
+    "segundos": 1.73
+  },
+  "h14|bloquear_pronomes=True": {
+    "pergunta": "Qual foi a remuneração de capitais de terceiros da Copasa na DVA de 2025, e o que a DVA inclui como juros?",
+    "parte_dados": "Qual foi a remuneração de capitais de terceiros da Copasa na DVA de 2025?",
+    "parte_conceitual": "O que a DVA inclui como juros?",
+    "dividida": true,
+    "segundos": 1.59
+  },
+  "h15|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o caixa líquido das atividades de investimento da Iochpe-Maxion em 2025, e que pagamentos de caixa são fluxos de investimento?",
+    "parte_dados": "Qual foi o caixa líquido das atividades de investimento da Iochpe-Maxion em 2025?",
+    "parte_conceitual": "Que pagamentos de caixa são fluxos de investimento?",
+    "dividida": true,
+    "segundos": 1.71
+  },
+  "h16|bloquear_pronomes=True": {
+    "pergunta": "Qual foi o lucro líquido consolidado da Neoenergia em 2025, e quando o emissor deve enviar o material apresentado em reuniões com analistas?",
+    "parte_dados": "Qual foi o lucro líquido consolidado da Neoenergia em 2025?",
+    "parte_conceitual": "Quando o emissor deve enviar o material apresentado em reuniões com analistas?",
+    "dividida": true,
+    "segundos": 1.69
+  },
+  "h17|bloquear_pronomes=True": {
+    "pergunta": "Qual foi a receita líquida consolidada da Engie Brasil Energia em 2025, e em quantos dias úteis o emissor da categoria B deve enviar o estatuto social consolidado após a assembleia que alterou o estatuto?",
+    "parte_dados": "Qual foi a receita líquida consolidada da Engie Brasil Energia em 2025?",
+    "parte_conceitual": "Em quantos dias úteis o emissor da categoria B deve enviar o estatuto social consolidado após a assembleia que alterou o estatuto?",
+    "dividida": true,
+    "segundos": 2.19
+  },
+  "h18|bloquear_pronomes=True": {
+    "pergunta": "Qual era o patrimônio líquido consolidado da Yduqs ao fim de 2025, e que informação sobre dividendos a entidade deve apresentar?",
+    "parte_dados": "Qual era o patrimônio líquido consolidado da Yduqs ao fim de 2025?",
+    "parte_conceitual": "Que informação sobre dividendos a entidade deve apresentar?",
+    "dividida": true,
+    "segundos": 1.61
+  },
+  "h19|bloquear_pronomes=True": {
+    "pergunta": "Qual era o ativo total consolidado da Vamos ao fim de 2025, e que dever os administradores do emissor têm em relação à legislação do mercado de valores mobiliários?",
+    "parte_dados": "Qual era o ativo total consolidado da Vamos ao fim de 2025?",
+    "parte_conceitual": "Que dever os administradores do emissor têm em relação à legislação do mercado de valores mobiliários?",
+    "dividida": true,
+    "segundos": 1.77
+  },
+  "h20|bloquear_pronomes=True": {
+    "pergunta": "Quanto caixa as atividades operacionais da Azzas 2154 geraram em 2025, e o que o método direto divulga?",
+    "parte_dados": "Quanto caixa as atividades operacionais da Azzas 2154 geraram em 2025?",
+    "parte_conceitual": "O que o método direto divulga?",
+    "dividida": true,
+    "segundos": 1.6
+  }
+}
