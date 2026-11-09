@@ -14,7 +14,7 @@ Descrição geral do funcionamento:
 Dependências:
 - pipeline/online/sintetizador.py, validador.py e gerador_sql.py (servidor Ollama em execução,
   com o modelo qwen2.5-coder:7b);
-- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
+- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento.
 
@@ -32,7 +32,7 @@ from gerador_sql import executar_sql
 from sintetizador import responder
 from validador import validar
 
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 # Quantitativas conferidas (as demais são puladas para o script não demorar).
 QUANTITATIVAS_CONFERIDAS = ("q01", "q02", "q03")
 

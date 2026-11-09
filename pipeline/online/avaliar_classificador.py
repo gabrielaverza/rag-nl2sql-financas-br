@@ -9,7 +9,7 @@ Descrição geral do funcionamento:
 
 Dependências:
 - pipeline/online/classificador.py (servidor Ollama em execução, com o modelo qwen2.5-coder:7b);
-- arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
+- arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento.
 
@@ -27,7 +27,7 @@ import time
 
 from classificador import CLASSES, classificar
 
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 
 
 # Classifica cada pergunta e imprime a acurácia, a matriz de confusão e os erros.

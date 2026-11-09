@@ -15,7 +15,7 @@ Descrição geral do funcionamento:
 
 Dependências:
 - pipeline/online/busca.py e os índices e o esquema em embeddings/;
-- arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
+- arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento.
 
@@ -41,7 +41,7 @@ from busca import (
 )
 
 KS = (1, 3, 5)
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 
 
 # Troca qualquer sequência de espaços e quebras de linha por um espaço.

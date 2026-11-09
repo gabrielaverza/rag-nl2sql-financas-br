@@ -14,7 +14,7 @@ Descrição geral do funcionamento:
 Dependências:
 - pipeline/online/sintetizador.py e gerador_sql.py (servidor Ollama em execução, com o modelo
   qwen2.5-coder:7b);
-- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
+- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento; --todas para
 usar todas as quantitativas (por padrão, só as 5 primeiras e as híbridas).
@@ -35,7 +35,7 @@ import sys
 from gerador_sql import executar_sql
 from sintetizador import SEM_INFORMACAO, responder
 
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 # Perguntas conceituais cuja resposta NÃO está nos normativos indexados (conferido: EBITDA
 # tem zero ocorrências no índice do glossário).
 FORA_DO_ESCOPO = [

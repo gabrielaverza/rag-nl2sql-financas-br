@@ -19,7 +19,7 @@ Descrição geral do funcionamento:
 
 Dependências:
 - pipeline/online/gerador_sql.py (servidor Ollama em execução, com o modelo qwen2.5-coder:7b);
-- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
+- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento; --k N para o
 número de tabelas da busca (padrão: k_tabelas de configuracao.json); --tabelas-ideais para usar as tabelas esperadas.
@@ -43,7 +43,7 @@ from collections import Counter
 from configuracao import carregar as carregar_configuracao
 from gerador_sql import executar_sql, gerar_sql
 
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 
 
 # Arredonda os números e ordena as linhas, para comparar resultados sem depender da ordem.

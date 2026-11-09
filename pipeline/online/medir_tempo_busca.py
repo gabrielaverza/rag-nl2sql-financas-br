@@ -10,12 +10,11 @@ Descrição geral do funcionamento:
   (que inclui ler o JSON do índice), e, para comparar, importar as bibliotecas de embeddings,
   carregar o modelo E5-base e ler os índices vetoriais.
 - Custo por pergunta: tempo de uma busca de 3 trechos no glossário e de uma busca de tabelas, com
-  cada método, nas perguntas dos dois conjuntos (depois de uma rodada de aquecimento). O tempo do
+  cada método, nas perguntas do conjunto oficial (depois de uma rodada de aquecimento). O tempo do
   E5-base inclui transformar a pergunta em vetor.
 - Mede só a busca; o LLM (classificador, SQL, síntese e validação) fica de fora.
 
-Dependências: os índices e o esquema em embeddings/, dados/perguntas_dfp.json e
-dados/perguntas_validacao.json; bibliotecas do pipeline mais rank-bm25 e nltk.
+Dependências: os índices e o esquema em embeddings/, dados/perguntas_validacao.json; bibliotecas do pipeline mais rank-bm25 e nltk.
 
 Parâmetros: nenhum argumento.
 
@@ -33,7 +32,7 @@ import time
 from datetime import datetime
 from statistics import mean, median
 
-CAMINHOS_PERGUNTAS = ("dados/perguntas_dfp.json", "dados/perguntas_validacao.json")
+CAMINHOS_PERGUNTAS = ("dados/perguntas_validacao.json",)
 PASTA_SAIDA = "metricas"
 RODADAS = 3
 
@@ -102,7 +101,7 @@ def main():
     t += [
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `python pipeline/online/medir_tempo_busca.py`.",
         f"- Máquina: {platform.platform()}, Python {platform.python_version()}; os embeddings rodam na CPU. Uma máquina e uma execução, então os valores são só uma ordem de grandeza.",
-        f"- Por pergunta: {len(perguntas)} perguntas dos dois conjuntos, {RODADAS} rodadas cada, depois de uma chamada de aquecimento. O LLM (classificador, SQL, síntese, validação) não entra; o fluxo completo leva cerca de 29 s por pergunta.",
+        f"- Por pergunta: {len(perguntas)} perguntas do conjunto oficial, {RODADAS} rodadas cada, depois de uma chamada de aquecimento. O LLM (classificador, SQL, síntese, validação) não entra; o fluxo completo leva cerca de 29 s por pergunta.",
         "",
         "## 1. Custos de partida (uma vez, quando o programa inicia)",
         "",

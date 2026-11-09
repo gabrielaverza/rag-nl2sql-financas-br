@@ -8,8 +8,8 @@ Descrição geral do funcionamento:
   responde com um JSON {"tipo": ...}.
 - O tipo decide o caminho: conceitual usa só o índice do glossário (normativos),
   quantitativa usa o índice de esquema e o SQL sobre as DFPs, e híbrida usa os dois.
-- Os exemplos NÃO fazem parte de dados/perguntas_dfp.json nem de
-  dados/perguntas_validacao.json, para a avaliação não ser contaminada.
+- Os exemplos NÃO fazem parte de dados/perguntas_validacao.json, para a avaliação não ser contaminada
+  (nenhum é uma pergunta do conjunto; a Cosan, porém, aparece nos exemplos e na pergunta q04).
 - Se o LLM não devolver uma classe válida em TENTATIVAS chamadas, a pergunta é
   tratada como híbrida.
 

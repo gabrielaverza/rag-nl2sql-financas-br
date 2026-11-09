@@ -5,17 +5,16 @@ Função: resume, por tipo de pergunta, as métricas de recuperação que avalia
 CSV, em contagens "x de n", para comparar os métodos sem reexecutar nenhuma busca.
 
 Descrição geral do funcionamento:
-- Lê os CSVs de metricas/ (validação e teste) e agrupa as perguntas por tipo (quantitativa, conceitual
+- Lê o CSV de metricas/ do conjunto oficial (perguntas_validacao.json) e agrupa as perguntas por tipo (quantitativa, conceitual
   e híbrida).
 - Para cada tipo, mostra os métodos lado a lado (E5-base, BM25, RRF, a política por tipo e o piso
   aleatório) nas métricas que fazem sentido para ele: tabelas nas quantitativas, trechos nas
   conceituais, e tabelas, trechos e os dois juntos nas híbridas.
-- Cada medida de 0 ou 1 aparece como contagem de perguntas na validação, no teste e nos dois juntos;
-  o MRR aparece como média dos dois conjuntos. No piso aleatório, a contagem é o valor esperado.
+- Cada medida de 0 ou 1 aparece como contagem de perguntas; o MRR aparece como média. No piso
+  aleatório, a contagem é o valor esperado.
 
-Dependências: metricas/baseline_recuperacao_perguntas_validacao.csv e
-metricas/baseline_recuperacao_perguntas_dfp.csv (gerados por avaliar_baseline.py). Só biblioteca
-padrão.
+Dependências: metricas/baseline_recuperacao_perguntas_validacao.csv (gerado por
+avaliar_baseline.py dados/perguntas_validacao.json). Só biblioteca padrão.
 
 Parâmetros: nenhum argumento.
 
@@ -31,10 +30,7 @@ import sys
 from datetime import datetime
 
 PASTA = "metricas"
-CSVS = (
-    ("Val.", os.path.join(PASTA, "baseline_recuperacao_perguntas_validacao.csv")),
-    ("Teste", os.path.join(PASTA, "baseline_recuperacao_perguntas_dfp.csv")),
-)
+CSVS = (("Perguntas", os.path.join(PASTA, "baseline_recuperacao_perguntas_validacao.csv")),)
 METODOS = [
     ("E5-base (embeddings)", "E5-base"),
     ("BM25 sem stemmer", "BM25"),
@@ -88,7 +84,7 @@ def contagem(vals: list[float], piso: bool) -> str:
 def tabela_secao(dados: dict, tipo: str, medidas: list) -> list[str]:
     cabecalho = ["Método"]
     for _, rotulo, forma in medidas:
-        cabecalho += [f"{rotulo} ({c})" for c in (*dados, "Total")] if forma == "contagem" else [f"{rotulo} (média)"]
+        cabecalho += [rotulo] if forma == "contagem" else [f"{rotulo} (média)"]
     linhas = ["| " + " | ".join(cabecalho) + " |", "|" + "|".join("---" for _ in cabecalho) + "|"]
     for metodo, curto in METODOS:
         celulas = [curto]
@@ -96,7 +92,7 @@ def tabela_secao(dados: dict, tipo: str, medidas: list) -> list[str]:
             por_conjunto = [valores(l, metodo, tipo, chave) for l in dados.values()]
             todos = [v for vs in por_conjunto for v in vs]
             if forma == "contagem":
-                celulas += [contagem(vs, metodo == PISO) for vs in por_conjunto] + [contagem(todos, metodo == PISO)]
+                celulas.append(contagem(todos, metodo == PISO))
             else:
                 celulas.append(fmt(sum(todos) / len(todos)) if todos else "n/d")
         linhas.append("| " + " | ".join(celulas) + " |")
@@ -110,9 +106,9 @@ def main():
     t = ["# Resumo das métricas de recuperação por tipo de pergunta", ""]
     t += [
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `python pipeline/online/resumir_por_tipo.py`, a partir dos CSVs de `metricas/`.",
-        "- Contagens \"x/n\": x perguntas com acerto entre n. Val. é o conjunto de validação (`perguntas_validacao.json`), Teste é `perguntas_dfp.json`, Total soma os dois. Os dois conjuntos são pequenos e não totalmente independentes do ajuste do E5-base (o teste o favorece mais).",
+        "- Contagens \"x/n\": x perguntas com acerto entre n. As perguntas são as do conjunto oficial (`perguntas_validacao.json`, 60 perguntas, 20 por tipo). Cada tipo tem 20 perguntas, então uma pergunta vale 5 pontos percentuais.",
         "- Todas as tabelas no top-k: todas as tabelas necessárias estão entre as k escolhidas (mais as referenciadas por chave estrangeira). Hit@k: pelo menos um trecho relevante entre os k primeiros. Ambos: tabelas completas e trecho relevante ao mesmo tempo. MRR: média de 1/posição do primeiro item certo.",
-        "- Métodos: BM25 sem stemmer com k1 = 2 e b = 0,5; RRF com k = 60; Por índice é a política (tabelas com E5 e trechos com BM25, para todos os tipos; escolhida depois de ver estes mesmos dados, então não é confirmação independente) e Política anterior é a que usava RRF nas híbridas, ambas com o tipo correto de cada pergunta. No piso aleatório, o número é o valor esperado de um sorteio.",
+        "- Métodos: BM25 sem stemmer com k1 = 2 e b = 0,5; RRF com k = 60; Por índice é a política (tabelas com E5 e trechos com BM25, para todos os tipos; escolhida depois de ver conjuntos anteriores, hoje inativos; aqui é medida em perguntas novas) e Política anterior é a que usava RRF nas híbridas, ambas com o tipo correto de cada pergunta. No piso aleatório, o número é o valor esperado de um sorteio.",
         "",
     ]
     for titulo, tipo, medidas in SECOES:

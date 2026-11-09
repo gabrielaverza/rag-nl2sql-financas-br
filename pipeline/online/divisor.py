@@ -7,8 +7,8 @@ conceitual (que vai à busca de trechos dos normativos), usando o LLM local.
 Descrição geral do funcionamento:
 - Um LLM local recebe as regras de divisão e alguns exemplos (few-shot) e responde com um JSON
   {"parte_dados": ..., "parte_conceitual": ...}, como o classificador faz com a classe.
-- Os exemplos do prompt NÃO são perguntas dos conjuntos de teste, de validação nem das divisões
-  manuais, e usam outras companhias e outros conceitos, para a avaliação não ser contaminada.
+- Os exemplos do prompt NÃO são perguntas do conjunto oficial (dados/perguntas_validacao.json) e usam
+  outras companhias e outros conceitos, para a avaliação não ser contaminada.
 - Cada parte é conferida: não pode estar vazia nem trazer muitas palavras que não estejam na pergunta
   (o LLM não deve inventar conceitos). A parte conceitual também não pode ter pronomes
   demonstrativos ou pessoais ("esse", "nessa", "ele"), que perdem o sentido longe da parte de dados e

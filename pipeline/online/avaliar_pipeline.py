@@ -14,7 +14,7 @@ Descrição geral do funcionamento:
 Dependências:
 - pipeline/online/main.py e avaliar_sql.py (servidor Ollama em execução, com o modelo
   qwen2.5-coder:7b);
-- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
+- dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_validacao.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento; --saida CAMINHO
 para gravar as respostas completas em JSON; --limite N para rodar só as N primeiras perguntas.
@@ -35,7 +35,7 @@ from avaliar_sql import resultado_contem_referencia, resultados_equivalentes
 from gerador_sql import executar_sql
 from main import executar
 
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
 
 
 def media(valores: list[float]) -> str:

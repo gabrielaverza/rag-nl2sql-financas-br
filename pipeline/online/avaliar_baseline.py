@@ -35,7 +35,6 @@ as métricas por pergunta e por método.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/online/avaliar_baseline.py
-    python pipeline/online/avaliar_baseline.py dados/perguntas_dfp.json
 """
 
 import csv
@@ -382,7 +381,7 @@ def montar_relatorio(caminho_perguntas: str, perguntas: list[dict], resultados: 
         f"- Bibliotecas: rank-bm25 {version('rank-bm25')}, nltk {version('nltk')}, sentence-transformers {version('sentence-transformers')}, numpy {version('numpy')}.",
         f"- BM25: Okapi BM25 da rank_bm25, sem ajuste nos dados. Parâmetros: {params}; epsilon = {fmt(eps)} (padrão da biblioteca). Os valores k1 = 2 e b = 0,5 são a combinação comum citada por Robertson e Zaragoza (2009, p. 31); os da biblioteca (k1 = 1,5 e b = 0,75) ficam dentro das faixas 0,5 < b < 0,8 e 1,2 < k1 < 2 (p. 30) e entram só como verificação de sensibilidade.",
         f"- RRF: fusão por posição dos rankings do E5-base e do BM25 sem stemmer; a nota de cada item é a soma de 1 / (k + posição), com k = {CONSTANTE_RRF}, o valor do artigo original (Cormack, Clarke e Büttcher, 2009), sem ajuste. No glossário reproduz a busca híbrida do MimirRAG; no esquema é uma extensão exploratória (as tabelas fundidas recebem depois a expansão por chave estrangeira).",
-        "- Por índice: a política com as tabelas buscadas pelo E5-base e os trechos pelo BM25 (BM25 sem stemmer, k1 = 2 e b = 0,5), para todos os tipos de pergunta, aplicada com o tipo correto de cada pergunta (sem erro do classificador). Foi escolhida pela autora depois de ver os resultados dos métodos nestes mesmos conjuntos, então esta linha NÃO é uma confirmação independente: só a avaliação em perguntas novas pode confirmá-la.",
+        "- Por índice: a política com as tabelas buscadas pelo E5-base e os trechos pelo BM25 (BM25 sem stemmer, k1 = 2 e b = 0,5), para todos os tipos de pergunta, aplicada com o tipo correto de cada pergunta (sem erro do classificador). Foi escolhida pela autora depois de ver os resultados dos métodos em conjuntos anteriores (hoje inativos); neste conjunto, que não participou da escolha, ela é medida em perguntas novas.",
         "- Por tipo (híbrida com RRF): a política anterior (quantitativa: tabelas com E5; conceitual: trechos com BM25; híbrida: tabelas e trechos com RRF), mantida só para comparação.",
         "- Pré-processamento do BM25: minúsculas, palavras (letras e dígitos), stopwords do português do NLTK, stemmer Snowball do português só na variante com stemmer, acentos removidos no fim. O E5-base recebe a pergunta com o prefixo `query: `.",
         "- Premissas iguais em todos os métodos: mesmas perguntas, mesmos registros indexados, pontuação da tabela pelo melhor registro de resumo ou entidades, expansão por chave estrangeira, mesmos k.",
@@ -426,7 +425,7 @@ def montar_relatorio(caminho_perguntas: str, perguntas: list[dict], resultados: 
         "## 5. Ressalvas",
         "",
         f"- Amostras pequenas ({n_tab} perguntas de tabelas, {n_glo} de trechos, {n_hib} híbridas): uma pergunta vale de 5 a 10 pontos percentuais, e diferenças de 1 a 3 perguntas são ruído. Os intervalos de bootstrap refletem só a variação entre perguntas deste conjunto.",
-        "- O BM25 roda sem ajuste nos dados (parâmetros tirados da referência, ver acima). A regra de pontuação por tabela foi escolhida olhando o conjunto de teste (`perguntas_dfp.json`), e a escolha do E5-base entre quatro modelos usou as perguntas de teste e de validação. Logo, nenhum dos dois conjuntos é totalmente independente para o E5-base, e o teste o favorece mais; o BM25 não foi ajustado em nenhum deles.",
+        "- O BM25 roda sem ajuste nos dados (parâmetros tirados da referência, ver acima). A regra de pontuação por tabela, o tamanho do trecho e a escolha do E5-base entre quatro modelos foram feitos em conjuntos de perguntas anteriores, hoje inativos; nenhuma decisão foi tomada olhando o resultado da busca neste conjunto. O BM25 não foi ajustado.",
         "- Cada pergunta tem uma só evidência literal, e um trecho só conta como relevante se a contém. Trechos úteis sem essa frase contam como erro, e a Precision@k fica limitada (com um relevante e k = 5, o máximo é 0,2).",
         "- As perguntas foram escritas pela autora; as do teste, com a evidência à vista, o que tende a favorecer a busca por palavras.",
         "- A tabela companhias está entre as esperadas em quase todas as perguntas e entra na lista pela regra de chave estrangeira em todos os métodos; a seção 1.2 mostra o acerto sem ela.",

@@ -14,7 +14,7 @@ Descrição geral do funcionamento:
 Dependências:
 - pipeline/online/formatador.py, sintetizador.py, validador.py e gerador_sql.py (servidor Ollama
   em execução, com o modelo qwen2.5-coder:7b);
-- dados/dfp.db e dados/perguntas_dfp.json.
+- dados/dfp.db e dados/perguntas_validacao.json.
 
 Parâmetros: nenhum argumento.
 
@@ -32,10 +32,10 @@ from gerador_sql import executar_sql
 from sintetizador import responder
 from validador import validar
 
-CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
-# Uma pergunta conceitual, uma quantitativa (empresa fora do resultado), duas com nome ambíguo
-# ou várias companhias (JBS) e uma híbrida.
-PERGUNTAS = ("c01", "q01", "q08", "q13", "h01")
+CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
+# Uma pergunta conceitual, uma quantitativa (empresa só no filtro do SQL), uma que compara duas
+# companhias, uma no balanço individual e uma híbrida.
+PERGUNTAS = ("c01", "q01", "q09", "q05", "h01")
 
 
 def main():
