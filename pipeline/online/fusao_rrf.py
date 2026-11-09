@@ -20,7 +20,7 @@ Descrição geral do funcionamento:
 
 Dependências: nenhuma além dos índices que recebe.
 
-Parâmetros: nenhum argumento. É um módulo importado por avaliar_baseline.py.
+Parâmetros: nenhum argumento. É um módulo importado pelos módulos de busca e pelo executor dos experimentos.
 
 Resultado: fornece CONSTANTE_RRF, fundir() e a classe IndiceHibrido.
 """

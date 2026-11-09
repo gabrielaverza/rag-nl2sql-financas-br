@@ -14,7 +14,7 @@ Descrição geral do funcionamento:
 - O conjunto de perguntas é sempre dados/perguntas_validacao.json (60 perguntas, o conjunto oficial).
 - Nível recuperação: para cada configuração e pergunta, busca as tabelas (quantitativas e híbridas) e
   os trechos dos normativos (conceituais e híbridas) com o método da configuração e calcula as métricas
-  de avaliar_baseline.py (todas as tabelas no top-k, Recall, MRR, Hit@k, Precision@k, nDCG@k e o
+  de metricas.py (todas as tabelas no top-k, Recall, MRR, Hit@k, Precision@k, nDCG@k e o
   acerto conjunto das híbridas). Com o divisor ligado, as híbridas buscam as tabelas com a pergunta
   inteira e os trechos com a parte conceitual (condição "mista"). As divisões são feitas uma vez e
   guardadas em metricas/divisoes_hibridas.json, para todas as configurações usarem as mesmas.
@@ -25,12 +25,12 @@ Descrição geral do funcionamento:
   rodada e é refeito a cada rodada, para a variação do LLM aparecer nas rodadas. Com
   "tabelas_ideais": true, uma passada extra gera o SQL só com as tabelas de tabelas_esperadas.
 - Comparação pareada: diferença média pergunta a pergunta (sempre o primeiro menos o segundo), vitórias,
-  derrotas e empates, e intervalo de 95% por bootstrap (comparar() de avaliar_baseline.py: 10.000
+  derrotas e empates, e intervalo de 95% por bootstrap (comparar() de metricas.py: 10.000
   reamostragens, semente 42). O relatório diz onde o intervalo fica em relação ao zero.
 
 Dependências:
-- pipeline/online/avaliar_baseline.py, avaliar_recuperacao.py, avaliar_sql.py, busca*.py, divisor.py e
-  main.py, os índices e o esquema em embeddings/ (os de outros modelos, em embeddings/modelos/<chave>/),
+- pipeline/avaliacao/metricas.py; pipeline/online/busca*.py, divisor.py e main.py; os índices e o
+  esquema em embeddings/ (os de outros modelos, em embeddings/modelos/<chave>/),
   dados/perguntas_validacao.json, dados/dfp.db e experimentos.json;
 - servidor Ollama com o modelo qwen2.5-coder:7b (divisor e nível pipeline).
 
@@ -54,9 +54,9 @@ pasta, com o identificador na mensagem, e uma tag (<nome>-v1, <nome>-v2...); o e
 comandos sugeridos no fim, mas não faz commit nem cria tag.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/online/executar_experimentos.py --listar
-    python pipeline/online/executar_experimentos.py metodos
-    python pipeline/online/executar_experimentos.py teste_pipeline --ids q01,c01,h01
+    python pipeline/avaliacao/executar_experimentos.py --listar
+    python pipeline/avaliacao/executar_experimentos.py metodos
+    python pipeline/avaliacao/executar_experimentos.py teste_pipeline --ids q01,c01,h01
 """
 
 import argparse
@@ -74,7 +74,12 @@ from statistics import mean
 
 import numpy as np
 
-from avaliar_baseline import (
+# Os módulos do fluxo ficam em pipeline/online/ e os compartilhados em pipeline/.
+PASTA = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(PASTA, "..", "online"))
+sys.path.insert(0, os.path.join(PASTA, ".."))
+
+from metricas import (  # noqa: E402
     KS_TABELAS,
     NOME_PISO,
     SEMENTE,
@@ -85,10 +90,11 @@ from avaliar_baseline import (
     juntar_hibrida,
     metricas_tabelas,
     metricas_trechos,
+    normalizar_texto,
+    resultado_contem_referencia,
+    resultados_equivalentes,
     tabela_md,
 )
-from avaliar_recuperacao import normalizar
-from avaliar_sql import resultado_contem_referencia, resultados_equivalentes
 from busca import (
     SECOES_FORA_DA_PONTUACAO,
     Indice,
@@ -276,7 +282,7 @@ class Recuperador:
         self.relevantes = {}
         for p in perguntas:
             if p["evidencia"]:
-                ids = {r["id"] for r in padrao.registros if any(normalizar(e) in normalizar(r["conteudo"]) for e in p["evidencia"])}
+                ids = {r["id"] for r in padrao.registros if any(normalizar_texto(e) in normalizar_texto(r["conteudo"]) for e in p["evidencia"])}
                 if not ids:
                     raise ValueError(f"{p['id']}: nenhum trecho contém a evidência")
                 self.relevantes[p["id"]] = ids
@@ -643,7 +649,7 @@ def posicao_intervalo(ic: tuple) -> str:
     return "inclui zero"
 
 
-COMANDO_PADRAO = "python pipeline/online/executar_experimentos.py {nome}"
+COMANDO_PADRAO = "python pipeline/avaliacao/executar_experimentos.py {nome}"
 
 
 # Monta o relatório do nível recuperação.

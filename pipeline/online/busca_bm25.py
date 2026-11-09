@@ -30,7 +30,7 @@ Dependências:
 - biblioteca rank-bm25; a nltk só para radicalizar (e, para gerar o índice, o corpus de
   stopwords do NLTK: python -m nltk.downloader stopwords).
 
-Parâmetros: nenhum argumento. É um módulo importado por avaliar_baseline.py e pelos demais.
+Parâmetros: nenhum argumento. É um módulo importado pelos demais módulos de busca e pelo executor dos experimentos.
 
 Resultado: fornece preprocessar(), tirar_acentos(), os caminhos dos índices de palavras e a classe
 IndiceBM25 (buscar, buscar_por_fonte, diagnostico).

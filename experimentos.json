@@ -23,7 +23,7 @@
     },
     "teste_equivalencia": {
       "rascunho": true,
-      "descricao": "Teste de equivalência do executor: com o divisor e o stemmer desligados, o executor deve reproduzir os números de avaliar_baseline.py; a última configuração (divisor ligado) deve reproduzir a condição mista de avaliar_divisao_hibridas.py. Os resultados são de teste e não valem como resultado dos experimentos.",
+      "descricao": "Teste de equivalência do executor: com o divisor e o stemmer desligados, as métricas de recuperação devem sair idênticas antes e depois de uma mudança no código que não deveria alterá-las (compare o resultados.csv, ignorando a coluna da execução); as duas primeiras configurações cobrem a pergunta inteira e as duas últimas, o divisor ligado. Os resultados são de teste e não valem como resultado dos experimentos.",
       "nivel": "recuperacao",
       "configuracoes": [
         {"nome": "E5 (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=false", "bm25.radicalizar=false"]},

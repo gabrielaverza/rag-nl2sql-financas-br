@@ -12,7 +12,7 @@ Descrição geral do funcionamento:
   (quantitativa: só tabelas; conceitual: só evidência; híbrida: as duas).
 - Avisos: evidência que aparece em mais de 5 trechos (genérica demais, o Recall perde sentido) e
   conjunto muito desequilibrado entre os tipos.
-- A evidência é comparada com os trechos como em avaliar_recuperacao.py: espaços normalizados, sem
+- A evidência é comparada com os trechos como no executor dos experimentos: espaços normalizados, sem
   ignorar maiúsculas.
 - Nenhuma busca por embeddings ou BM25 é feita aqui, então a conferência não depende dos métodos
   avaliados (a evidência deve ser escolhida lendo os normativos, e não olhando o que a busca devolve).
@@ -31,7 +31,7 @@ como primeiro argumento; --base é opcional.
 Resultado: imprime os erros, os avisos e a contagem por tipo; termina com código 1 se houver erro.
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/online/validar_perguntas.py dados/perguntas_validacao.json --base
+    python pipeline/avaliacao/validar_perguntas.py dados/perguntas_validacao.json --base
 """
 
 import json
@@ -190,7 +190,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     argumentos = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not argumentos:
-        print("Uso: python pipeline/online/validar_perguntas.py arquivo_de_perguntas.json [--base]")
+        print("Uso: python pipeline/avaliacao/validar_perguntas.py arquivo_de_perguntas.json [--base]")
         sys.exit(1)
     caminho = argumentos[0]
     perguntas = ler(caminho)

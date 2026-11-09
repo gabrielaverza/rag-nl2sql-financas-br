@@ -21,7 +21,7 @@ Parâmetros: nenhum argumento.
 Resultado: imprime o relatório e grava metricas/rascunhos/tempo_busca.md (pasta ignorada pelo git).
 
 Executar de dentro de rag-nl2sql-financas-br/:
-    python pipeline/online/medir_tempo_busca.py
+    python pipeline/avaliacao/medir_tempo_busca.py
 """
 
 import json
@@ -31,6 +31,11 @@ import sys
 import time
 from datetime import datetime
 from statistics import mean, median
+
+# Os módulos de busca ficam em pipeline/online/ e os compartilhados em pipeline/.
+PASTA = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(PASTA, "..", "online"))
+sys.path.insert(0, os.path.join(PASTA, ".."))
 
 CAMINHOS_PERGUNTAS = ("dados/perguntas_validacao.json",)
 PASTA_SAIDA = os.path.join("metricas", "rascunhos")
@@ -99,7 +104,7 @@ def main():
 
     t = ["# Tempo da busca: partida e por pergunta", ""]
     t += [
-        f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `python pipeline/online/medir_tempo_busca.py`.",
+        f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `python pipeline/avaliacao/medir_tempo_busca.py`.",
         f"- Máquina: {platform.platform()}, Python {platform.python_version()}; os embeddings rodam na CPU. Uma máquina e uma execução, então os valores são só uma ordem de grandeza.",
         f"- Por pergunta: {len(perguntas)} perguntas do conjunto oficial, {RODADAS} rodadas cada, depois de uma chamada de aquecimento. O LLM (classificador, SQL, síntese, validação) não entra; o fluxo completo leva cerca de 29 s por pergunta.",
         "",

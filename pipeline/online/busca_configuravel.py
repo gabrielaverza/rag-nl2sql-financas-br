@@ -20,7 +20,7 @@ Descrição geral do funcionamento:
 - obter_busca() devolve a busca única do processo, criada com a configuração do arquivo; o
   orquestrador pode trocá-la com definir_configuracao() (por exemplo, com sobrescritas de --set).
 - politica() converte uma configuração em um quadro "tipo -> método das tabelas e dos trechos",
-  usado por avaliar_baseline.py para montar as linhas "por índice" e "por tipo".
+  disponível para quem precisa consultar o método de cada tipo (o fluxo usa obter_busca()).
 
 Dependências:
 - pipeline/online/busca.py, busca_bm25.py, fusao_rrf.py e configuracao.py, e os índices e o esquema
