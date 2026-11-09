@@ -1,0 +1,857 @@
+[
+  {
+    "id": "esquema_bpa_con_001",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. A tabela 'BPA_con' armazena dados do Balanço Patrimonial Ativo, versão consolidada, publicados pela CVM no Brasil. A tabela é usada para armazenar e acessar informações financeiras consolidadas de empresas do grupo, incluindo valores de contas patrimoniais."
+  },
+  {
+    "id": "esquema_bpa_con_002",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Entidades: Empresa, Contas Patrimoniais, Exercício Financeiro, Moeda, Escala Monetária"
+  },
+  {
+    "id": "esquema_bpa_con_003",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Relações: BPA_con.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_bpa_con_004",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM.); DT_FIM_EXERC (Data de término do exercício financeiro.); ORDEM_EXERC (Ordem do exercício financeiro.) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores da conta.); ESCALA_MOEDA (Escala monetária aplicada aos valores da conta.) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_bpa_con_005",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Colunas: CD_CONTA (Código da conta patrimonial.); DS_CONTA (Descrição da conta patrimonial.); VL_CONTA (Valor da conta patrimonial.); ST_CONTA_FIXA (Status da conta patrimonial, indicando se é fixa ou variável.) [valores: N, S]"
+  },
+  {
+    "id": "esquema_bpa_con_006",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1 Ativo Total; 1.01 Ativo Circulante; 1.01.01 Caixa e Equivalentes de Caixa; 1.01.02 Aplicações Financeiras; 1.01.02.01 Aplicações Financeiras Avaliadas a Valor Justo através do Resultado; 1.01.02.01.01 Títulos para Negociação; 1.01.02.01.02 Títulos Designados a Valor Justo; 1.01.02.02 Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes"
+  },
+  {
+    "id": "esquema_bpa_con_007",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.01.02.03 Aplicações Financeiras Avaliadas ao Custo Amortizado; 1.01.03 Contas a Receber; 1.01.03.01 Clientes; 1.01.03.02 Outras Contas a Receber; 1.01.03.03 Previdência Complementar (com risco atuarial); 1.01.03.04 Outras Operações; 1.01.04 Estoques; 1.01.05 Ativos Biológicos; 1.01.06 Tributos a Recuperar; 1.01.06.01 Tributos Correntes a Recuperar"
+  },
+  {
+    "id": "esquema_bpa_con_008",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.01.07 Despesas Antecipadas; 1.01.08 Outros Ativos Circulantes; 1.01.08.01 Ativos Não-Correntes a Venda; 1.01.08.02 Ativos de Operações Descontinuadas; 1.01.08.03 Outros; 1.01.09 Outros Ativos Circulantes; 1.01.09.01 Ativos Não Correntes a Venda; 1.01.09.02 Ativos de Operações Descontinuadas; 1.01.09.03 Outros; 1.02 Ativo Não Circulante"
+  },
+  {
+    "id": "esquema_bpa_con_009",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.02.01 Ativo Realizável a Longo Prazo; 1.02.01.01 Aplicações Financeiras Avaliadas a Valor Justo através do Resultado; 1.02.01.01.01 Títulos Designados a Valor Justo; 1.02.01.02 Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes; 1.02.01.03 Aplicações Financeiras Avaliadas ao Custo Amortizado; 1.02.01.04 Contas a Receber; 1.02.01.05 Estoques"
+  },
+  {
+    "id": "esquema_bpa_con_010",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.02.01.06 Ativos Biológicos; 1.02.01.07 Tributos Diferidos; 1.02.01.08 Despesas Antecipadas; 1.02.01.09 Créditos com Partes Relacionadas; 1.02.01.09.01 Créditos com Coligadas; 1.02.01.10 Outros Ativos Não Circulantes; 1.02.01.10.01 Ativos Não-Correntes a Venda; 1.02.01.10.02 Ativos de Operações Descontinuadas"
+  },
+  {
+    "id": "esquema_bpa_con_011",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.02.01.11.01 Ativos de Contratos de Seguros; 1.02.01.11.02 Ativos de Contratos de Resseguros; 1.02.02 Investimentos; 1.02.02.01 Participações Societárias; 1.02.02.01.01 Participações em Coligadas; 1.02.02.01.02 Participações em Coligadas no Exterior; 1.02.02.01.03 Participações em Controladas no País; 1.02.02.01.04 Participações em Controladas em Conjunto; 1.02.02.01.05 Outros Investimentos"
+  },
+  {
+    "id": "esquema_bpa_con_012",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.02.02.01.06 Participações em Controladas em Conjunto no Exterior; 1.02.02.01.07 Outros Investimentos; 1.02.02.02 Propriedades para Investimento; 1.02.03 Imobilizado; 1.02.03.01 Imobilizado em Operação; 1.02.03.02 Direito de Uso em Arrendamento; 1.02.03.03 Imobilizado em Andamento; 1.02.04 Intangível; 1.02.04.01 Intangíveis; 1.02.04.01.01 Contrato de Concessão"
+  },
+  {
+    "id": "esquema_bpa_con_013",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.02.04.02 Goodwill; 1.02.04.03 Títulos e Valores Mobiliários; 1.02.04.04 Operações de Crédito; 1.02.04.05 Provisão para Perdas Esperadas Associadas ao Risco de Crédito; 1.02.04.06 Operações de Arrendamento; 1.02.04.07 Provisão para Perdas Esperadas Associadas ao Risco de Crédito de Operações de Arrendamento; 1.02.04.08 Outros Ativos Financeiros; 1.03 Tributos"
+  },
+  {
+    "id": "esquema_bpa_con_014",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.03.01 Imposto de Renda e Contribuição Social - Correntes; 1.03.02 Imposto de Renda e Contribuição Social - Diferidos; 1.03.03 Outros; 1.04 Outros Ativos; 1.04.01 Ativos Não Correntes a Venda; 1.04.02 Ativos de Operações Descontinuadas; 1.04.03 Outros; 1.05 Investimentos; 1.05.01 Participações em Coligadas; 1.05.02 Participações em Controladas em Conjunto"
+  },
+  {
+    "id": "esquema_bpa_con_015",
+    "fonte": "BPA_con",
+    "conteudo": "Tabela BPA_con. Contas: 1.05.03 Propriedades para Investimento; 1.05.04 Outros Investimentos; 1.06 Imobilizado; 1.06.01 Imobilizado de Uso; 1.06.02 Direito de Uso de Arrendamento; 1.06.03 Depreciação Acumulada; 1.07 Intangível; 1.07.01 Intangíveis; 1.07.02 Goodwill; 1.07.03 Amortização Acumulada"
+  },
+  {
+    "id": "esquema_bpa_ind_001",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. A tabela 'BPA_ind' armazena dados do Balanço Patrimonial Ativo, versão individual, da CVM, incluindo informações sobre ativos e valores financeiros de empresas. A tabela é usada para fornecer detalhes específicos sobre o patrimônio líquido e ativos de empresas, conforme publicado pela CVM."
+  },
+  {
+    "id": "esquema_bpa_ind_002",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Entidades: Empresa, Ativo, Patrimônio Líquido, Valor Financeiro, Companhia, Demonstração Financeira"
+  },
+  {
+    "id": "esquema_bpa_ind_003",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Relações: BPA_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_bpa_ind_004",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Colunas: CD_CVM (Código de Valores Mobiliários da empresa); DT_FIM_EXERC (Data de fim do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]; CD_CONTA (Código da conta financeira)"
+  },
+  {
+    "id": "esquema_bpa_ind_005",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Colunas: DS_CONTA (Descrição da conta financeira); VL_CONTA (Valor da conta financeira); ST_CONTA_FIXA (Status da conta financeira (fixa)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_bpa_ind_006",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1 Ativo Total; 1.01 Ativo Circulante; 1.01.01 Caixa e Equivalentes de Caixa; 1.01.02 Aplicações Financeiras; 1.01.02.01 Aplicações Financeiras Avaliadas a Valor Justo através do Resultado; 1.01.02.01.01 Títulos para Negociação; 1.01.02.01.02 Títulos Designados a Valor Justo; 1.01.02.02 Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes"
+  },
+  {
+    "id": "esquema_bpa_ind_007",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.01.02.03 Aplicações Financeiras Avaliadas ao Custo Amortizado; 1.01.03 Contas a Receber; 1.01.03.01 Clientes; 1.01.03.02 Outras Contas a Receber; 1.01.03.03 Previdência Complementar (com risco atuarial); 1.01.03.04 Outras Operações; 1.01.04 Estoques; 1.01.05 Ativos Biológicos; 1.01.06 Tributos a Recuperar; 1.01.06.01 Tributos Correntes a Recuperar"
+  },
+  {
+    "id": "esquema_bpa_ind_008",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.01.07 Despesas Antecipadas; 1.01.08 Outros Ativos Circulantes; 1.01.08.01 Ativos Não-Correntes a Venda; 1.01.08.02 Ativos de Operações Descontinuadas; 1.01.08.03 Outros; 1.01.09 Outros Valores e Bens; 1.01.09.01 Ativos Não Correntes a Venda; 1.01.09.02 Ativos de Operações Descontinuadas; 1.01.09.03 Outros; 1.02 Ativo Não Circulante"
+  },
+  {
+    "id": "esquema_bpa_ind_009",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.02.01 Ativo Realizável a Longo Prazo; 1.02.01.01 Aplicações Financeiras Avaliadas a Valor Justo através do Resultado; 1.02.01.01.01 Títulos Designados a Valor Justo; 1.02.01.02 Aplicações Financeiras Avaliadas a Valor Justo através de Outros Resultados Abrangentes; 1.02.01.03 Aplicações Financeiras Avaliadas ao Custo Amortizado; 1.02.01.04 Contas a Receber; 1.02.01.05 Estoques"
+  },
+  {
+    "id": "esquema_bpa_ind_010",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.02.01.06 Ativos Biológicos; 1.02.01.07 Tributos Diferidos; 1.02.01.08 Despesas Antecipadas; 1.02.01.09 Créditos com Partes Relacionadas; 1.02.01.09.01 Créditos com Coligadas; 1.02.01.09.02 Créditos com Controladas; 1.02.01.10 Outros Ativos Não Circulantes; 1.02.01.10.01 Ativos Não-Correntes a Venda; 1.02.01.10.02 Ativos de Operações Descontinuadas"
+  },
+  {
+    "id": "esquema_bpa_ind_011",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.02.01.11.01 Ativos de Contratos de Seguros; 1.02.01.11.02 Ativos de Contratos de Resseguros; 1.02.02 Investimentos; 1.02.02.01 Participações Societárias; 1.02.02.01.01 Participações em Coligadas; 1.02.02.01.02 Participações em Controladas; 1.02.02.01.03 Participações em Controladas em Conjunto; 1.02.02.01.04 Outros Investimentos; 1.02.02.01.05 Participações em Controladas em Conjunto no País"
+  },
+  {
+    "id": "esquema_bpa_ind_012",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.02.02.01.06 Participações em Controladas em Conjunto no Exterior; 1.02.02.01.07 Outros Investimentos; 1.02.02.02 Propriedades para Investimento; 1.02.03 Imobilizado; 1.02.03.01 Imobilizado em Operação; 1.02.03.02 Direito de Uso em Arrendamento; 1.02.03.03 Imobilizado em Andamento; 1.02.04 Intangível; 1.02.04.01 Intangíveis; 1.02.04.01.01 Contrato de Concessão"
+  },
+  {
+    "id": "esquema_bpa_ind_013",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.02.04.02 Aplicações no Mercado Aberto; 1.02.04.03 Títulos e Valores Mobiliários; 1.02.04.04 Operações de Crédito; 1.02.04.05 Provisão para Perdas Esperadas Associadas ao Risco de Crédito; 1.02.04.06 Operações de Arrendamento; 1.02.04.07 Provisão para Perdas Esperadas Associadas ao Risco de Crédito de Operações de Arrendamento; 1.02.04.08 Outros Ativos Financeiros"
+  },
+  {
+    "id": "esquema_bpa_ind_014",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.02.05 Operações de Crédito; 1.02.06 Operações de Arrendamento Mercantil; 1.02.07 Outros Créditos; 1.02.08 Outros Valores e Bens; 1.03 Tributos; 1.03.01 Imposto de Renda e Contribuição Social - Correntes; 1.03.01.01 Dependências no Exterior; 1.03.01.02 Participações em Controladas; 1.03.01.03 Participações em Coligadas e Equiparadas; 1.03.01.04 Outros Investimentos"
+  },
+  {
+    "id": "esquema_bpa_ind_015",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.03.01.05 Provisão para Perdas; 1.03.02 Imposto de Renda e Contribuição Social - Diferidos; 1.03.03 Outros; 1.03.04 Intangível; 1.03.05 Diferido; 1.04 Outros Ativos; 1.04.01 Ativos Não Correntes a Venda; 1.04.02 Ativos de Operações Descontinuadas; 1.04.03 Outros; 1.05 Investimentos; 1.05.01 Participações em Coligadas"
+  },
+  {
+    "id": "esquema_bpa_ind_016",
+    "fonte": "BPA_ind",
+    "conteudo": "Tabela BPA_ind. Contas: 1.05.02 Participações em Controladas em Conjunto; 1.05.03 Participações em Controladas; 1.05.04 Propriedades para Investimento; 1.05.05 Outros Investimentos; 1.06 Imobilizado; 1.06.01 Imobilizado de Uso; 1.06.02 Direito de Uso de Arrendamento; 1.06.03 Depreciação Acumulada; 1.07 Intangível; 1.07.01 Intangíveis; 1.07.02 Goodwill; 1.07.03 Amortização Acumulada"
+  },
+  {
+    "id": "esquema_bpp_con_001",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. A tabela 'BPP_con' armazena dados do Balanço Patrimonial Passivo, versão consolidada, publicado pela CVM no Brasil. A tabela é usada para fornecer informações detalhadas sobre o patrimônio passivo das empresas do grupo, incluindo valores em diferentes moedas e escalas."
+  },
+  {
+    "id": "esquema_bpp_con_002",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Entidades: Empresa, Patrimônio Passivo, Demonstração Financeira, Companhia, Valor Financeiro"
+  },
+  {
+    "id": "esquema_bpp_con_003",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Relações: BPP_con.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_bpp_con_004",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_FIM_EXERC (Data de fim do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda em que o valor da conta é expresso); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]; CD_CONTA (Código da conta contábil)"
+  },
+  {
+    "id": "esquema_bpp_con_005",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Colunas: DS_CONTA (Descrição da conta contábil); VL_CONTA (Valor da conta contábil); ST_CONTA_FIXA (Status da conta contábil (fixa ou variável)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_bpp_con_006",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2 Passivo Total; 2.01 Passivo Circulante; 2.01.01 Obrigações Sociais e Trabalhistas; 2.01.01.01 Obrigações Sociais; 2.01.01.02 Obrigações Trabalhistas; 2.01.02 Fornecedores; 2.01.02.01 Fornecedores Nacionais; 2.01.02.02 Fornecedores Estrangeiros; 2.01.02.03 Previdência Complementar (com risco atuarial); 2.01.02.04 Outras Operações; 2.01.03 Obrigações Fiscais"
+  },
+  {
+    "id": "esquema_bpp_con_007",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.01.03.01 Obrigações Fiscais Federais; 2.01.03.01.01 Imposto de Renda e Contribuição Social a Pagar; 2.01.03.02 Obrigações Fiscais Estaduais; 2.01.03.03 Obrigações Fiscais Municipais; 2.01.04 Empréstimos e Financiamentos; 2.01.04.01 Empréstimos e Financiamentos; 2.01.04.01.01 Em Moeda Nacional; 2.01.04.01.02 Em Moeda Estrangeira"
+  },
+  {
+    "id": "esquema_bpp_con_008",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.01.04.02 Debêntures; 2.01.04.03 Financiamento por Arrendamento; 2.01.05 Outras Obrigações; 2.01.05.01 Passivos com Partes Relacionadas; 2.01.05.01.01 Débitos com Coligadas; 2.01.05.01.03 Débitos com Controladores; 2.01.05.01.04 Débitos com Outras Partes Relacionadas; 2.01.05.02 Outros; 2.01.05.02.01 Dividendos e JCP a Pagar"
+  },
+  {
+    "id": "esquema_bpp_con_009",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.01.05.02.02 Dividendo Mínimo Obrigatório a Pagar; 2.01.05.02.03 Obrigações por Pagamentos Baseados em Ações; 2.01.06 Provisões; 2.01.06.01 Provisões Fiscais Previdenciárias Trabalhistas e Cíveis; 2.01.06.01.01 Provisões Fiscais; 2.01.06.01.02 Provisões Previdenciárias e Trabalhistas; 2.01.06.01.03 Provisões para Benefícios a Empregados"
+  },
+  {
+    "id": "esquema_bpp_con_010",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.01.06.01.04 Provisões Cíveis; 2.01.06.02 Outras Provisões; 2.01.06.02.01 Provisões para Garantias; 2.01.06.02.02 Provisões para Reestruturação; 2.01.06.02.03 Provisões para Passivos Ambientais e de Desativação; 2.01.07 Passivos sobre Ativos Não-Correntes a Venda e Descontinuados; 2.01.07.01 Passivos sobre Ativos Não-Correntes a Venda"
+  },
+  {
+    "id": "esquema_bpp_con_011",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.01.07.02 Passivos sobre Ativos de Operações Descontinuadas; 2.02 Passivo Não Circulante; 2.02.01 Empréstimos e Financiamentos; 2.02.01.01 Empréstimos e Financiamentos; 2.02.01.01.01 Em Moeda Nacional; 2.02.01.01.02 Em Moeda Estrangeira; 2.02.01.02 Debêntures; 2.02.01.02.01 Passivos de Contratos de Seguros; 2.02.01.02.02 Passivos de Contratos de Resseguros"
+  },
+  {
+    "id": "esquema_bpp_con_012",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.02.01.02.03 Previdência Complementar (com risco atuarial); 2.02.01.02.04 Outras Operações; 2.02.01.03 Financiamento por Arrendamento; 2.02.01.06.01 Passivos sobre Ativos Não Correntes a Venda; 2.02.01.06.02 Passivos sobre Ativos de Operações Descontinuadas; 2.02.01.07.01 Lucros a Apropriar; 2.02.01.07.02 Receitas a Apropriar"
+  },
+  {
+    "id": "esquema_bpp_con_013",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.02.01.07.03 Subvenções de Investimento a Apropriar; 2.02.02 Outras Obrigações; 2.02.02.01 Passivos com Partes Relacionadas; 2.02.02.01.01 Débitos com Coligadas; 2.02.02.01.03 Débitos com Controladores; 2.02.02.01.04 Débitos com Outras Partes Relacionadas; 2.02.02.02 Outros; 2.02.02.02.01 Obrigações por Pagamentos Baseados em Ações"
+  },
+  {
+    "id": "esquema_bpp_con_014",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.02.02.02.02 Adiantamento para Futuro Aumento de Capital; 2.02.03 Tributos Diferidos; 2.02.03.01 Imposto de Renda e Contribuição Social Diferidos; 2.02.04 Provisões; 2.02.04.01 Provisões Fiscais Previdenciárias Trabalhistas e Cíveis; 2.02.04.01.01 Provisões Fiscais; 2.02.04.01.02 Provisões Previdenciárias e Trabalhistas"
+  },
+  {
+    "id": "esquema_bpp_con_015",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.02.04.01.03 Provisões para Benefícios a Empregados; 2.02.04.01.04 Provisões Cíveis; 2.02.04.02 Outras Provisões; 2.02.04.02.01 Provisões para Garantias; 2.02.04.02.02 Provisões para Reestruturação; 2.02.04.02.03 Provisões para Passivos Ambientais e de Desativação; 2.02.05 Passivos sobre Ativos Não-Correntes a Venda e Descontinuados"
+  },
+  {
+    "id": "esquema_bpp_con_016",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.02.05.01 Passivos sobre Ativos Não-Correntes a Venda; 2.02.05.02 Passivos sobre Ativos de Operações Descontinuadas; 2.02.06 Lucros e Receitas a Apropriar; 2.02.06.01 Lucros a Apropriar; 2.02.06.02 Receitas a Apropriar; 2.02.06.03 Subvenções de Investimento a Apropriar; 2.03 Patrimônio Líquido Consolidado; 2.03.01 Capital Social Realizado"
+  },
+  {
+    "id": "esquema_bpp_con_017",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.03.02 Reservas de Capital; 2.03.02.01 Ágio na Emissão de Ações; 2.03.02.02 Reserva Especial de Ágio na Incorporação; 2.03.02.03 Alienação de Bônus de Subscrição; 2.03.02.04 Opções Outorgadas; 2.03.02.05 Ações em Tesouraria; 2.03.02.06 Adiantamento para Futuro Aumento de Capital; 2.03.03 Reservas de Reavaliação; 2.03.03.01 Ativos Próprios"
+  },
+  {
+    "id": "esquema_bpp_con_018",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.03.03.02 Controladas/Coligadas; 2.03.04 Reservas de Lucros; 2.03.04.01 Reserva Legal; 2.03.04.02 Reserva Estatutária; 2.03.04.03 Reserva para Contingências; 2.03.04.04 Reserva de Lucros a Realizar; 2.03.04.05 Reserva de Retenção de Lucros; 2.03.04.06 Reserva Especial para Dividendos Não Distribuídos; 2.03.04.07 Reserva de Incentivos Fiscais"
+  },
+  {
+    "id": "esquema_bpp_con_019",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.03.04.08 Dividendo Adicional Proposto; 2.03.04.09 Ações em Tesouraria; 2.03.05 Lucros/Prejuízos Acumulados; 2.03.06 Ajustes de Avaliação Patrimonial; 2.03.07 Ajustes Acumulados de Conversão; 2.03.08 Outros Resultados Abrangentes; 2.03.09 Participação dos Acionistas Não Controladores; 2.04 Passivos Fiscais; 2.05 Outros Passivos"
+  },
+  {
+    "id": "esquema_bpp_con_020",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.06 Passivos sobre Ativos Não Correntes a Venda e Descontinuados; 2.06.01 Passivos sobre Ativos Não Correntes a Venda; 2.06.02 Passivos sobre Ativos de Operações Descontinuadas; 2.07 Patrimônio Líquido Consolidado; 2.07.01 Patrimônio Líquido Atribuído ao Controlador; 2.07.01.01 Capital Social Realizado; 2.07.01.02 Reservas de Capital; 2.07.01.02.01 Ágio na Emissão de Ações"
+  },
+  {
+    "id": "esquema_bpp_con_021",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.07.01.02.02 Reserva Especial de Ágio na Incorporação; 2.07.01.02.03 Alienação de Bônus de Subscrição; 2.07.01.02.04 Opções Outorgadas; 2.07.01.02.05 Ações em Tesouraria; 2.07.01.03 Reservas de Reavaliação; 2.07.01.04 Reservas de Lucros; 2.07.01.04.01 Reserva Legal; 2.07.01.04.02 Reserva Estatutária; 2.07.01.04.03 Reserva para Contingências"
+  },
+  {
+    "id": "esquema_bpp_con_022",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.07.01.04.04 Reserva de Lucros a Realizar; 2.07.01.04.05 Reserva de Retenção de Lucros; 2.07.01.04.06 Reserva Especial para Dividendos Não Distribuídos; 2.07.01.04.07 Reserva de Incentivos Fiscais; 2.07.01.04.08 Dividendo Adicional Proposto; 2.07.01.04.09 Ações em Tesouraria; 2.07.01.05 Lucros/Prejuízos Acumulados; 2.07.01.06 Ajustes de Avaliação Patrimonial"
+  },
+  {
+    "id": "esquema_bpp_con_023",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.07.01.07 Ajustes Acumulados de Conversão; 2.07.01.08 Outros Resultados Abrangentes; 2.07.02 Patrimônio Líquido Atribuído aos Não Controladores; 2.08 Patrimônio Líquido Consolidado; 2.08.01 Capital Social Realizado; 2.08.02 Reservas de Capital; 2.08.02.01 Ágio na Emissão de Ações; 2.08.02.02 Reserva Especial de Ágio na Incorporação"
+  },
+  {
+    "id": "esquema_bpp_con_024",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.08.02.03 Alienação de Bônus de Subscrição; 2.08.02.04 Opções Outorgadas; 2.08.02.05 Ações em Tesouraria; 2.08.03 Reservas de Reavaliação; 2.08.04 Reservas de Lucros; 2.08.04.01 Reserva Legal; 2.08.04.02 Reserva Estatutária; 2.08.04.03 Reserva para Contingências; 2.08.04.04 Reserva de Lucros a Realizar; 2.08.04.05 Reserva de Retenção de Lucros"
+  },
+  {
+    "id": "esquema_bpp_con_025",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.08.04.06 Reserva Especial para Dividendos Não Distribuídos; 2.08.04.07 Reserva de Incentivos Fiscais; 2.08.04.08 Dividendo Adicional Proposto; 2.08.04.09 Ações em Tesouraria; 2.08.05 Lucros/Prejuízos Acumulados; 2.08.06 Ajustes de Avaliação Patrimonial; 2.08.07 Ajustes Acumulados de Conversão; 2.08.08 Outros Resultados Abrangentes"
+  },
+  {
+    "id": "esquema_bpp_con_026",
+    "fonte": "BPP_con",
+    "conteudo": "Tabela BPP_con. Contas: 2.08.09 Participação dos Acionistas Não Controladores"
+  },
+  {
+    "id": "esquema_bpp_ind_001",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. A tabela 'BPP_ind' armazena dados do Balanço Patrimonial Passivo, versão individual, da CVM, incluindo informações sobre contas financeiras de empresas. A tabela é usada para fornecer detalhes específicos sobre o patrimônio passivo das empresas conforme demonstrado na CVM."
+  },
+  {
+    "id": "esquema_bpp_ind_002",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Entidades: Empresa, Contas Financeiras, Patrimônio Passivo, Companhias, Demonstrações Financeiras"
+  },
+  {
+    "id": "esquema_bpp_ind_003",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Relações: BPP_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_bpp_ind_004",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_FIM_EXERC (Data de término do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores da conta); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]; CD_CONTA (Código da conta financeira)"
+  },
+  {
+    "id": "esquema_bpp_ind_005",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Colunas: DS_CONTA (Descrição da conta financeira); VL_CONTA (Valor da conta financeira); ST_CONTA_FIXA (Status da conta financeira (fixa ou variável)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_bpp_ind_006",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2 Passivo Total; 2.01 Passivo Circulante; 2.01.01 Obrigações Sociais e Trabalhistas; 2.01.01.01 Obrigações Sociais; 2.01.01.02 Obrigações Trabalhistas; 2.01.02 Fornecedores; 2.01.02.01 Fornecedores Nacionais; 2.01.02.02 Fornecedores Estrangeiros; 2.01.02.03 Previdência Complementar (com risco atuarial); 2.01.02.04 Outras Operações; 2.01.03 Obrigações Fiscais"
+  },
+  {
+    "id": "esquema_bpp_ind_007",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.01.03.01 Obrigações Fiscais Federais; 2.01.03.01.01 Imposto de Renda e Contribuição Social a Pagar; 2.01.03.02 Obrigações Fiscais Estaduais; 2.01.03.03 Obrigações Fiscais Municipais; 2.01.04 Empréstimos e Financiamentos; 2.01.04.01 Empréstimos e Financiamentos; 2.01.04.01.01 Em Moeda Nacional; 2.01.04.01.02 Em Moeda Estrangeira"
+  },
+  {
+    "id": "esquema_bpp_ind_008",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.01.04.02 Debêntures; 2.01.04.03 Financiamento por Arrendamento; 2.01.05 Outras Obrigações; 2.01.05.01 Passivos com Partes Relacionadas; 2.01.05.01.01 Débitos com Coligadas; 2.01.05.01.02 Débitos com Controladas; 2.01.05.01.03 Débitos com Controladores; 2.01.05.01.04 Débitos com Outras Partes Relacionadas; 2.01.05.02 Outros"
+  },
+  {
+    "id": "esquema_bpp_ind_009",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.01.05.02.01 Dividendos e JCP a Pagar; 2.01.05.02.02 Dividendo Mínimo Obrigatório a Pagar; 2.01.05.02.03 Obrigações por Pagamentos Baseados em Ações; 2.01.06 Provisões; 2.01.06.01 Provisões Fiscais Previdenciárias Trabalhistas e Cíveis; 2.01.06.01.01 Provisões Fiscais; 2.01.06.01.02 Provisões Previdenciárias e Trabalhistas"
+  },
+  {
+    "id": "esquema_bpp_ind_010",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.01.06.01.03 Provisões para Benefícios a Empregados; 2.01.06.01.04 Provisões Cíveis; 2.01.06.02 Outras Provisões; 2.01.06.02.01 Provisões para Garantias; 2.01.06.02.02 Provisões para Reestruturação; 2.01.06.02.03 Provisões para Passivos Ambientais e de Desativação; 2.01.07 Passivos sobre Ativos Não-Correntes a Venda e Descontinuados"
+  },
+  {
+    "id": "esquema_bpp_ind_011",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.01.07.01 Passivos sobre Ativos Não-Correntes a Venda; 2.01.07.02 Passivos sobre Ativos de Operações Descontinuadas; 2.01.08 Obrigações por Repasse do Exterior; 2.01.09 Outras Obrigações; 2.02 Passivo Não Circulante; 2.02.01 Empréstimos e Financiamentos; 2.02.01.01 Empréstimos e Financiamentos; 2.02.01.01.01 Em Moeda Nacional; 2.02.01.01.02 Em Moeda Estrangeira"
+  },
+  {
+    "id": "esquema_bpp_ind_012",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.02.01.02 Debêntures; 2.02.01.02.01 Passivos de Contratos de Seguros; 2.02.01.02.02 Passivos de Contratos de Resseguros; 2.02.01.02.03 Previdência Complementar (com risco atuarial); 2.02.01.02.04 Outras Operações; 2.02.01.03 Financiamento por Arrendamento; 2.02.01.06.01 Passivos sobre Ativos Não Correntes a Venda; 2.02.01.06.02 Passivos sobre Ativos de Operações Descontinuadas"
+  },
+  {
+    "id": "esquema_bpp_ind_013",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.02.01.07.01 Lucros a Apropriar; 2.02.01.07.02 Receitas a Apropriar; 2.02.01.07.03 Subvenções de Investimento a Apropriar; 2.02.02 Outras Obrigações; 2.02.02.01 Passivos com Partes Relacionadas; 2.02.02.01.01 Débitos com Coligadas; 2.02.02.01.02 Débitos com Controladas; 2.02.02.01.03 Débitos com Controladores"
+  },
+  {
+    "id": "esquema_bpp_ind_014",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.02.02.01.04 Débitos com Outras Partes Relacionadas; 2.02.02.02 Outros; 2.02.02.02.01 Obrigações por Pagamentos Baseados em Ações; 2.02.02.02.02 Adiantamento para Futuro Aumento de Capital; 2.02.03 Tributos Diferidos; 2.02.03.01 Imposto de Renda e Contribuição Social Diferidos; 2.02.04 Provisões"
+  },
+  {
+    "id": "esquema_bpp_ind_015",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.02.04.01 Provisões Fiscais Previdenciárias Trabalhistas e Cíveis; 2.02.04.01.01 Provisões Fiscais; 2.02.04.01.02 Provisões Previdenciárias e Trabalhistas; 2.02.04.01.03 Provisões para Benefícios a Empregados; 2.02.04.01.04 Provisões Cíveis; 2.02.04.02 Outras Provisões; 2.02.04.02.01 Provisões para Garantias"
+  },
+  {
+    "id": "esquema_bpp_ind_016",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.02.04.02.02 Provisões para Reestruturação; 2.02.04.02.03 Provisões para Passivos Ambientais e de Desativação; 2.02.05 Passivos sobre Ativos Não-Correntes a Venda e Descontinuados; 2.02.05.01 Passivos sobre Ativos Não-Correntes a Venda; 2.02.05.02 Passivos sobre Ativos de Operações Descontinuadas; 2.02.06 Lucros e Receitas a Apropriar; 2.02.06.01 Lucros a Apropriar"
+  },
+  {
+    "id": "esquema_bpp_ind_017",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.02.06.02 Receitas a Apropriar; 2.02.06.03 Subvenções de Investimento a Apropriar; 2.02.07 Obrigações por Repasse do País; 2.02.08 Obrigações por Repasse do Exterior; 2.02.09 Outras Obrigações; 2.03 Patrimônio Líquido; 2.03.01 Capital Social Realizado; 2.03.02 Reservas de Capital; 2.03.02.01 Ágio na Emissão de Ações"
+  },
+  {
+    "id": "esquema_bpp_ind_018",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.03.02.02 Reserva Especial de Ágio na Incorporação; 2.03.02.03 Alienação de Bônus de Subscrição; 2.03.02.04 Opções Outorgadas; 2.03.02.05 Ações em Tesouraria; 2.03.02.06 Adiantamento para Futuro Aumento de Capital; 2.03.03 Reservas de Reavaliação; 2.03.03.01 Ativos Próprios; 2.03.03.02 Controladas/Coligadas; 2.03.04 Reservas de Lucros"
+  },
+  {
+    "id": "esquema_bpp_ind_019",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.03.04.01 Reserva Legal; 2.03.04.02 Reserva Estatutária; 2.03.04.03 Reserva para Contingências; 2.03.04.04 Reserva de Lucros a Realizar; 2.03.04.05 Reserva de Retenção de Lucros; 2.03.04.06 Reserva Especial para Dividendos Não Distribuídos; 2.03.04.07 Reserva de Incentivos Fiscais; 2.03.04.08 Dividendo Adicional Proposto; 2.03.04.09 Ações em Tesouraria"
+  },
+  {
+    "id": "esquema_bpp_ind_020",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.03.05 Lucros/Prejuízos Acumulados; 2.03.06 Ajustes de Avaliação Patrimonial; 2.03.07 Ajustes Acumulados de Conversão; 2.03.08 Outros Resultados Abrangentes; 2.04 Passivos Fiscais; 2.05 Outros Passivos; 2.05.01 Capital Social Realizado; 2.05.02 Reservas de Capital; 2.05.03 Reservas de Reavaliação; 2.05.03.01 Ativos Próprios"
+  },
+  {
+    "id": "esquema_bpp_ind_021",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.05.03.02 Controladas/Coligadas e Equiparadas; 2.05.04 Reservas de Lucro; 2.05.04.01 Legal; 2.05.04.02 Estatutária; 2.05.04.03 Para Contingências; 2.05.04.04 De Lucros a Realizar; 2.05.04.05 Retenção de Lucros; 2.05.04.06 Especial p/ Dividendos Não Distribuídos; 2.05.04.07 Outras Reservas de Lucro; 2.05.05 Ajustes de Avaliação Patrimonial"
+  },
+  {
+    "id": "esquema_bpp_ind_022",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.05.05.01 Ajustes de Títulos e Valores Mobiliários; 2.05.05.02 Ajustes Acumulados de Conversão; 2.05.05.03 Ajustes de Combinação de Negócios; 2.05.06 Lucros/Prejuízos Acumulados; 2.06 Passivos sobre Ativos Não Correntes a Venda e Descontinuados; 2.06.01 Passivos sobre Ativos Não Correntes a Venda; 2.06.02 Passivos sobre Ativos de Operações Descontinuadas"
+  },
+  {
+    "id": "esquema_bpp_ind_023",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.07 Patrimônio Líquido; 2.07.01 Capital Social Realizado; 2.07.02 Reservas de Capital; 2.07.02.01 Ágio na Emissão de Ações; 2.07.02.02 Reserva Especial de Ágio na Incorporação; 2.07.02.03 Alienação de Bônus de Subscrição; 2.07.02.04 Opções Outorgadas; 2.07.02.05 Ações em Tesouraria; 2.07.03 Reservas de Reavaliação; 2.07.04 Reservas de Lucros"
+  },
+  {
+    "id": "esquema_bpp_ind_024",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.07.04.01 Reserva Legal; 2.07.04.02 Reserva Estatutária; 2.07.04.03 Reserva para Contingências; 2.07.04.04 Reserva de Lucros a Realizar; 2.07.04.05 Reserva de Retenção de Lucros; 2.07.04.06 Reserva Especial para Dividendos Não Distribuídos; 2.07.04.07 Reserva de Incentivos Fiscais; 2.07.04.08 Dividendo Adicional Proposto; 2.07.04.09 Ações em Tesouraria"
+  },
+  {
+    "id": "esquema_bpp_ind_025",
+    "fonte": "BPP_ind",
+    "conteudo": "Tabela BPP_ind. Contas: 2.07.05 Lucros/Prejuízos Acumulados; 2.07.06 Ajustes de Avaliação Patrimonial; 2.07.07 Ajustes Acumulados de Conversão; 2.07.08 Outros Resultados Abrangentes"
+  },
+  {
+    "id": "esquema_dfc_mi_con_001",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. A tabela 'DFC_MI_con' armazena dados da Demonstração de Fluxo de Caixa, método indireto, versão consolidada, publicada pela CVM no Brasil. A tabela é usada para registrar informações financeiras relacionadas ao fluxo de caixa de várias empresas do grupo, conforme exigido pelo Formulário de Demonstrações Financeiras Padronizadas (DFP)."
+  },
+  {
+    "id": "esquema_dfc_mi_con_002",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. Entidades: Companhias, Demonstração de Fluxo de Caixa, Método Indireto, Versão Consolidada, Formulário de Demonstrações Financeiras Padronizadas (DFP), CVM (Comissão de Valores Mobiliários)"
+  },
+  {
+    "id": "esquema_dfc_mi_con_003",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. Relações: DFC_MI_con.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dfc_mi_con_004",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. Colunas: CD_CVM (Código da companhia conforme registrado pela CVM.); DT_INI_EXERC (Data inicial do exercício financeiro.); DT_FIM_EXERC (Data final do exercício financeiro.); ORDEM_EXERC (Ordem do exercício financeiro.) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros.)"
+  },
+  {
+    "id": "esquema_dfc_mi_con_005",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. Colunas: ESCALA_MOEDA (Escala da moeda utilizada nos valores financeiros.) [valores: MIL, UNIDADE]; CD_CONTA (Código da conta financeira.); DS_CONTA (Descrição da conta financeira.); VL_CONTA (Valor da conta financeira.); ST_CONTA_FIXA (Status da conta financeira, indicando se é fixa ou variável.) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dfc_mi_con_006",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. Contas: 6.01 Caixa Líquido Atividades Operacionais; 6.01.01 Caixa Gerado nas Operações; 6.01.01.01 Lucro ou Prejuízo Líquido antes dos Tributos sobre o Lucro; 6.01.01.02 Ajustes ao Lucro ou Prejuízo; 6.01.02 Variações nos Ativos e Passivos; 6.01.03 Outros; 6.02 Caixa Líquido Atividades de Investimento; 6.03 Caixa Líquido Atividades de Financiamento"
+  },
+  {
+    "id": "esquema_dfc_mi_con_007",
+    "fonte": "DFC_MI_con",
+    "conteudo": "Tabela DFC_MI_con. Contas: 6.04 Variação Cambial s/ Caixa e Equivalentes; 6.05 Aumento (Redução) de Caixa e Equivalentes; 6.05.01 Saldo Inicial de Caixa e Equivalentes; 6.05.02 Saldo Final de Caixa e Equivalentes"
+  },
+  {
+    "id": "esquema_dfc_mi_ind_001",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. A tabela 'DFC_MI_ind' armazena dados da Demonstração de Fluxo de Caixa, método indireto, versão individual, conforme publicada pela CVM no Brasil. A tabela é usada para registrar informações financeiras detalhadas de empresas individuais, incluindo receitas, despesas e fluxo de caixa."
+  },
+  {
+    "id": "esquema_dfc_mi_ind_002",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. Entidades: Empresa, Demonstração Financeira, Fluxo de Caixa, Conta Financeira, Valor Financeiro"
+  },
+  {
+    "id": "esquema_dfc_mi_ind_003",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. Relações: DFC_MI_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dfc_mi_ind_004",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_INI_EXERC (Data inicial do exercício financeiro); DT_FIM_EXERC (Data final do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_dfc_mi_ind_005",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. Colunas: CD_CONTA (Código da conta financeira); DS_CONTA (Descrição da conta financeira); VL_CONTA (Valor financeiro da conta); ST_CONTA_FIXA (Status da conta financeira (fixa ou variável)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dfc_mi_ind_006",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. Contas: 6.01 Caixa Líquido Atividades Operacionais; 6.01.01 Caixa Gerado nas Operações; 6.01.01.01 Lucro ou Prejuízo Líquido antes dos Tributos sobre o Lucro; 6.01.01.02 Ajustes ao Lucro ou Prejuízo; 6.01.02 Variações nos Ativos e Passivos; 6.01.03 Outros; 6.02 Caixa Líquido Atividades de Investimento; 6.03 Caixa Líquido Atividades de Financiamento"
+  },
+  {
+    "id": "esquema_dfc_mi_ind_007",
+    "fonte": "DFC_MI_ind",
+    "conteudo": "Tabela DFC_MI_ind. Contas: 6.04 Variação Cambial s/ Caixa e Equivalentes; 6.05 Aumento (Redução) de Caixa e Equivalentes; 6.05.01 Saldo Inicial de Caixa e Equivalentes; 6.05.02 Saldo Final de Caixa e Equivalentes"
+  },
+  {
+    "id": "esquema_dmpl_con_001",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. A tabela 'DMPL_con' armazena dados da demonstração das mutações do patrimônio líquido consolidada, publicada pela CVM no Brasil. A tabela é usada para fornecer informações detalhadas sobre as mutações do patrimônio líquido de várias empresas do grupo, conforme exigido pelo Formulário de Demonstrações Financeiras Padronizadas (DFP)."
+  },
+  {
+    "id": "esquema_dmpl_con_002",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Entidades: Empresa, Demonstração Financeira, Patrimônio Líquido, Mutações, Contas Contábeis, Valores Financeiros"
+  },
+  {
+    "id": "esquema_dmpl_con_003",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Relações: DMPL_con.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dmpl_con_004",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM.); DT_INI_EXERC (Data inicial do exercício financeiro.); DT_FIM_EXERC (Data final do exercício financeiro.); ORDEM_EXERC (Ordem do exercício financeiro.) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros.); ESCALA_MOEDA (Escala da moeda utilizada.) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_dmpl_con_005",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Colunas: COLUNA_DF (Coluna da demonstração financeira.); CD_CONTA (Código da conta contábil.); DS_CONTA (Descrição da conta contábil.); VL_CONTA (Valor financeiro da conta.); ST_CONTA_FIXA (Status da conta contábil (fixa ou variável).) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dmpl_con_006",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Contas: 5.01 Saldos Iniciais; 5.02 Ajustes de Exercícios Anteriores; 5.03 Saldos Iniciais Ajustados; 5.04 Transações de Capital com os Sócios; 5.04.01 Aumentos de Capital; 5.04.02 Gastos com Emissão de Ações; 5.04.03 Opções Outorgadas Reconhecidas; 5.04.04 Ações em Tesouraria Adquiridas; 5.04.05 Ações em Tesouraria Vendidas; 5.04.06 Dividendos"
+  },
+  {
+    "id": "esquema_dmpl_con_007",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Contas: 5.04.07 Juros sobre Capital Próprio; 5.05 Resultado Abrangente Total; 5.05.01 Lucro Líquido do Período; 5.05.02 Outros Resultados Abrangentes; 5.05.02.01 Ajustes de Instrumentos Financeiros; 5.05.02.02 Tributos s/ Ajustes Instrumentos Financeiros; 5.05.02.03 Equiv. Patrim. s/Result. Abrang. Coligadas; 5.05.02.04 Ajustes de Conversão do Período"
+  },
+  {
+    "id": "esquema_dmpl_con_008",
+    "fonte": "DMPL_con",
+    "conteudo": "Tabela DMPL_con. Contas: 5.05.02.05 Tributos s/ Ajustes de Conversão do Período; 5.05.03 Reclassificações para o Resultado; 5.05.03.01 Ajustes de Instrumentos Financeiros; 5.06 Mutações Internas do Patrimônio Líquido; 5.06.01 Constituição de Reservas; 5.06.02 Realização da Reserva Reavaliação; 5.06.03 Tributos sobre a Realização da Reserva de Reavaliação; 5.07 Saldos Finais"
+  },
+  {
+    "id": "esquema_dmpl_ind_001",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. A tabela 'DMPL_ind' armazena dados da Demonstração das Mutações do Patrimônio Líquido, versão individual, publicada pela CVM no Brasil. A tabela é usada para fornecer informações detalhadas sobre as mutações do patrimônio líquido de uma empresa em um determinado período."
+  },
+  {
+    "id": "esquema_dmpl_ind_002",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Entidades: Empresa, Patrimônio Líquido, Demonstração Financeira, Mutações, Período Fiscal, Moeda"
+  },
+  {
+    "id": "esquema_dmpl_ind_003",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Relações: DMPL_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dmpl_ind_004",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_INI_EXERC (Data inicial do período fiscal); DT_FIM_EXERC (Data final do período fiscal); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores da demonstração); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_dmpl_ind_005",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Colunas: COLUNA_DF (Coluna da demonstração financeira); CD_CONTA (Código da conta contábil); DS_CONTA (Descrição da conta contábil); VL_CONTA (Valor da conta contábil); ST_CONTA_FIXA (Status da conta contábil fixa) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dmpl_ind_006",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Contas: 5.01 Saldos Iniciais; 5.02 Ajustes de Exercícios Anteriores; 5.03 Saldos Iniciais Ajustados; 5.04 Transações de Capital com os Sócios; 5.04.01 Aumentos de Capital; 5.04.02 Gastos com Emissão de Ações; 5.04.03 Opções Outorgadas Reconhecidas; 5.04.04 Ações em Tesouraria Adquiridas; 5.04.05 Ações em Tesouraria Vendidas; 5.04.06 Dividendos"
+  },
+  {
+    "id": "esquema_dmpl_ind_007",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Contas: 5.04.07 Juros sobre Capital Próprio; 5.05 Resultado Abrangente Total; 5.05.01 Lucro Líquido do Período; 5.05.02 Outros Resultados Abrangentes; 5.05.02.01 Ajustes de Instrumentos Financeiros; 5.05.02.02 Tributos s/ Ajustes Instrumentos Financeiros; 5.05.02.03 Equiv. Patrim. s/Result. Abrang. Controladas e Coligadas"
+  },
+  {
+    "id": "esquema_dmpl_ind_008",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Contas: 5.05.02.04 Ajustes de Conversão do Período; 5.05.02.05 Tributos s/ Ajustes de Conversão do Período; 5.05.03 Reclassificações para o Resultado; 5.05.03.01 Ajustes de Instrumentos Financeiros; 5.06 Mutações Internas do Patrimônio Líquido; 5.06.01 Constituição de Reservas; 5.06.02 Realização da Reserva Reavaliação"
+  },
+  {
+    "id": "esquema_dmpl_ind_009",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Contas: 5.06.03 Tributos sobre a Realização da Reserva de Reavaliação; 5.07 Saldos Finais; 5.07.01 Ajustes de Títulos e Valores Mobiliários; 5.07.02 Ajustes Acumulados de Conversão; 5.07.03 Ajustes de Combinação de Negócios; 5.08 Aumento/Redução do Capital Social; 5.09 Constituição/Realização Reservas Capital; 5.10 Ações em Tesouraria; 5.11 Outras Transações de Capital"
+  },
+  {
+    "id": "esquema_dmpl_ind_010",
+    "fonte": "DMPL_ind",
+    "conteudo": "Tabela DMPL_ind. Contas: 5.12 Outros; 5.13 Saldo Final"
+  },
+  {
+    "id": "esquema_dre_con_001",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. A tabela 'DRE_con' armazena dados da Demonstração de Resultado Consolidada de empresas brasileiras, conforme publicada pela CVM. A tabela é usada para armazenar e acessar informações financeiras consolidadas de empresas, incluindo receitas, despesas e resultados operacionais."
+  },
+  {
+    "id": "esquema_dre_con_002",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Entidades: Empresa, Demonstração de Resultado, Conta Financeira, Valor Financeiro"
+  },
+  {
+    "id": "esquema_dre_con_003",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Relações: DRE_con.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dre_con_004",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_INI_EXERC (Data inicial do período do exercício financeiro); DT_FIM_EXERC (Data final do período do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros)"
+  },
+  {
+    "id": "esquema_dre_con_005",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Colunas: ESCALA_MOEDA (Escala da moeda utilizada nos valores financeiros) [valores: MIL, UNIDADE]; CD_CONTA (Código da conta financeira); DS_CONTA (Descrição da conta financeira); VL_CONTA (Valor financeiro da conta); ST_CONTA_FIXA (Status da conta financeira (fixa ou variável)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dre_con_006",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.01 Receita de Venda de Bens e/ou Serviços; 3.01.03.01 Rendas de Contribuições Retidas; 3.01.03.02 Variações das Provisões Técnicas; 3.01.03.03 Outras Receitas de Prev. Complementar; 3.01.04.01 Receita Líquida com Títs. Capitalização; 3.01.04.02 Variações das Provisões Técnicas; 3.01.04.03 Outras Receitas de Capitalização"
+  },
+  {
+    "id": "esquema_dre_con_007",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.02 Custo dos Bens e/ou Serviços Vendidos; 3.02.03.01 Despesas com Benefícios e Resgates; 3.02.03.02 Despesas de Comercialização de Prev. Complementar; 3.02.03.03 Outras Despesas de Prev. Complementar; 3.02.04.01 Despesas com Resgates e Sorteios; 3.02.04.02 Despesas de Comercialização de Op. de Capitalização"
+  },
+  {
+    "id": "esquema_dre_con_008",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.02.04.03 Outras Despesas de Op. de Capitalização; 3.03 Resultado Bruto; 3.04 Despesas/Receitas Operacionais; 3.04.01 Despesas com Vendas; 3.04.02 Despesas Gerais e Administrativas; 3.04.03 Perdas pela Não Recuperabilidade de Ativos; 3.04.04 Outras Receitas Operacionais; 3.04.05 Outras Despesas Operacionais; 3.04.06 Resultado de Equivalência Patrimonial; 3.04.07 Outras Despesas Operacionais"
+  },
+  {
+    "id": "esquema_dre_con_009",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.04.08 Resultado da Equivalência Patrimonial; 3.05 Resultado Antes do Resultado Financeiro e dos Tributos; 3.06 Resultado Financeiro; 3.06.01 Receitas Financeiras; 3.06.02 Despesas Financeiras; 3.07 Resultado Antes dos Tributos sobre o Lucro; 3.08 Imposto de Renda e Contribuição Social sobre o Lucro; 3.08.01 Corrente; 3.08.02 Diferido; 3.09 Resultado Líquido das Operações Continuadas"
+  },
+  {
+    "id": "esquema_dre_con_010",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.09.01 Atribuído a Sócios da Empresa Controladora; 3.09.02 Atribuído a Sócios Não Controladores; 3.10 Resultado Líquido de Operações Descontinuadas; 3.10.01 Lucro/Prejuízo Líquido das Operações Descontinuadas; 3.10.02 Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas; 3.11 Lucro/Prejuízo Consolidado do Período; 3.11.01 Atribuído a Sócios da Empresa Controladora"
+  },
+  {
+    "id": "esquema_dre_con_011",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.11.02 Atribuído a Sócios Não Controladores; 3.12 Resultado Líquido de Operações Descontinuadas; 3.12.01 Lucro/Prejuízo Líquido das Operações Descontinuadas; 3.12.02 Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas; 3.13 Lucro/Prejuízo Consolidado do Período; 3.13.01 Atribuído a Sócios da Empresa Controladora"
+  },
+  {
+    "id": "esquema_dre_con_012",
+    "fonte": "DRE_con",
+    "conteudo": "Tabela DRE_con. Contas: 3.13.02 Atribuído a Sócios Não Controladores"
+  },
+  {
+    "id": "esquema_dre_ind_001",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. A tabela 'DRE_ind' armazena dados da Demonstração de Resultado Individual, fornecendo informações financeiras detalhadas de uma empresa específica. Esta tabela é usada para documentar e analisar os resultados financeiros de uma empresa individual, conforme publicado pela CVM."
+  },
+  {
+    "id": "esquema_dre_ind_002",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Entidades: Empresa, Demonstração de Resultado, Conta Financeira, Valor Financeiro, Moeda, Escala de Moeda"
+  },
+  {
+    "id": "esquema_dre_ind_003",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Relações: DRE_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dre_ind_004",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_INI_EXERC (Data inicial do período do exercício financeiro); DT_FIM_EXERC (Data final do período do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_dre_ind_005",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Colunas: CD_CONTA (Código da conta financeira); DS_CONTA (Descrição da conta financeira); VL_CONTA (Valor financeiro da conta); ST_CONTA_FIXA (Status da conta financeira (fixa ou variável)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dre_ind_006",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Contas: 3.01 Receita de Venda de Bens e/ou Serviços; 3.01.03.01 Rendas de Contribuições Retidas; 3.01.03.02 Variações das Provisões Técnicas; 3.01.03.03 Outras Receitas de Prev. Complementar; 3.01.04.01 Receita Líquida com Títs. Capitalização; 3.01.04.02 Variações das Provisões Técnicas; 3.01.04.03 Outras Receitas de Capitalização"
+  },
+  {
+    "id": "esquema_dre_ind_007",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Contas: 3.02 Custo dos Bens e/ou Serviços Vendidos; 3.02.03.01 Despesas com Benefícios e Resgates; 3.02.03.02 Despesas de Comercialização de Prev. Complementar; 3.02.03.03 Outras Despesas de Prev. Complementar; 3.02.04.01 Despesas com Resgates e Sorteios; 3.02.04.02 Despesas de Comercialização de Op. de Capitalização"
+  },
+  {
+    "id": "esquema_dre_ind_008",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Contas: 3.02.04.03 Outras Despesas de Op. de Capitalização; 3.03 Resultado Bruto; 3.04 Despesas/Receitas Operacionais; 3.04.01 Despesas com Vendas; 3.04.02 Despesas Gerais e Administrativas; 3.04.03 Perdas pela Não Recuperabilidade de Ativos; 3.04.04 Outras Receitas Operacionais; 3.04.05 Outras Despesas Operacionais; 3.04.06 Resultado de Equivalência Patrimonial; 3.04.07 Outras Despesas Operacionais"
+  },
+  {
+    "id": "esquema_dre_ind_009",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Contas: 3.04.08 Resultado da Equivalência Patrimonial; 3.05 Resultado Antes do Resultado Financeiro e dos Tributos; 3.06 Resultado Financeiro; 3.06.01 Receitas Financeiras; 3.06.02 Despesas Financeiras; 3.07 Resultado Antes dos Tributos sobre o Lucro; 3.08 Imposto de Renda e Contribuição Social sobre o Lucro; 3.08.01 Corrente; 3.08.02 Diferido; 3.09 Resultado Líquido das Operações Continuadas"
+  },
+  {
+    "id": "esquema_dre_ind_010",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Contas: 3.10 Resultado Líquido de Operações Descontinuadas; 3.10.01 Lucro/Prejuízo Líquido das Operações Descontinuadas; 3.10.02 Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas; 3.11 Lucro/Prejuízo do Período; 3.12 Resultado Líquido de Operações Descontinuadas; 3.12.01 Lucro/Prejuízo Líquido das Operações Descontinuadas"
+  },
+  {
+    "id": "esquema_dre_ind_011",
+    "fonte": "DRE_ind",
+    "conteudo": "Tabela DRE_ind. Contas: 3.12.02 Ganhos/Perdas Líquidas sobre Ativos de Operações Descontinuadas; 3.13 Lucro/Prejuízo do Período"
+  },
+  {
+    "id": "esquema_dva_con_001",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. A tabela 'DVA_con' armazena dados da Demonstração de Valor Adicionado consolidada, publicada pela CVM no Brasil. A tabela é usada para fornecer informações financeiras consolidadas de empresas do grupo, incluindo receitas, despesas e resultados operacionais."
+  },
+  {
+    "id": "esquema_dva_con_002",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Entidades: Empresa, Demonstração Financeira, Valor Adicionado, Contas Financeiras, Exercício Financeiro"
+  },
+  {
+    "id": "esquema_dva_con_003",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Relações: DVA_con.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dva_con_004",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_INI_EXERC (Data inicial do período do exercício financeiro); DT_FIM_EXERC (Data final do período do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_dva_con_005",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Colunas: CD_CONTA (Código da conta financeira); DS_CONTA (Descrição da conta financeira); VL_CONTA (Valor da conta financeira); ST_CONTA_FIXA (Status da conta financeira (fixa ou variável)) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dva_con_006",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.01 Receitas; 7.01.01 Vendas de Mercadorias, Produtos e Serviços; 7.01.02 Outras Receitas; 7.01.03 Receitas refs. à Construção de Ativos Próprios; 7.01.04 Provisão/Reversão de Créds. Liquidação Duvidosa; 7.01.05 Provisão/Reversão de Créds. Liquidação Duvidosa; 7.02 Insumos Adquiridos de Terceiros"
+  },
+  {
+    "id": "esquema_dva_con_007",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.02.01 Custos Prods., Mercs. e Servs. Vendidos; 7.02.02 Materiais, Energia, Servs. de Terceiros e Outros; 7.02.03 Perda/Recuperação de Valores Ativos; 7.02.04 Outros; 7.03 Valor Adicionado Bruto; 7.03.01 Materiais, Energia e Outros; 7.03.02 Serviços de Terceiros; 7.03.03 Perda/Recuperação de Valores Ativos; 7.03.04 Outros"
+  },
+  {
+    "id": "esquema_dva_con_008",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.04 Retenções; 7.04.01 Depreciação, Amortização e Exaustão; 7.04.02 Outras; 7.05 Valor Adicionado Líquido Produzido; 7.05.01 Depreciação, Amortização e Exaustão; 7.05.02 Outras; 7.05.03 Var. Despesas Comercialização Diferidas; 7.05.04 Perda/Recuperação de Valores Ativos; 7.05.05 Outros; 7.06 Vlr Adicionado Recebido em Transferência"
+  },
+  {
+    "id": "esquema_dva_con_009",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.06.01 Resultado de Equivalência Patrimonial; 7.06.02 Receitas Financeiras; 7.06.03 Outros; 7.07 Valor Adicionado Total a Distribuir; 7.07.01 Resultado de Equivalência Patrimonial; 7.07.02 Outros; 7.08 Distribuição do Valor Adicionado; 7.08.01 Pessoal; 7.08.01.01 Remuneração Direta; 7.08.01.02 Benefícios; 7.08.01.03 F.G.T.S.; 7.08.01.04 Outros"
+  },
+  {
+    "id": "esquema_dva_con_010",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.08.02 Impostos, Taxas e Contribuições; 7.08.02.01 Federais; 7.08.02.02 Estaduais; 7.08.02.03 Municipais; 7.08.03 Remuneração de Capitais de Terceiros; 7.08.03.01 Juros; 7.08.03.02 Aluguéis; 7.08.03.03 Outras; 7.08.04 Remuneração de Capitais Próprios; 7.08.04.01 Juros sobre o Capital Próprio; 7.08.04.02 Dividendos"
+  },
+  {
+    "id": "esquema_dva_con_011",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.08.04.03 Lucros Retidos / Prejuízo do Período; 7.08.04.04 Part. Não Controladores nos Lucros Retidos; 7.08.05 Outros; 7.09 Distribuição do Valor Adicionado; 7.09.01 Pessoal; 7.09.01.01 Remuneração Direta; 7.09.01.02 Benefícios; 7.09.01.03 F.G.T.S.; 7.09.01.04 Outros; 7.09.02 Impostos, Taxas e Contribuições"
+  },
+  {
+    "id": "esquema_dva_con_012",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.09.02.01 Federais; 7.09.02.02 Estaduais; 7.09.02.03 Municipais; 7.09.03 Remuneração de Capitais de Terceiros; 7.09.03.01 Aluguéis; 7.09.03.02 Outras; 7.09.04 Remuneração de Capitais Próprios; 7.09.04.01 Juros sobre o Capital Próprio; 7.09.04.02 Dividendos; 7.09.04.03 Lucros Retidos / Prejuízo do Período"
+  },
+  {
+    "id": "esquema_dva_con_013",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.09.04.04 Participação de Não Controladores nos Lucros Retidos; 7.09.05 Outros; 7.10 Valor Adicionado Total a Distribuir; 7.11 Distribuição do Valor Adicionado; 7.11.01 Pessoal; 7.11.01.01 Remuneração Direta; 7.11.01.02 Benefícios; 7.11.01.03 F.G.T.S.; 7.11.01.04 Outros; 7.11.02 Impostos, Taxas e Contribuições; 7.11.02.01 Federais"
+  },
+  {
+    "id": "esquema_dva_con_014",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.11.02.02 Estaduais; 7.11.02.03 Municipais; 7.11.03 Remuneração de Capitais de Terceiros; 7.11.03.01 Juros; 7.11.03.02 Aluguéis; 7.11.03.03 Outras; 7.11.04 Remuneração de Capitais Próprios; 7.11.04.01 Juros sobre o Capital Próprio; 7.11.04.02 Dividendos; 7.11.04.03 Lucros Retidos / Prejuízo do Período"
+  },
+  {
+    "id": "esquema_dva_con_015",
+    "fonte": "DVA_con",
+    "conteudo": "Tabela DVA_con. Contas: 7.11.04.04 Part. Não Controladores nos Lucros Retidos; 7.11.05 Outros"
+  },
+  {
+    "id": "esquema_dva_ind_001",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. A tabela 'DVA_ind' armazena dados da Demonstração de Valor Adicionado, versão individual, publicada pela CVM no Brasil. A tabela é usada para fornecer informações financeiras detalhadas de empresas individuais."
+  },
+  {
+    "id": "esquema_dva_ind_002",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Entidades: Empresa, Demonstração Financeira, Valor Adicionado, Contabilidade, CVM, Formulário de Demonstrações Financeiras Padronizadas"
+  },
+  {
+    "id": "esquema_dva_ind_003",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Relações: DVA_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_dva_ind_004",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Colunas: CD_CVM (Código da empresa conforme registrado pela CVM); DT_INI_EXERC (Data inicial do exercício financeiro); DT_FIM_EXERC (Data final do exercício financeiro); ORDEM_EXERC (Ordem do exercício financeiro) [valores: PENÚLTIMO, ÚLTIMO]; MOEDA (Moeda utilizada nos valores financeiros); ESCALA_MOEDA (Escala da moeda utilizada) [valores: MIL, UNIDADE]"
+  },
+  {
+    "id": "esquema_dva_ind_005",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Colunas: CD_CONTA (Código da conta contábil); DS_CONTA (Descrição da conta contábil); VL_CONTA (Valor da conta contábil); ST_CONTA_FIXA (Status da conta contábil fixa) [valores: N, S]"
+  },
+  {
+    "id": "esquema_dva_ind_006",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.01 Receitas; 7.01.01 Vendas de Mercadorias, Produtos e Serviços; 7.01.02 Outras Receitas; 7.01.03 Receitas refs. à Construção de Ativos Próprios; 7.01.04 Provisão/Reversão de Créds. Liquidação Duvidosa; 7.01.05 Provisão/Reversão de Créds. Liquidação Duvidosa; 7.02 Insumos Adquiridos de Terceiros"
+  },
+  {
+    "id": "esquema_dva_ind_007",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.02.01 Custos Prods., Mercs. e Servs. Vendidos; 7.02.02 Materiais, Energia, Servs. de Terceiros e Outros; 7.02.03 Perda/Recuperação de Valores Ativos; 7.02.04 Outros; 7.03 Valor Adicionado Bruto; 7.03.01 Materiais, Energia e Outros; 7.03.02 Serviços de Terceiros; 7.03.03 Perda/Recuperação de Valores Ativos; 7.03.04 Outros"
+  },
+  {
+    "id": "esquema_dva_ind_008",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.04 Retenções; 7.04.01 Depreciação, Amortização e Exaustão; 7.04.02 Outras; 7.05 Valor Adicionado Líquido Produzido; 7.05.01 Depreciação, Amortização e Exaustão; 7.05.02 Outras; 7.05.03 Var. Despesas Comercialização Diferidas; 7.05.04 Perda/Recuperação de Valores Ativos; 7.05.05 Outros; 7.06 Vlr Adicionado Recebido em Transferência"
+  },
+  {
+    "id": "esquema_dva_ind_009",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.06.01 Resultado de Equivalência Patrimonial; 7.06.02 Receitas Financeiras; 7.06.03 Outros; 7.07 Valor Adicionado Total a Distribuir; 7.07.01 Resultado de Equivalência Patrimonial; 7.07.02 Outros; 7.08 Distribuição do Valor Adicionado; 7.08.01 Pessoal; 7.08.01.01 Remuneração Direta; 7.08.01.02 Benefícios; 7.08.01.03 F.G.T.S.; 7.08.01.04 Outros"
+  },
+  {
+    "id": "esquema_dva_ind_010",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.08.02 Impostos, Taxas e Contribuições; 7.08.02.01 Federais; 7.08.02.02 Estaduais; 7.08.02.03 Municipais; 7.08.03 Remuneração de Capitais de Terceiros; 7.08.03.01 Juros; 7.08.03.02 Aluguéis; 7.08.03.03 Outras; 7.08.04 Remuneração de Capitais Próprios; 7.08.04.01 Juros sobre o Capital Próprio; 7.08.04.02 Dividendos"
+  },
+  {
+    "id": "esquema_dva_ind_011",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.08.04.03 Lucros Retidos / Prejuízo do Período; 7.08.05 Outros; 7.09 Distribuição do Valor Adicionado; 7.09.01 Pessoal; 7.09.01.01 Remuneração Direta; 7.09.01.02 Benefícios; 7.09.01.03 F.G.T.S.; 7.09.01.04 Outros; 7.09.02 Impostos, Taxas e Contribuições; 7.09.02.01 Federais; 7.09.02.02 Estaduais"
+  },
+  {
+    "id": "esquema_dva_ind_012",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.09.02.03 Municipais; 7.09.03 Remuneração do Capital de Terceiros; 7.09.03.01 Aluguéis; 7.09.03.02 Outras; 7.09.04 Remuneração de Capital Próprio; 7.09.04.01 Juros sobre o Capital Próprio; 7.09.04.02 Dividendos; 7.09.04.03 Lucros Retidos / Prejuízo do Período; 7.09.05 Outros; 7.10 Valor Adicionado Total a Distribuir"
+  },
+  {
+    "id": "esquema_dva_ind_013",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.11 Distribuição do Valor Adicionado; 7.11.01 Pessoal; 7.11.01.01 Remuneração Direta; 7.11.01.02 Benefícios; 7.11.01.03 F.G.T.S.; 7.11.01.04 Outros; 7.11.02 Impostos, Taxas e Contribuições; 7.11.02.01 Federais; 7.11.02.02 Estaduais; 7.11.02.03 Municipais; 7.11.03 Remuneração de Capitais de Terceiros"
+  },
+  {
+    "id": "esquema_dva_ind_014",
+    "fonte": "DVA_ind",
+    "conteudo": "Tabela DVA_ind. Contas: 7.11.03.01 Juros; 7.11.03.02 Aluguéis; 7.11.03.03 Outras; 7.11.04 Remuneração de Capitais Próprios; 7.11.04.01 Juros sobre o Capital Próprio; 7.11.04.02 Dividendos; 7.11.04.03 Lucros Retidos / Prejuízo do Período; 7.11.05 Outros"
+  },
+  {
+    "id": "esquema_companhias_001",
+    "fonte": "companhias",
+    "conteudo": "Tabela companhias. A tabela 'companhias' armazena informações básicas sobre as empresas, incluindo seu código CVM e CNPJ. A tabela 'companhias' é usada para identificar e referenciar as empresas em outros registros do banco de dados."
+  },
+  {
+    "id": "esquema_companhias_002",
+    "fonte": "companhias",
+    "conteudo": "Tabela companhias. Entidades: Empresa, Código CVM, CNPJ"
+  },
+  {
+    "id": "esquema_companhias_003",
+    "fonte": "companhias",
+    "conteudo": "Tabela companhias. Relações: BPA_con.CD_CVM referencia companhias.CD_CVM; BPA_ind.CD_CVM referencia companhias.CD_CVM; BPP_con.CD_CVM referencia companhias.CD_CVM; BPP_ind.CD_CVM referencia companhias.CD_CVM; DFC_MI_con.CD_CVM referencia companhias.CD_CVM; DFC_MI_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_companhias_004",
+    "fonte": "companhias",
+    "conteudo": "Tabela companhias. Relações: DMPL_con.CD_CVM referencia companhias.CD_CVM; DMPL_ind.CD_CVM referencia companhias.CD_CVM; DRE_con.CD_CVM referencia companhias.CD_CVM; DRE_ind.CD_CVM referencia companhias.CD_CVM; DVA_con.CD_CVM referencia companhias.CD_CVM; DVA_ind.CD_CVM referencia companhias.CD_CVM"
+  },
+  {
+    "id": "esquema_companhias_005",
+    "fonte": "companhias",
+    "conteudo": "Tabela companhias. Colunas: CD_CVM (Código CVM da empresa, identificador único.); CNPJ_CIA (CNPJ da empresa, número de identificação jurídica.); DENOM_CIA (Denominação da empresa.)"
+  }
+]
