@@ -18,14 +18,16 @@ Descrição geral do funcionamento:
 
 Dependências:
 - bibliotecas numpy e sentence-transformers (esta só ao carregar um modelo);
-- modelos já em cache local. Este módulo não baixa nada: se faltar um modelo, o erro
-  mostra o comando para baixá-lo.
+- modelos já em cache local. Carregar um modelo nunca baixa nada: se faltar, o erro mostra o
+  comando. O download só acontece em garantir_modelos(..., baixar=True), que os scripts
+  offline chamam no início quando a autora passa --baixar-modelos.
 
 Parâmetros: nenhum argumento para importar. Executado como script, imprime a tabela dos
 modelos e diz quais já estão no cache.
 
 Resultado: fornece MODELOS, MODELO_PADRAO, obter_ficha(), limite_aplicado(), esta_em_cache(),
-carregar_modelo(), vetorizar_pergunta() e vetorizar_trechos().
+garantir_modelos(), carregar_modelo(), carregar_tokenizador(), vetorizar_pergunta() e
+vetorizar_trechos().
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/modelos_embedding.py
@@ -51,6 +53,7 @@ MODELOS = {
         "limite_tokens": 128,
         "normalizar": True,
         "idioma": "multilingue",
+        "tamanho_mb": 480,
     },
     "e5-small": {
         "id": "intfloat/multilingual-e5-small",
@@ -60,6 +63,7 @@ MODELOS = {
         "limite_tokens": 512,
         "normalizar": True,
         "idioma": "multilingue",
+        "tamanho_mb": 493,
     },
     "e5-base": {
         "id": "intfloat/multilingual-e5-base",
@@ -69,6 +73,7 @@ MODELOS = {
         "limite_tokens": 512,
         "normalizar": True,
         "idioma": "multilingue",
+        "tamanho_mb": 1135,
     },
     "bge-m3": {
         "id": "BAAI/bge-m3",
@@ -78,6 +83,7 @@ MODELOS = {
         "limite_tokens": 8192,
         "normalizar": True,
         "idioma": "multilingue",
+        "tamanho_mb": 2296,
     },
     "e5-base-v2": {
         "id": "intfloat/e5-base-v2",
@@ -87,6 +93,7 @@ MODELOS = {
         "limite_tokens": 512,
         "normalizar": True,
         "idioma": "ingles",
+        "tamanho_mb": 439,
     },
 }
 
@@ -111,6 +118,42 @@ def esta_em_cache(chave: str) -> bool:
 
     caminho = try_to_load_from_cache(obter_ficha(chave)["id"], "config.json")
     return isinstance(caminho, str)
+
+
+# Baixa um modelo para o cache local. Só é chamada quando a autora pede o download.
+def baixar_modelo(chave: str):
+    from sentence_transformers import SentenceTransformer
+
+    SentenceTransformer(obter_ficha(chave)["id"])
+
+
+# Confere no início de uma execução se os modelos estão no cache e baixa só os que faltam, e só se pedido.
+def garantir_modelos(chaves: list[str], baixar: bool = False):
+    faltando = [c for c in dict.fromkeys(chaves) if not esta_em_cache(c)]
+    if not faltando:
+        return
+    linhas = [
+        f"  - {c}: {obter_ficha(c)['id']} (https://huggingface.co/{obter_ficha(c)['id']}), "
+        f"cerca de {obter_ficha(c)['tamanho_mb']} MB"
+        for c in faltando
+    ]
+    total = sum(obter_ficha(c)["tamanho_mb"] for c in faltando)
+    if not baixar:
+        # Baixar é uma decisão da autora: sem a opção explícita, o script para e diz o que falta.
+        raise SystemExit(
+            "Faltam modelos no cache local:\n" + "\n".join(linhas) + f"\nTotal: cerca de {total} MB. "
+            "Para baixá-los, rode de novo com --baixar-modelos (a opção é a autorização do download)."
+        )
+    print("Baixando os modelos que faltam (autorizado por --baixar-modelos):\n" + "\n".join(linhas))
+    for c in faltando:
+        baixar_modelo(c)
+
+
+# Carrega só o tokenizador do modelo (sem os pesos), a partir do cache local.
+def carregar_tokenizador(chave: str = MODELO_PADRAO):
+    from transformers import AutoTokenizer
+
+    return AutoTokenizer.from_pretrained(obter_ficha(chave)["id"], local_files_only=True)
 
 
 # Carrega o modelo uma única vez e o reaproveita; nunca baixa, só lê do cache local.
@@ -147,10 +190,10 @@ def vetorizar_trechos(textos: list[str], chave: str = MODELO_PADRAO) -> np.ndarr
 
 # Imprime a tabela dos modelos registrados e se cada um está no cache.
 def listar():
-    print(f"{'chave':<11}{'idioma':<13}{'dim':>5}{'limite':>8}{'usado':>7}  {'pergunta':<11}{'trecho':<13}{'cache':<6}id")
+    print(f"{'chave':<11}{'idioma':<13}{'dim':>5}{'limite':>8}{'usado':>7}{'MB':>6}  {'pergunta':<11}{'trecho':<13}{'cache':<6}id")
     for chave, ficha in MODELOS.items():
         print(
-            f"{chave:<11}{ficha['idioma']:<13}{ficha['dimensoes']:>5}{ficha['limite_tokens']:>8}{limite_aplicado(chave):>7}  "
+            f"{chave:<11}{ficha['idioma']:<13}{ficha['dimensoes']:>5}{ficha['limite_tokens']:>8}{limite_aplicado(chave):>7}{ficha['tamanho_mb']:>6}  "
             f"{ficha['prefixo_pergunta']!r:<11}{ficha['prefixo_trecho']!r:<13}"
             f"{'sim' if esta_em_cache(chave) else 'não':<6}{ficha['id']}"
         )
