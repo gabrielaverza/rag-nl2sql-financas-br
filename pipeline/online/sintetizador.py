@@ -4,8 +4,8 @@ Etapa: Online.
 Função: síntese da resposta em linguagem natural.
 
 Descrição geral do funcionamento:
-- Conceitual: recupera os trechos mais parecidos no índice do glossário (normativos) e o
-  LLM responde só com eles, sem SQL.
+- Conceitual: recupera os trechos mais parecidos no índice do glossário (normativos), pela busca
+  configurável (método e k_trechos de configuracao.json), e o LLM responde só com eles, sem SQL.
 - Quantitativa: o LLM escreve a resposta a partir do resultado do SQL.
 - Híbrida: o LLM combina o resultado do SQL com os trechos do glossário.
 - O resultado do SQL vai ao LLM com cada valor rotulado pelo nome da coluna, e os valores
@@ -14,12 +14,12 @@ Descrição geral do funcionamento:
   a informação pedida, ele deve dizer que não encontrou.
 
 Dependências:
-- pipeline/online/busca.py e embeddings/index_glossario.json;
+- pipeline/online/busca_configuravel.py e os índices do glossário em embeddings/;
 - servidor Ollama em execução, com o modelo qwen2.5-coder:7b baixado.
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
 
-Resultado: fornece responder(pergunta, tipo, resultado_sql), que devolve a resposta, os trechos
+Resultado: fornece responder(pergunta, tipo, resultado_sql, consulta_trechos), que devolve a resposta, os trechos
 usados e o contexto mostrado ao LLM (a validação confere a fidelidade contra ele).
 """
 
@@ -27,10 +27,9 @@ import re
 
 import ollama
 
-from busca import CAMINHO_INDICE_GLOSSARIO, Indice, vetorizar
+from busca_configuravel import obter_busca
 
 MODELO_LLM = "qwen2.5-coder:7b"
-K_TRECHOS = 3
 MAX_LINHAS_NO_PROMPT = 30
 # Sem limite de tokens, o 7B pode repetir texto sem parar (já aconteceu, passou de 19 mil tokens);
 # a resposta pedida tem até 5 frases. O contexto passa do tamanho padrão do Ollama (4096) com
@@ -39,15 +38,10 @@ MAX_TOKENS_RESPOSTA = 400
 NUM_CTX = 8192
 SEM_INFORMACAO = "Não encontrei essa informação nos documentos disponíveis."
 
-_glossario = None
-
-
-# Os k trechos do glossário mais parecidos com a pergunta.
-def recuperar_trechos(pergunta: str, k: int = K_TRECHOS) -> list[dict]:
-    global _glossario
-    if _glossario is None:
-        _glossario = Indice(CAMINHO_INDICE_GLOSSARIO)
-    return _glossario.buscar(vetorizar(pergunta), k)
+# Os k trechos do glossário mais parecidos com o texto da busca, pela busca configurável
+# (k padrão: k_trechos de configuracao.json).
+def recuperar_trechos(pergunta: str, k: int | None = None, tipo: str | None = None) -> list[dict]:
+    return obter_busca().trechos(pergunta, tipo, k)
 
 
 def _formatar_trechos(trechos: list[dict]) -> str:
@@ -104,9 +98,11 @@ def _instrucoes(tem_dados: bool, tem_trechos: bool) -> str:
 
 
 # tipo: "conceitual", "quantitativa" ou "hibrida". resultado_sql é o dicionário devolvido por
-# gerador_sql.gerar_sql (necessário nos tipos quantitativa e híbrida).
-def responder(pergunta: str, tipo: str, resultado_sql: dict | None = None) -> dict:
-    trechos = recuperar_trechos(pergunta) if tipo in ("conceitual", "hibrida") else []
+# gerador_sql.gerar_sql (necessário nos tipos quantitativa e híbrida). consulta_trechos é o texto
+# que busca os trechos; sem ele, a busca usa a pergunta inteira (com o divisor ligado, o
+# orquestrador passa a parte conceitual da pergunta híbrida).
+def responder(pergunta: str, tipo: str, resultado_sql: dict | None = None, consulta_trechos: str | None = None) -> dict:
+    trechos = recuperar_trechos(consulta_trechos or pergunta, tipo=tipo) if tipo in ("conceitual", "hibrida") else []
     tem_dados = tipo in ("quantitativa", "hibrida")
     if tem_dados and resultado_sql is None:
         raise ValueError("resultado_sql é obrigatório nos tipos quantitativa e híbrida")

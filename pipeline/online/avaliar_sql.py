@@ -22,7 +22,7 @@ Dependências:
 - dados/dfp.db e o arquivo de perguntas em dados/ (por padrão, dados/perguntas_dfp.json).
 
 Parâmetros: caminho opcional do arquivo de perguntas, como primeiro argumento; --k N para o
-número de tabelas da busca; --tabelas-ideais para usar as tabelas esperadas.
+número de tabelas da busca (padrão: k_tabelas de configuracao.json); --tabelas-ideais para usar as tabelas esperadas.
 
 Resultado: imprime o resultado de cada pergunta, o EX resumido por tipo e por completude do
 contexto, e os erros com o SQL gerado e o de referência. Não grava arquivos.
@@ -40,7 +40,8 @@ import sys
 import time
 from collections import Counter
 
-from gerador_sql import K_TABELAS, executar_sql, gerar_sql
+from configuracao import carregar as carregar_configuracao
+from gerador_sql import executar_sql, gerar_sql
 
 CAMINHO_PERGUNTAS = "dados/perguntas_dfp.json"
 
@@ -95,9 +96,10 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
     parser.add_argument("perguntas", nargs="?", default=CAMINHO_PERGUNTAS)
-    parser.add_argument("--k", type=int, default=K_TABELAS)
+    parser.add_argument("--k", type=int, default=None, help="número de tabelas da busca (padrão: k_tabelas de configuracao.json)")
     parser.add_argument("--tabelas-ideais", action="store_true")
     args = parser.parse_args()
+    args.k = args.k or carregar_configuracao()["k_tabelas"]
     with open(args.perguntas, encoding="utf-8") as f:
         perguntas = [p for p in json.load(f) if p["sql_referencia"]]
 

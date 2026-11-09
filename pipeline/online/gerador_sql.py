@@ -4,9 +4,10 @@ Etapa: Online.
 Função: caminho quantitativo, geração e execução do SQL sobre as DFPs.
 
 Descrição geral do funcionamento:
-- A busca escolhe as k tabelas mais parecidas com a pergunta no índice de esquema, mais as
-  tabelas que elas referenciam por chave estrangeira (companhias). Também é possível
-  passar a lista de tabelas, sem usar a busca (usado para medir o gerador com tabelas ideais).
+- A busca configurável (busca_configuravel.py) escolhe as k tabelas mais parecidas com a
+  pergunta (k_tabelas e o método vêm de configuracao.json), mais as tabelas que elas referenciam
+  por chave estrangeira (companhias). Também é possível passar a lista de tabelas, sem usar a
+  busca (usado para medir o gerador com tabelas ideais).
 - O contexto traz só essas tabelas (colunas, tipos, valores possíveis, plano de contas e
   junções), lido do esquema.json. O esquema completo não vai ao LLM.
 - Cada conta do plano de contas aparece com o filtro CD_CONTA pronto e com os termos de
@@ -16,8 +17,8 @@ Descrição geral do funcionamento:
   limite de tentativas.
 
 Dependências:
-- pipeline/online/busca.py, os índices e o esquema.json em embeddings/, dados/dfp.db e
-  dados/sinonimos_contas.json;
+- pipeline/online/busca_configuravel.py e busca.py, os índices e o esquema.json em embeddings/,
+  dados/dfp.db e dados/sinonimos_contas.json;
 - servidor Ollama em execução, com o modelo qwen2.5-coder:7b baixado.
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
@@ -32,20 +33,12 @@ import time
 
 import ollama
 
-from busca import (
-    CAMINHO_ESQUEMA,
-    CAMINHO_INDICE_ESQUEMA,
-    Indice,
-    buscar_tabelas,
-    carregar_tabelas_referenciadas,
-    vetorizar,
-)
+from busca import CAMINHO_ESQUEMA
+from busca_configuravel import obter_busca
 
 CAMINHO_DB = "dados/dfp.db"
 CAMINHO_SINONIMOS = "dados/sinonimos_contas.json"
 MODELO_LLM = "qwen2.5-coder:7b"
-# Número de tabelas escolhidas pela busca (as referenciadas por chave estrangeira vêm além delas).
-K_TABELAS = 3
 # O contexto com o plano de contas passa do tamanho padrão do Ollama, que cortaria o início do prompt.
 NUM_CTX = 16384
 MAX_TENTATIVAS = 3
@@ -58,30 +51,27 @@ PALAVRAS_PROIBIDAS = {
     "detach", "pragma", "vacuum", "reindex", "truncate",
 }
 
-_indice = None
 _esquema = None
-_referenciadas = None
 _sinonimos = None
 
 
-# Lê o índice, o esquema e os sinônimos das contas uma vez só e os reaproveita nas consultas seguintes.
+# Lê o esquema e os sinônimos das contas uma vez só e os reaproveita nas consultas seguintes.
 def _carregar():
-    global _indice, _esquema, _referenciadas, _sinonimos
-    if _indice is None:
-        _indice = Indice(CAMINHO_INDICE_ESQUEMA)
+    global _esquema, _sinonimos
+    if _esquema is None:
         with open(CAMINHO_ESQUEMA, encoding="utf-8") as f:
             _esquema = {e["tabela"]: e for e in json.load(f)}
-        _referenciadas = carregar_tabelas_referenciadas()
         with open(CAMINHO_SINONIMOS, encoding="utf-8") as f:
             _sinonimos = json.load(f)
-    return _indice, _esquema, _referenciadas
+    return _esquema
 
 
-# Devolve as entradas do esquema.json das tabelas da busca, ou das tabelas passadas.
-def selecionar_contexto(pergunta: str, k: int = K_TABELAS, tabelas: list[str] | None = None) -> list[dict]:
-    indice, esquema, referenciadas = _carregar()
+# Devolve as entradas do esquema.json das tabelas da busca configurável (k padrão: k_tabelas da
+# configuração), ou das tabelas passadas.
+def selecionar_contexto(pergunta: str, k: int | None = None, tabelas: list[str] | None = None, tipo: str | None = None) -> list[dict]:
+    esquema = _carregar()
     if tabelas is None:
-        tabelas = buscar_tabelas(indice, vetorizar(pergunta), k, referenciadas)
+        tabelas = obter_busca().tabelas(pergunta, tipo, k)
     return [esquema[t] for t in tabelas]
 
 
@@ -182,8 +172,8 @@ def executar_sql(sql: str, limite_linhas: int | None = LIMITE_LINHAS) -> tuple[l
 
 # Gera o SQL da pergunta e o executa, devolvendo o problema ao LLM para corrigir
 # a consulta até o limite de tentativas.
-def gerar_sql(pergunta: str, k: int = K_TABELAS, tabelas: list[str] | None = None) -> dict:
-    entradas = selecionar_contexto(pergunta, k, tabelas)
+def gerar_sql(pergunta: str, k: int | None = None, tabelas: list[str] | None = None, tipo: str | None = None) -> dict:
+    entradas = selecionar_contexto(pergunta, k, tabelas, tipo)
     resultado = {
         "pergunta": pergunta,
         "tabelas_contexto": [e["tabela"] for e in entradas],
