@@ -10,9 +10,7 @@ Descrição geral do funcionamento:
   busca (usado para medir o gerador com tabelas ideais).
 - O contexto traz só essas tabelas (colunas, tipos, valores possíveis, plano de contas e
   junções), lido do esquema.json. O esquema completo não vai ao LLM.
-- Cada conta do plano de contas aparece com o filtro CD_CONTA pronto e com os sinônimos de
-  dados/sinonimos_contas.json, só os que um normativo indexado sustenta (por exemplo, "lucro bruto"
-  para a conta 3.03 de resultado bruto).
+- Cada conta do plano de contas aparece com a descrição oficial e o filtro CD_CONTA pronto.
 - O LLM gera o SQL. O código só aceita um único SELECT e executa em modo somente leitura.
 - Se der erro ou o resultado vier vazio, o LLM recebe o problema e gera outro SQL, até o
   limite de tentativas.
@@ -21,7 +19,7 @@ Descrição geral do funcionamento:
 
 Dependências:
 - pipeline/online/busca_configuravel.py e busca.py, os índices e o esquema.json em embeddings/,
-  dados/dfp.db e dados/sinonimos_contas.json;
+  dados/dfp.db;
 - servidor Ollama em execução, com o modelo qwen2.5-coder:7b baixado.
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
@@ -41,7 +39,6 @@ from busca import CAMINHO_ESQUEMA
 from busca_configuravel import obter_busca
 
 CAMINHO_DB = "dados/dfp.db"
-CAMINHO_SINONIMOS = "dados/sinonimos_contas.json"
 MODELO_LLM = "qwen2.5-coder:7b"
 # O contexto com o plano de contas passa do tamanho padrão do Ollama, que cortaria o início do prompt.
 NUM_CTX = 16384
@@ -56,17 +53,14 @@ PALAVRAS_PROIBIDAS = {
 }
 
 _esquema = None
-_sinonimos = None
 
 
-# Lê o esquema e os sinônimos das contas uma vez só e os reaproveita nas consultas seguintes.
+# Lê o esquema uma vez só e o reaproveita nas consultas seguintes.
 def _carregar():
-    global _esquema, _sinonimos
+    global _esquema
     if _esquema is None:
         with open(CAMINHO_ESQUEMA, encoding="utf-8") as f:
             _esquema = {e["tabela"]: e for e in json.load(f)}
-        with open(CAMINHO_SINONIMOS, encoding="utf-8") as f:
-            _sinonimos = json.load(f)
     return _esquema
 
 
@@ -94,16 +88,11 @@ def montar_contexto(entradas: list[dict]) -> str:
                 valores = " Valores possíveis: " + ", ".join(f"'{v}'" for v in c["valores_possiveis"]) + "."
             linhas.append(f'  - {c["nome"]} ({c["tipo"]}{chave}): {c["descricao"]}.{valores}')
         # O significado das contas está no valor de CD_CONTA, não no nome da coluna. Cada linha
-        # traz o filtro pronto e os termos de analista (sinônimos) da conta, quando existem.
+        # traz a descrição oficial da conta e o filtro pronto.
         if e["contas"]:
             linhas.append("Plano de contas (filtre com CD_CONTA = código):")
-            # Os sinônimos valem para a demonstração toda (BPA_con e BPA_ind usam os de BPA).
-            da_demonstracao = _sinonimos.get(e["tabela"].rsplit("_", 1)[0], {})
             for c in e["contas"]:
-                # Cada conta traz a descrição oficial e os sinônimos que um normativo sustenta.
-                termos = [x["termo"] for x in da_demonstracao.get(c["codigo"], {}).get("sinonimos", [])]
-                chamada = f' (também chamada de: {", ".join(termos)})' if termos else ""
-                linhas.append(f"  - {c['descricao']}{chamada} -> CD_CONTA = '{c['codigo']}'")
+                linhas.append(f"  - {c['descricao']} -> CD_CONTA = '{c['codigo']}'")
         blocos.append("\n".join(linhas))
         for r in e["chaves_de_juncao"]:
             if r["tabela_relacionada"] not in nomes:
