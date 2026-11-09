@@ -26,6 +26,8 @@ rag-nl2sql-financas-br/
 │   └── perguntas_validacao_ficha.md    # ficha de conferência das 60 perguntas
 ├── embeddings/
 │   ├── esquema.json                    # documentação do esquema, uma entrada por tabela
+│   ├── corpus_esquema.json             # registros de busca do esquema (id, fonte, conteudo), sem vetores
+│   ├── corpus_glossario.json           # trechos dos normativos (id, fonte, conteudo), sem vetores
 │   ├── index_esquema.json              # índice vetorial do esquema (modelo padrão)
 │   ├── index_glossario.json            # índice vetorial dos normativos (modelo padrão)
 │   ├── index_bm25_esquema.json         # índice de palavras (BM25) do esquema
@@ -39,10 +41,11 @@ rag-nl2sql-financas-br/
     ├── modelos_embedding.py            # registro dos modelos de embeddings (usado pelos dois estágios)
     ├── offline/
     │   ├── carregar_dfp.py             # CSVs da CVM -> dados/dfp.db
-    │   ├── gerar_indice_esquema.py     # dados/dfp.db -> esquema.json -> index_esquema.json
-    │   ├── gerar_indice_glossario.py   # normativos/*.pdf -> index_glossario.json
-    │   ├── gerar_indice_bm25.py        # índices vetoriais -> índices de palavras (BM25)
-    │   └── rodar_offline.py            # gera os três índices acima, para um ou mais modelos
+    │   ├── gerar_corpus.py             # esquema.json e normativos/*.pdf -> corpus_esquema.json e corpus_glossario.json
+    │   ├── gerar_indice_esquema.py     # dados/dfp.db -> esquema.json; corpus_esquema.json -> index_esquema.json
+    │   ├── gerar_indice_glossario.py   # corpus_glossario.json -> index_glossario.json
+    │   ├── gerar_indice_bm25.py        # corpus -> índices de palavras (BM25)
+    │   └── rodar_offline.py            # prepara o corpus e gera os índices acima, para um ou mais modelos
     ├── online/
     │   ├── configuracao.py             # lê, confere e sobrescreve o configuracao.json
     │   ├── busca.py                    # busca por embeddings nos dois índices
@@ -100,8 +103,8 @@ gerado para consultar é o `dados/dfp.db` (passo 1).
 
 ```bash
 python pipeline/offline/carregar_dfp.py              # CSVs -> dados/dfp.db
-python pipeline/offline/gerar_indice_esquema.py      # opcional: refaz esquema.json + index_esquema.json (usa o LLM)
-python pipeline/offline/rodar_offline.py             # índice do esquema, do glossário e BM25 (modelo padrão)
+python pipeline/offline/gerar_indice_esquema.py      # opcional: refaz esquema.json, o corpus e o índice do esquema (usa o LLM)
+python pipeline/offline/rodar_offline.py             # corpus, índice do esquema, do glossário e BM25 (modelo padrão)
 python pipeline/offline/rodar_offline.py --modelos e5-base bge-m3   # também para outros modelos
 ```
 
@@ -182,10 +185,11 @@ Prepara tudo o que a consulta usa: o banco, a documentação do esquema e os ín
 | Arquivo | Função |
 |---|---|
 | `carregar_dfp.py` | Lê os CSVs da CVM e cria `dados/dfp.db` (SQLite) com `companhias` e as 12 tabelas de demonstração |
-| `gerar_indice_esquema.py` | Lê a estrutura do banco, pede ao LLM os textos em português de cada tabela, grava `esquema.json` e o índice vetorial. Com `--so-indice`, regera só o índice a partir do `esquema.json`; `--modelo` escolhe o modelo |
-| `gerar_indice_glossario.py` | Extrai o texto dos PDFs, divide em trechos e grava o índice vetorial dos normativos; `--modelo` escolhe o modelo |
-| `gerar_indice_bm25.py` | Grava os índices de palavras (BM25) do esquema e do glossário, a partir dos registros dos índices vetoriais |
-| `rodar_offline.py` | Roda o índice de esquema, o do glossário e o BM25 na ordem certa, para um ou mais modelos (`--modelos`, `--todos-os-modelos`, `--etapas`) |
+| `gerar_corpus.py` | Prepara o corpus de busca: extrai o texto dos PDFs, remove cabeçalhos, rodapés e texto riscado e divide em trechos (glossário), e escreve os textos de cada aspecto das tabelas a partir do `esquema.json` (esquema). Grava `corpus_esquema.json` e `corpus_glossario.json`; `--partes` escolhe quais |
+| `gerar_indice_esquema.py` | Lê a estrutura do banco, pede ao LLM os textos em português de cada tabela, grava `esquema.json`, o corpus do esquema e o índice vetorial. Com `--so-indice`, regera só o índice a partir do corpus; `--modelo` escolhe o modelo |
+| `gerar_indice_glossario.py` | Lê o corpus do glossário e grava o índice vetorial dos normativos; `--modelo` escolhe o modelo |
+| `gerar_indice_bm25.py` | Grava os índices de palavras (BM25) do esquema e do glossário, a partir do corpus |
+| `rodar_offline.py` | Roda o corpus, o índice de esquema, o do glossário e o BM25 na ordem certa, para um ou mais modelos (`--modelos`, `--todos-os-modelos`, `--etapas`) |
 | `../modelos_embedding.py` | Registro dos modelos (identificador, prefixos, dimensões, limite de tokens) e verificação do cache; é usado também pelo estágio online |
 
 **Esquema.** A estrutura (colunas, tipos, chaves e relações) é lida direto do SQLite. Como o
@@ -196,18 +200,24 @@ os textos (resumo, propósito, entidades e descrição das colunas), recebendo o
 demonstração e se ela é consolidada ou individual. Cada tabela gera um registro por aspecto (resumo e
 propósito, entidades, relações, colunas e contas), com até 120 tokens: 13 tabelas e 171 registros.
 
+**Corpus.** O texto que cada método de busca indexa vem de um passo só, `gerar_corpus.py`: uma lista de
+registros com `id`, `fonte` e `conteudo`, sem vetores. Os vetores (um índice por modelo) e o índice de
+palavras do BM25 partem desse mesmo corpus, então todos os métodos e modelos comparam as mesmas
+unidades de busca. O tamanho dos registros é medido sempre com o tokenizador do E5-base, para o corpus
+ser o mesmo qualquer que seja o modelo.
+
 **Glossário.** Extrai o texto de cada PDF (varredura recursiva de `cvm/` e `cpc/`), remove cabeçalhos
 e rodapés repetidos (detectados por frequência entre páginas) e as linhas riscadas (redação substituída
 nos PDFs consolidados) e divide o texto em trechos de até 120 tokens, medidos com o tokenizador do
 E5-base, com sobreposição de cerca de 15%. Resultado: 1.283 trechos (157 do CPC 03, 202 do CPC 09, 330
 do CPC 26 e 594 da Resolução 80). Os trechos são os mesmos qualquer que seja o modelo de embeddings.
 
-**BM25.** O índice guarda, por registro, o texto e as palavras já limpas (minúsculas, sem acentos,
+**BM25.** O índice lê o corpus (não depende dos vetores nem do modelo) e guarda, por registro, o texto e as palavras já limpas (minúsculas, sem acentos,
 sem palavras vazias do português), com e sem radicalização, para a busca não refazer isso a cada
 partida.
 
 **Modelos.** `minilm`, `e5-small`, `e5-base` (padrão), `bge-m3` e `e5-base-v2` (só inglês, usado como
-controle). O índice do modelo padrão fica em `embeddings/`; o dos outros, em
+controle). O corpus fica em `embeddings/`. O índice vetorial do modelo padrão fica em `embeddings/`; o dos outros, em
 `embeddings/modelos/<chave>/`, fora do git.
 
 ---
