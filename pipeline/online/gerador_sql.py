@@ -10,8 +10,9 @@ Descrição geral do funcionamento:
   busca (usado para medir o gerador com tabelas ideais).
 - O contexto traz só essas tabelas (colunas, tipos, valores possíveis, plano de contas e
   junções), lido do esquema.json. O esquema completo não vai ao LLM.
-- Cada conta do plano de contas aparece com o filtro CD_CONTA pronto e com os termos de
-  analista (sinônimos) de dados/sinonimos_contas.json, como "receita líquida" para a conta 3.01.
+- Cada conta do plano de contas aparece com o filtro CD_CONTA pronto e com os sinônimos de
+  dados/sinonimos_contas.json, só os que um normativo indexado sustenta (por exemplo, "lucro bruto"
+  para a conta 3.03 de resultado bruto).
 - O LLM gera o SQL. O código só aceita um único SELECT e executa em modo somente leitura.
 - Se der erro ou o resultado vier vazio, o LLM recebe o problema e gera outro SQL, até o
   limite de tentativas.
@@ -99,7 +100,8 @@ def montar_contexto(entradas: list[dict]) -> str:
             # Os sinônimos valem para a demonstração toda (BPA_con e BPA_ind usam os de BPA).
             da_demonstracao = _sinonimos.get(e["tabela"].rsplit("_", 1)[0], {})
             for c in e["contas"]:
-                termos = da_demonstracao.get(c["codigo"])
+                # Cada conta traz a descrição oficial e os sinônimos que um normativo sustenta.
+                termos = [x["termo"] for x in da_demonstracao.get(c["codigo"], {}).get("sinonimos", [])]
                 chamada = f' (também chamada de: {", ".join(termos)})' if termos else ""
                 linhas.append(f"  - {c['descricao']}{chamada} -> CD_CONTA = '{c['codigo']}'")
         blocos.append("\n".join(linhas))

@@ -1,53 +1,205 @@
 {
-  "BPA": {
-    "1": ["ativo total", "total do ativo"],
-    "1.01": ["ativo circulante", "curto prazo"],
-    "1.01.01": ["caixa", "caixa e equivalentes"],
-    "1.01.02": ["aplicações financeiras"],
-    "1.01.03": ["contas a receber", "recebíveis", "clientes"],
-    "1.02": ["ativo não circulante"],
-    "1.02.01": ["realizável a longo prazo"]
-  },
   "BPP": {
-    "2": ["total do passivo"],
-    "2.01": ["passivo circulante"],
-    "2.01.02": ["fornecedores", "contas a pagar a fornecedores"],
-    "2.02": ["passivo não circulante"],
-    "2.02.01": ["dívida de longo prazo"],
-    "2.03": ["patrimônio líquido", "PL"],
-    "2.03.01": ["capital social"],
-    "2.03.04": ["reservas de lucros"],
-    "2.03.09": ["participação de não controladores"]
+    "2.03.09": {
+      "descricao_oficial": "Participação dos Acionistas Não Controladores",
+      "sinonimos": [
+        {
+          "termo": "participação de não controladores",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_130",
+          "citacao": "...posição para venda de acordo com o Pronunciamento Técnico CPC 31; (q) participação de não controladores apresentada de forma destacada dentro do",
+          "justificativa": "O CPC 26 lista, entre as rubricas do balanço, a participação de não controladores apresentada de forma destacada no patrimônio líquido; é o que a conta 2.03.09 registra."
+        }
+      ]
+    }
   },
   "DRE": {
-    "3.01": ["receita líquida"],
-    "3.02": ["custo dos produtos vendidos", "CPV", "CMV", "custo das mercadorias vendidas"],
-    "3.03": ["lucro bruto"],
-    "3.04.01": ["despesas de vendas"],
-    "3.04.02": ["despesas administrativas", "despesas gerais e administrativas"],
-    "3.04.06": ["equivalência patrimonial"],
-    "3.05": ["resultado operacional", "lucro operacional"],
-    "3.06": ["resultado financeiro"],
-    "3.06.01": ["receitas financeiras"],
-    "3.06.02": ["despesas financeiras"],
-    "3.07": ["resultado antes dos tributos"],
-    "3.08": ["imposto de renda e contribuição social", "IR e CSLL", "tributos sobre o lucro"],
-    "3.11": ["lucro líquido", "resultado líquido", "lucro do exercício"]
+    "3.02": {
+      "descricao_oficial": "Custo dos Bens e/ou Serviços Vendidos",
+      "sinonimos": [
+        {
+          "termo": "custo dos produtos, das mercadorias e dos serviços vendidos",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_204",
+          "citacao": "...monstração do resultado deve incluir ainda as seguintes rubricas: (i) custo dos produtos, das mercadorias e dos serviços vendidos; (ii) lucro bruto; (iii) despesas com vendas, gerais, administrativas e outras despesas e...",
+          "justificativa": "Primeira rubrica que o CPC 26 manda incluir na demonstração do resultado por função, antes do lucro bruto; corresponde à conta 3.02."
+        }
+      ]
+    },
+    "3.03": {
+      "descricao_oficial": "Resultado Bruto",
+      "sinonimos": [
+        {
+          "termo": "lucro bruto",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_204",
+          "citacao": "...(i) custo dos produtos, das mercadorias e dos serviços vendidos; (ii) lucro bruto; (iii) despesas com vendas, gerais, administrativas e outras despesas e receitas",
+          "justificativa": "Segunda rubrica da demonstração do resultado por função no CPC 26, logo depois do custo dos produtos, mercadorias e serviços vendidos; corresponde à conta 3.03."
+        }
+      ]
+    },
+    "3.04.01": {
+      "descricao_oficial": "Despesas com Vendas",
+      "sinonimos": [
+        {
+          "termo": "despesas de vendas",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_233",
+          "citacao": "...dos produtos e serviços vendidos (X) Lucro bruto X Outras receitas X Despesas de vendas (X) Despesas administrativas (X) Outras despesas (X) Resultado antes dos tributos X 104....",
+          "justificativa": "Aparece com esse nome no modelo de demonstração do resultado por função do CPC 26, entre as despesas operacionais; corresponde à conta 3.04.01."
+        }
+      ]
+    },
+    "3.04.02": {
+      "descricao_oficial": "Despesas Gerais e Administrativas",
+      "sinonimos": [
+        {
+          "termo": "despesas administrativas",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_233",
+          "citacao": "...s vendidos (X) Lucro bruto X Outras receitas X Despesas de vendas (X) Despesas administrativas (X) Outras despesas (X) Resultado antes dos tributos X 104. As entidades que classificare...",
+          "justificativa": "Aparece com esse nome no modelo de demonstração do resultado por função do CPC 26, logo depois das despesas de vendas; corresponde à conta 3.04.02."
+        }
+      ]
+    },
+    "3.05": {
+      "descricao_oficial": "Resultado Antes do Resultado Financeiro e dos Tributos",
+      "sinonimos": [
+        {
+          "termo": "resultado antes das receitas e despesas financeiras",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_205",
+          "citacao": "operacionais; (iv) resultado antes das receitas e despesas financeiras; (v) resultado antes dos tributos sobre o lucro; (vi) resultado líquido do período. (Item...",
+          "justificativa": "Rubrica do CPC 26 que vem antes do resultado antes dos tributos sobre o lucro, depois de excluir o resultado financeiro; corresponde à conta 3.05."
+        }
+      ]
+    },
+    "3.08": {
+      "descricao_oficial": "Imposto de Renda e Contribuição Social sobre o Lucro",
+      "sinonimos": [
+        {
+          "termo": "tributos sobre o lucro",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_203",
+          "citacao": "(d) tributos sobre o lucro; (e) (eliminada); (ea) um único valor para o total de operações descontinuadas (ver Pronu...",
+          "justificativa": "Rubrica da lista mínima da demonstração do resultado no CPC 26; corresponde à conta 3.08."
+        }
+      ]
+    },
+    "3.11": {
+      "descricao_oficial": "Lucro/Prejuízo Consolidado do Período",
+      "descricao_oficial_individual": "Lucro/Prejuízo do Período",
+      "sinonimos": [
+        {
+          "termo": "lucro líquido",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_042",
+          "citacao": "...que o sentido seja claro. Por exemplo, a entidade pode usar o termo “lucro líquido” para descrever “resultado”. Sugere-se, todavia, por facilidade de comunicação a maior ad...",
+          "justificativa": "O CPC 26 diz que a entidade pode usar o termo \"lucro líquido\" para descrever o \"resultado\", o total da demonstração do resultado; corresponde à conta 3.11."
+        },
+        {
+          "termo": "resultado líquido do período",
+          "fonte": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+          "trecho_id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_205",
+          "citacao": "...sas financeiras; (v) resultado antes dos tributos sobre o lucro; (vi) resultado líquido do período. (Item alterado pela Revisão CPC 06) 82A. Outros resultados abrangentes devem apresentar...",
+          "justificativa": "Última rubrica da lista mínima da demonstração do resultado no CPC 26; corresponde à conta 3.11."
+        }
+      ]
+    }
   },
   "DFC_MI": {
-    "6.01": ["caixa das atividades operacionais"],
-    "6.02": ["caixa das atividades de investimento"],
-    "6.03": ["caixa das atividades de financiamento", "fluxo de caixa de financiamento"]
+    "6.01": {
+      "descricao_oficial": "Caixa Líquido Atividades Operacionais",
+      "sinonimos": [
+        {
+          "termo": "fluxos de caixa das atividades operacionais",
+          "fonte": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+          "trecho_id": "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_033",
+          "citacao": "...entos de aluguéis e das vendas subsequentes de tais ativos são também fluxos de caixa das atividades operacionais. 15",
+          "justificativa": "O CPC 03 manda classificar os fluxos de caixa em atividades operacionais, de investimento e de financiamento; a conta 6.01 é o total líquido da categoria de atividades operacionais."
+        }
+      ]
+    },
+    "6.02": {
+      "descricao_oficial": "Caixa Líquido Atividades de Investimento",
+      "sinonimos": [
+        {
+          "termo": "fluxos de caixa das atividades de investimento",
+          "fonte": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+          "trecho_id": "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_046",
+          "citacao": "...uturos, e pelos efeitos de itens de receita ou despesa associados com fluxos de caixa das atividades de investimento ou de financiamento. 19",
+          "justificativa": "Categoria de atividades de investimento do CPC 03; a conta 6.02 é o total líquido dessa categoria."
+        }
+      ]
+    },
+    "6.03": {
+      "descricao_oficial": "Caixa Líquido Atividades de Financiamento",
+      "sinonimos": [
+        {
+          "termo": "fluxos de caixa das atividades de financiamento",
+          "fonte": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+          "trecho_id": "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_069",
+          "citacao": "...racionais, e os dividendos e juros sobre o capital próprio pagos como fluxos de caixa das atividades de financiamento. Alternativa diferente deve ser seguida de nota evidenciando esse fato. Imposto de renda...",
+          "justificativa": "Categoria de atividades de financiamento do CPC 03; a conta 6.03 é o total líquido dessa categoria."
+        },
+        {
+          "termo": "fluxo de caixa de financiamento",
+          "fonte": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+          "trecho_id": "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_067",
+          "citacao": "...e os juros sobre o capital próprio pagos podem ser classificados como fluxo de caixa de financiamento porque são custos da obtenção de recursos financeiros",
+          "justificativa": "Forma usada pelo CPC 03 para a mesma categoria de atividades de financiamento."
+        }
+      ]
+    }
   },
   "DVA": {
-    "7.01.01": ["receita bruta"],
-    "7.03": ["valor adicionado bruto"],
-    "7.05": ["valor adicionado líquido", "valor adicionado líquido produzido"],
-    "7.07": ["valor adicionado total a distribuir", "valor adicionado total", "riqueza gerada"],
-    "7.08": ["distribuição do valor adicionado", "distribuição da riqueza"],
-    "7.08.01": ["pessoal", "gastos com pessoal"],
-    "7.08.02": ["impostos, taxas e contribuições"],
-    "7.08.03": ["remuneração de capitais de terceiros", "juros e aluguéis"],
-    "7.08.04": ["remuneração de capitais próprios", "dividendos e lucros retidos"]
+    "7.08": {
+      "descricao_oficial": "Distribuição do Valor Adicionado",
+      "sinonimos": [
+        {
+          "termo": "distribuição da riqueza criada",
+          "fonte": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+          "trecho_id": "glossario_cpc_09_r1_demonstracao_valor_adicionado_006",
+          "citacao": ". 6. A distribuição da riqueza criada deve ser detalhada, minimamente, da seguinte forma: (a) pessoal e encargos; (b) impostos,...",
+          "justificativa": "O CPC 09 chama de distribuição da riqueza criada o detalhamento em pessoal, impostos, juros e aluguéis e remuneração dos sócios; é o grupo que a conta 7.08 totaliza."
+        }
+      ]
+    },
+    "7.08.01": {
+      "descricao_oficial": "Pessoal",
+      "sinonimos": [
+        {
+          "termo": "pessoal e encargos",
+          "fonte": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+          "trecho_id": "glossario_cpc_09_r1_demonstracao_valor_adicionado_006",
+          "citacao": "...iqueza criada deve ser detalhada, minimamente, da seguinte forma: (a) pessoal e encargos; (b) impostos, taxas e contribuições; (c) juros e aluguéis; (d) juros sobre o capital pró...",
+          "justificativa": "Primeiro item do detalhamento da distribuição da riqueza no CPC 09; corresponde à conta 7.08.01."
+        }
+      ]
+    },
+    "7.08.03": {
+      "descricao_oficial": "Remuneração de Capitais de Terceiros",
+      "sinonimos": [
+        {
+          "termo": "juros e aluguéis",
+          "fonte": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+          "trecho_id": "glossario_cpc_09_r1_demonstracao_valor_adicionado_006",
+          "citacao": "...rma: (a) pessoal e encargos; (b) impostos, taxas e contribuições; (c) juros e aluguéis; (d) juros sobre o capital próprio (JCP), dividendos e lucros retidos/prejuízos do exercí...",
+          "justificativa": "Terceiro item do detalhamento da distribuição da riqueza no CPC 09; corresponde à remuneração de capitais de terceiros (conta 7.08.03)."
+        }
+      ]
+    },
+    "7.08.04": {
+      "descricao_oficial": "Remuneração de Capitais Próprios",
+      "sinonimos": [
+        {
+          "termo": "juros sobre o capital próprio (JCP), dividendos e lucros retidos/prejuízos do exercício",
+          "fonte": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+          "trecho_id": "glossario_cpc_09_r1_demonstracao_valor_adicionado_006",
+          "citacao": "...argos; (b) impostos, taxas e contribuições; (c) juros e aluguéis; (d) juros sobre o capital próprio (JCP), dividendos e lucros retidos/prejuízos do exercício. 7",
+          "justificativa": "Quarto item do detalhamento da distribuição da riqueza no CPC 09; corresponde à remuneração de capitais próprios (conta 7.08.04)."
+        }
+      ]
+    }
   }
 }

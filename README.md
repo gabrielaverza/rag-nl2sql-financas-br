@@ -24,7 +24,7 @@ rag-nl2sql-financas-br/
 │   ├── dfp.db                          # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
 │   ├── perguntas_validacao.json        # as 60 perguntas oficiais de avaliação
 │   ├── perguntas_validacao_ficha.md    # ficha de conferência das 60 perguntas
-│   └── sinonimos_contas.json           # termos de analista de cada conta (ex.: receita líquida)
+│   └── sinonimos_contas.json           # descrição oficial de cada conta e sinônimos sustentados por um normativo
 ├── embeddings/
 │   ├── esquema.json                    # documentação do esquema, uma entrada por tabela
 │   ├── index_esquema.json              # índice vetorial do esquema (modelo padrão)
@@ -254,11 +254,12 @@ tabelas continuam sendo buscadas com a pergunta inteira e os trechos, com a part
 
 **Gerador de SQL.** Para as perguntas quantitativas e híbridas. O contexto do LLM traz só as tabelas
 escolhidas, lidas do `esquema.json`: colunas, tipos, valores possíveis, junções e o plano de contas.
-Cada conta aparece com o filtro pronto e, quando há, com os termos de analista de
-`dados/sinonimos_contas.json` (65 termos de 41 contas):
+Cada conta aparece com o filtro pronto e, quando há, com os sinônimos de
+`dados/sinonimos_contas.json` (17 sinônimos em 15 contas, cada um com a descrição oficial da conta e o
+trecho do normativo que o sustenta):
 
 ```
-- Receita de Venda de Bens e/ou Serviços (também chamada de: receita líquida) -> CD_CONTA = '3.01'
+- Resultado Bruto (também chamada de: lucro bruto) -> CD_CONTA = '3.03'
 ```
 
 As regras do prompt tratam de consolidado (`_con`) como padrão, `ORDEM_EXERC`, filtro de companhia por
