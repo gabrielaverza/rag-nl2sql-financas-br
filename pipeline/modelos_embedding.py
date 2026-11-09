@@ -12,6 +12,8 @@ Descrição geral do funcionamento:
 - Os quatro modelos multilíngues (minilm, e5-small, e5-base e bge-m3) são os comparados nos
   experimentos. O e5-base-v2 é um controle só em inglês, para mostrar o efeito do
   multilinguismo.
+- Ao carregar, cada modelo usa o seu próprio limite de tokens (campo limite_tokens), com teto
+  de 512: o BGE-M3 aceita 8192, mas nenhum texto do projeto passa de cerca de 125 tokens.
 - Ler o registro é leve: o sentence-transformers só é importado quando um modelo é carregado.
 
 Dependências:
@@ -22,8 +24,8 @@ Dependências:
 Parâmetros: nenhum argumento para importar. Executado como script, imprime a tabela dos
 modelos e diz quais já estão no cache.
 
-Resultado: fornece MODELOS, MODELO_PADRAO, obter_ficha(), esta_em_cache(), carregar_modelo(),
-vetorizar_pergunta() e vetorizar_trechos().
+Resultado: fornece MODELOS, MODELO_PADRAO, obter_ficha(), limite_aplicado(), esta_em_cache(),
+carregar_modelo(), vetorizar_pergunta() e vetorizar_trechos().
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/modelos_embedding.py
@@ -33,9 +35,10 @@ import numpy as np
 
 MODELO_PADRAO = "e5-base"
 
-# Tamanho de entrada aplicado a todos os modelos ao carregar, como no teste de modelos de
-# 28/10/2026. O limite do próprio modelo (campo limite_tokens) fica só como informação.
-MAX_SEQ_LENGTH_APLICADO = 512
+# Teto do tamanho de entrada aplicado ao carregar. Cada modelo usa o seu limite nativo
+# (campo limite_tokens), mas nunca mais que este teto. Com os textos de hoje (no máximo 124
+# tokens, medidos com os tokenizadores do MiniLM e do E5) nenhum modelo corta nada.
+TETO_TOKENS = 512
 
 # Os vetores são sempre normalizados na busca (a pergunta e o índice), então o produto
 # interno vale o cosseno; por isso "normalizar" é True em todos.
@@ -97,6 +100,11 @@ def obter_ficha(chave: str) -> dict:
     return MODELOS[chave]
 
 
+# Devolve o tamanho de entrada aplicado ao modelo: o limite dele, com teto de TETO_TOKENS.
+def limite_aplicado(chave: str) -> int:
+    return min(obter_ficha(chave)["limite_tokens"], TETO_TOKENS)
+
+
 # Diz se os arquivos do modelo já estão no cache local do Hugging Face, sem baixar nada.
 def esta_em_cache(chave: str) -> bool:
     from huggingface_hub import try_to_load_from_cache
@@ -120,7 +128,7 @@ def carregar_modelo(chave: str = MODELO_PADRAO):
                 f"python -c \"from sentence_transformers import SentenceTransformer; "
                 f"SentenceTransformer('{ficha['id']}')\""
             ) from erro
-        modelo.max_seq_length = MAX_SEQ_LENGTH_APLICADO
+        modelo.max_seq_length = limite_aplicado(chave)
         _modelos_carregados[chave] = modelo
     return _modelos_carregados[chave]
 
@@ -139,10 +147,10 @@ def vetorizar_trechos(textos: list[str], chave: str = MODELO_PADRAO) -> np.ndarr
 
 # Imprime a tabela dos modelos registrados e se cada um está no cache.
 def listar():
-    print(f"{'chave':<11}{'idioma':<13}{'dim':>5}{'limite':>8}  {'pergunta':<11}{'trecho':<13}{'cache':<6}id")
+    print(f"{'chave':<11}{'idioma':<13}{'dim':>5}{'limite':>8}{'usado':>7}  {'pergunta':<11}{'trecho':<13}{'cache':<6}id")
     for chave, ficha in MODELOS.items():
         print(
-            f"{chave:<11}{ficha['idioma']:<13}{ficha['dimensoes']:>5}{ficha['limite_tokens']:>8}  "
+            f"{chave:<11}{ficha['idioma']:<13}{ficha['dimensoes']:>5}{ficha['limite_tokens']:>8}{limite_aplicado(chave):>7}  "
             f"{ficha['prefixo_pergunta']!r:<11}{ficha['prefixo_trecho']!r:<13}"
             f"{'sim' if esta_em_cache(chave) else 'não':<6}{ficha['id']}"
         )
