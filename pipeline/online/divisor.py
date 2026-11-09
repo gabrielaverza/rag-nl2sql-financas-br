@@ -1,5 +1,5 @@
 """
-Etapa: Online (preparação, ainda fora do pipeline).
+Etapa: Online.
 
 Função: divide uma pergunta híbrida em duas partes, a de dados (que vai à busca de tabelas e ao SQL) e a
 conceitual (que vai à busca de trechos dos normativos), usando o LLM local.
@@ -16,8 +16,10 @@ Descrição geral do funcionamento:
   volta (como o gerador de SQL faz com o erro) e pede a troca do pronome pelo substantivo.
 - Se a resposta continuar inválida em TENTATIVAS chamadas, a divisão é descartada e as duas partes
   viram a pergunta inteira (dividida = False), como o classificador que cai na classe padrão.
-- Nada do pipeline oficial chama este módulo; ele existe para ser avaliado e, se a autora decidir,
-  entrar depois do classificador, só nas perguntas híbridas.
+- O orquestrador (main.py) chama este módulo depois do classificador, só nas perguntas híbridas e
+  só se divisor.ativo for true em configuracao.json. A parte de dados não muda a busca das tabelas
+  (que usa a pergunta inteira); a parte conceitual busca os trechos. O parâmetro bloquear_pronomes
+  (divisor.bloquear_pronomes) liga ou desliga a recusa de pronomes, para medir a influência dela.
 
 Dependências:
 - servidor Ollama em execução, com o modelo qwen2.5-coder:7b baixado;
@@ -25,7 +27,7 @@ Dependências:
 
 Parâmetros: nenhum argumento. É um módulo importado.
 
-Resultado: fornece dividir(pergunta), que devolve parte_dados, parte_conceitual e dividida.
+Resultado: fornece dividir(pergunta, bloquear_pronomes), que devolve parte_dados, parte_conceitual e dividida.
 """
 
 import json
@@ -102,7 +104,9 @@ def _pronomes(texto: str) -> list[str]:
 
 
 # Divide a pergunta em parte de dados e parte conceitual; se não conseguir, devolve a pergunta inteira nas duas.
-def dividir(pergunta: str) -> dict:
+# Com bloquear_pronomes (padrão, divisor.bloquear_pronomes de configuracao.json), uma parte conceitual
+# com pronome é recusada e o LLM é chamado de novo; sem ele, a parte é aceita com o pronome.
+def dividir(pergunta: str, bloquear_pronomes: bool = True) -> dict:
     mensagens = [{"role": "system", "content": INSTRUCOES}, {"role": "user", "content": f"Pergunta: {pergunta}"}]
     for tentativa in range(1, TENTATIVAS + 1):
         resposta = ollama.chat(
@@ -117,7 +121,7 @@ def dividir(pergunta: str) -> dict:
             dados, conceito = _texto(bruto.get("parte_dados")), _texto(bruto.get("parte_conceitual"))
         except (json.JSONDecodeError, AttributeError):
             continue
-        pronomes = _pronomes(conceito)
+        pronomes = _pronomes(conceito) if bloquear_pronomes else []
         if dados and conceito and not pronomes and max(_fracao_nova(pergunta, dados), _fracao_nova(pergunta, conceito)) <= LIMITE_PALAVRAS_NOVAS:
             return {"parte_dados": dados, "parte_conceitual": conceito, "dividida": True}
         if pronomes:
