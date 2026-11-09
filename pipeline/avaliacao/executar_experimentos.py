@@ -19,7 +19,7 @@ Descrição geral do funcionamento:
   inteira e os trechos com a parte conceitual (condição "mista"). As divisões são feitas uma vez e
   guardadas em metricas/divisoes_hibridas.json, para todas as configurações usarem as mesmas.
 - Nível pipeline: para cada rodada, configuração e pergunta, chama executar() de main.py e mede a
-  classe prevista, o EX (estrito e aceitando outras companhias que combinam com o nome), a
+  classe prevista, o EX (estrito e adaptado, que aceita a coluna DENOM_CIA e linhas de companhias com o nome da pergunta), a
   fidelidade, a relevância do contexto, a aprovação do validador e o tempo de cada passo. O SQL gerado
   fica em um cache por (pergunta, tabelas do contexto) que vale entre as configurações da mesma
   rodada e é refeito a cada rodada, para a variação do LLM aparecer nas rodadas. Com
@@ -65,6 +65,7 @@ import hashlib
 import json
 import os
 import platform
+import sqlite3
 import subprocess
 import sys
 import time
@@ -79,21 +80,20 @@ sys.path.insert(0, os.path.join(PASTA, ".."))
 
 from metricas import (  # noqa: E402
     KS_TABELAS,
+    KS_TRECHOS,
+    TABELA_COMUM,
     fmt,
-    juntar_hibrida,
-    metricas_tabelas,
-    metricas_trechos,
+    NomesDeCompanhias,
+    metricas_recuperacao,
     normalizar_texto,
-    resultado_contem_referencia,
+    resultado_adaptado,
     resultados_equivalentes,
     tabela_md,
 )
 from busca import (
     SECOES_FORA_DA_PONTUACAO,
     Indice,
-    buscar_tabelas,
     caminho_indice,
-    carregar_tabelas_referenciadas,
     vetorizar,
 )
 from busca_bm25 import CAMINHO_BM25_ESQUEMA, CAMINHO_BM25_GLOSSARIO, IndiceBM25
@@ -110,40 +110,21 @@ CAMINHO_DIVISOES = "/".join((PASTA_SAIDA, "divisoes_hibridas.json"))
 TIPOS = ("quantitativa", "conceitual", "hibrida")
 PLURAL = {"quantitativa": "quantitativas", "conceitual": "conceituais", "hibrida": "híbridas"}
 
-# Métricas mostradas por tipo no relatório: (chave, rótulo, "contagem" ou "media").
-METRICAS_POR_TIPO = {
-    "quantitativa": [
-        ("tab_todos@3", "Todas as tabelas no top-3", "contagem"),
-        ("tab_todos@5", "Todas as tabelas no top-5", "contagem"),
-        ("tab_rr", "MRR das tabelas", "media"),
-    ],
-    "conceitual": [
-        ("glo_hit@3", "Hit@3 dos trechos", "contagem"),
-        ("glo_hit@5", "Hit@5 dos trechos", "contagem"),
-        ("glo_hit@10", "Hit@10 dos trechos", "contagem"),
-        ("glo_rr", "MRR dos trechos", "media"),
-        ("glo_ndcg@10", "nDCG@10 dos trechos", "media"),
-    ],
-    "hibrida": [
-        ("tab_todos@3", "Todas as tabelas no top-3", "contagem"),
-        ("tab_todos@5", "Todas as tabelas no top-5", "contagem"),
-        ("glo_hit@3", "Hit@3 dos trechos", "contagem"),
-        ("glo_hit@10", "Hit@10 dos trechos", "contagem"),
-        ("glo_ndcg@10", "nDCG@10 dos trechos", "media"),
-        ("hib_conj@3", "Tabelas e trecho no top-3", "contagem"),
-        ("hib_conj@5", "Tabelas e trecho no top-5", "contagem"),
-    ],
+# Índices avaliados em cada tipo de pergunta: (prefixo das chaves, rótulo, cortes de k).
+INDICES_POR_TIPO = {
+    "quantitativa": (("tab", "tabelas", KS_TABELAS),),
+    "conceitual": (("glo", "trechos", KS_TRECHOS),),
+    "hibrida": (("tab", "tabelas", KS_TABELAS), ("glo", "trechos", KS_TRECHOS)),
 }
+FAMILIAS = (("prec", "Precision@k"), ("recall", "Recall@k"), ("ndcg", "nDCG@k"))
 METRICAS_PIPELINE = [
     ("classe_certa", "Classe certa", "contagem"),
+    ("ex_adaptado", "EX adaptado", "contagem"),
     ("ex_estrito", "EX estrito", "contagem"),
-    ("ex_companhias", "EX aceitando outras companhias", "contagem"),
-    ("sql_ok", "SQL executou com linhas", "contagem"),
+    ("ideal_ex_adaptado", "EX adaptado com tabelas ideais", "contagem"),
     ("ideal_ex_estrito", "EX estrito com tabelas ideais", "contagem"),
-    ("ideal_ex_companhias", "EX aceitando outras companhias, tabelas ideais", "contagem"),
     ("fidelidade", "Fidelidade média", "media"),
     ("relevancia", "Relevância média do contexto", "media"),
-    ("aprovado", "Respostas aprovadas", "contagem"),
     ("tempo_total", "Tempo total por pergunta (s)", "media"),
 ]
 PASSOS = ("classificador", "divisor", "sql", "sintese", "validacao")
@@ -157,28 +138,22 @@ PASSOS = ("classificador", "divisor", "sql", "sintese", "validacao")
 def escala_e_sentido(chave: str) -> tuple[str, str]:
     if chave.startswith("tempo_"):
         return "segundos", "menor é melhor"
-    binarias = ("tab_todos@", "glo_hit@", "hib_", "classe_certa", "ex_", "ideal_ex_", "sql_ok", "aprovado")
+    binarias = ("classe_certa", "ex_", "ideal_ex_")
     if chave.startswith(binarias):
         return "0 ou 1", "maior é melhor"
     return "0 a 1", "maior é melhor"
 
 
 DESCRICAO_METRICAS = [
-    ("Todas as tabelas no top-k (`tab_todos@k`)", "0 ou 1 por pergunta", "1 se todas as tabelas necessárias estão entre as k mais parecidas (mais as que elas referenciam por chave estrangeira). É a que limita o SQL. Maior é melhor."),
-    ("Recall das tabelas (`tab_recall@k`)", "0 a 1", "Fração das tabelas necessárias que aparece na lista. Maior é melhor."),
-    ("MRR das tabelas (`tab_rr`)", "0 a 1", "1 dividido pela posição da primeira tabela necessária no ranking de tabelas. Maior é melhor."),
-    ("Hit@k dos trechos (`glo_hit@k`)", "0 ou 1 por pergunta", "1 se há ao menos um trecho relevante entre os k primeiros. É a base do \"X de 20\". Maior é melhor."),
-    ("Recall dos trechos (`glo_recall@k`)", "0 a 1", "Fração dos trechos relevantes achados entre os k primeiros."),
-    ("MRR dos trechos (`glo_rr`)", "0 a 1", "1 dividido pela posição do primeiro trecho relevante. Maior é melhor."),
-    ("nDCG@k dos trechos (`glo_ndcg@k`)", "0 a 1", "Nota a ordem da lista dando mais peso a um acerto no topo (desconto 1/log2 da posição a partir da segunda). Maior é melhor; a principal na comparação de modelos."),
-    ("Acerto conjunto das híbridas (`hib_conj@k`)", "0 ou 1 por pergunta", "1 se as tabelas completas e um trecho relevante aparecem ao mesmo tempo no top-k."),
+    ("Precision@k (`tab_prec@k`, `glo_prec@k`)", "0 a 1", "Fração dos k primeiros itens que são relevantes (tabelas ou trechos). Divide sempre por k. Com uma só evidência por pergunta, o máximo nos trechos é 1/k. Maior é melhor."),
+    ("Recall@k (`tab_recall@k`, `glo_recall@k`)", "0 a 1", "Fração dos itens relevantes que aparece entre os k primeiros. Maior é melhor."),
+    ("nDCG@k (`tab_ndcg@k`, `glo_ndcg@k`)", "0 a 1", "Considera a ordem da lista, dando mais peso a um acerto no topo; relevância binária. A ranx usa o desconto 1/log2(i+1), e não o de Järvelin da fundamentação. Maior é melhor."),
+    ("MRR (`tab_rr`, `glo_rr`)", "0 a 1", "Média do inverso da posição do primeiro item relevante. Maior é melhor."),
     ("Classe certa (`classe_certa`)", "0 ou 1", "O classificador acertou o tipo da pergunta."),
     ("EX estrito (`ex_estrito`)", "0 ou 1", "O resultado do SQL gerado é igual ao do `sql_referencia` (ordem das colunas e das linhas ignorada, números com 2 casas). Só nas perguntas com SQL."),
-    ("EX aceitando outras companhias (`ex_companhias`)", "0 ou 1", "Aceita também a coluna `DENOM_CIA` e linhas de outras companhias cujo nome combina com o `LIKE` (extensão do EX de Zhong et al., 2020)."),
-    ("`sql_ok`", "0 ou 1", "O SQL executou e devolveu linhas."),
+    ("EX adaptado (`ex_adaptado`)", "0 ou 1", "Vale se o EX estrito vale ou se o resultado traz todas as linhas da referência (a coluna `DENOM_CIA` é tolerada) e as linhas a mais são de companhias cujo `DENOM_CIA` contém a palavra que identifica a companhia dita na pergunta. Adaptação do EX de Zhong et al. (2020), sem artigo; mais permissiva que o EX estrito."),
     ("Tabelas ideais (`ideal_ex_*`)", "0 ou 1", "EX do SQL gerado quando o gerador recebe as tabelas certas (`tabelas_esperadas`) em vez das da busca. É um teto, e a diferença para o EX normal mostra quanto da perda vem da busca."),
     ("Fidelidade e relevância (`fidelidade`, `relevancia`)", "0 a 1", "Do validador: fração das afirmações da resposta sustentadas pelo contexto, e fração dos trechos que contribuem para a pergunta. Medem sustentação pelo contexto, não a correção do dado."),
-    ("Aprovado (`aprovado`)", "0 ou 1", "A fidelidade chegou ao limiar do validador (0,8)."),
     ("Tempos (`tempo_*`)", "segundos", "Tempo da pergunta inteira e de cada passo do fluxo. Menor é melhor."),
 ]
 
@@ -252,9 +227,8 @@ class Divisoes:
 # ---------------------------------------------------------------------------
 
 class Recuperador:
-    # Prepara o que não depende da configuração: relações de chave estrangeira, tamanhos e trechos relevantes.
+    # Prepara o que não depende da configuração: tamanhos dos índices e trechos relevantes.
     def __init__(self, perguntas: list[dict]):
-        self.referenciadas = carregar_tabelas_referenciadas()
         self._indices = {}
         padrao = self.indice("glossario", "embeddings", MODELO_PADRAO, False)
         self.n_trechos = len(padrao.registros)
@@ -307,10 +281,10 @@ class Recuperador:
             indice = self.indice("esquema", metodo, modelo, radicalizar)
             consulta = self.consulta(metodo, p["pergunta"], modelo)
             completo = indice.buscar_por_fonte(consulta, self.n_tabelas)
-            ranking = [r["fonte"] for r in completo]
-            listas = {k: buscar_tabelas(indice, consulta, k, self.referenciadas) for k in KS_TABELAS}
-            esperadas = p["tabelas_esperadas"]
-            m.update(metricas_tabelas("tab", ranking, listas, esperadas))
+            # A tabela companhias fica fora: o sistema a acrescenta por regra a todas as listas.
+            ranking = [r["fonte"] for r in completo if r["fonte"] != TABELA_COMUM]
+            esperadas = [t for t in p["tabelas_esperadas"] if t != TABELA_COMUM]
+            m.update(metricas_recuperacao("tab", ranking, esperadas, KS_TABELAS))
             posicoes["tabelas"] = {t: ranking.index(t) + 1 for t in esperadas}
         if p["evidencia"]:
             metodo = metodo_de_busca(config, "glossario", tipo)
@@ -319,12 +293,9 @@ class Recuperador:
                 texto = divisao["parte_conceitual"]
             indice = self.indice("glossario", metodo, modelo, radicalizar)
             consulta = self.consulta(metodo, texto, modelo)
-            ranking_trechos = indice.buscar(consulta, self.n_trechos)
-            relevancias = [r["id"] in self.relevantes[p["id"]] for r in ranking_trechos]
-            m.update(metricas_trechos(relevancias))
-            posicoes["trechos"] = [i for i, r in enumerate(relevancias, start=1) if r][:5]
-        if tipo == "hibrida" and p["tabelas_esperadas"] and p["evidencia"]:
-            juntar_hibrida(m)
+            ranking_trechos = [r["id"] for r in indice.buscar(consulta, self.n_trechos)]
+            m.update(metricas_recuperacao("glo", ranking_trechos, self.relevantes[p["id"]], KS_TRECHOS))
+            posicoes["trechos"] = [i for i, r in enumerate(ranking_trechos, start=1) if r in self.relevantes[p["id"]]][:5]
         return {"id": p["id"], "tipo": tipo, "m": m, "posicoes": posicoes}
 
 
@@ -354,14 +325,24 @@ def rodar_recuperacao(exp: dict, perguntas: list[dict], refazer_divisoes: bool) 
 # ---------------------------------------------------------------------------
 
 # Compara o SQL gerado com o de referência e devolve (EX estrito, EX aceitando outras companhias).
-def calcular_ex(r_sql: dict | None, referencia_sql: str) -> tuple[bool, bool]:
+def calcular_ex(r_sql: dict | None, p: dict, nomes: NomesDeCompanhias) -> tuple[bool, bool]:
     from gerador_sql import executar_sql
 
     if not r_sql or r_sql["status"] != "ok":
         return False, False
-    _, referencia = executar_sql(referencia_sql, limite_linhas=None)
+    _, referencia = executar_sql(p["sql_referencia"], limite_linhas=None)
     estrito = resultados_equivalentes(r_sql["linhas"], referencia)
-    return estrito, estrito or resultado_contem_referencia(r_sql["colunas"], r_sql["linhas"], referencia)
+    termos = nomes.termos(p["pergunta"], [b["companhia"] for b in p.get("base_dados") or []])
+    return estrito, resultado_adaptado(r_sql["colunas"], r_sql["linhas"], referencia, termos)
+
+
+# Lê do banco os nomes das companhias, para achar a palavra que identifica a companhia de cada pergunta.
+def carregar_nomes_companhias() -> NomesDeCompanhias:
+    conn = sqlite3.connect("file:dados/dfp.db?mode=ro", uri=True)
+    try:
+        return NomesDeCompanhias([linha[0] for linha in conn.execute("SELECT DENOM_CIA FROM companhias")])
+    finally:
+        conn.close()
 
 
 # Roda o nível pipeline: rodadas, configurações e perguntas. Devolve linhas de métricas e as respostas.
@@ -369,6 +350,7 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
     from gerador_sql import gerar_sql
     from main import executar
 
+    nomes = carregar_nomes_companhias()
     resultados = {nome: {r: [] for r in range(1, rodadas + 1)} for nome in exp["configs"]}
     respostas = []
     for rodada in range(1, rodadas + 1):
@@ -385,7 +367,6 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
                 m = {
                     "classe_certa": float(r["classe"] == p["tipo"]),
                     "fidelidade": v["fidelidade"]["score"],
-                    "aprovado": float(v["aprovado"]),
                     "tempo_total": total,
                 }
                 if v["relevancia_contexto"]["score"] is not None:
@@ -394,12 +375,12 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
                     if passo in r["tempos"]:
                         m[f"tempo_{passo}"] = r["tempos"][passo]
                 if p["sql_referencia"]:
-                    estrito, companhias = calcular_ex(r_sql, p["sql_referencia"])
-                    m.update(ex_estrito=float(estrito), ex_companhias=float(companhias), sql_ok=float(bool(r_sql and r_sql["status"] == "ok")))
+                    estrito, adaptado = calcular_ex(r_sql, p, nomes)
+                    m.update(ex_estrito=float(estrito), ex_adaptado=float(adaptado))
                     if exp.get("tabelas_ideais"):
                         ideal = gerar_sql(p["pergunta"], tabelas=p["tabelas_esperadas"], cache=cache)
-                        e_i, c_i = calcular_ex(ideal, p["sql_referencia"])
-                        m.update(ideal_ex_estrito=float(e_i), ideal_ex_companhias=float(c_i))
+                        e_i, a_i = calcular_ex(ideal, p, nomes)
+                        m.update(ideal_ex_estrito=float(e_i), ideal_ex_adaptado=float(a_i))
                 resultados[nome][rodada].append({"id": p["id"], "tipo": p["tipo"], "m": m, "posicoes": {}})
                 respostas.append({
                     "rodada": rodada, "configuracao": nome, "id": p["id"], "tipo": p["tipo"], "classe": r["classe"],
@@ -622,6 +603,7 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
         f"- {exp.get('descricao', '')}",
         f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas ({', '.join(f'{sum(1 for p in perguntas if p['tipo'] == tp)} {PLURAL[tp]}' for tp in TIPOS)})." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
         f"- Os índices têm {saida['n_tabelas']} tabelas e {saida['n_trechos']} trechos.",
+        f"- Métricas calculadas com a biblioteca ranx {version('ranx')}: Precision@k, Recall@k, nDCG@k e MRR, com relevância binária. Nas tabelas, a tabela `companhias` fica fora do ranking e dos itens esperados (o sistema a acrescenta por regra a todas as listas), então as k tabelas medidas são as k mais parecidas com a pergunta.",
         "- Nas perguntas híbridas, as tabelas são buscadas com a pergunta inteira e os trechos com a parte conceitual quando o divisor está ligado (configuração `divisor.ativo`); as divisões ficam em `metricas/divisoes_hibridas.json`.",
         "",
         "## 1. Configurações",
@@ -637,10 +619,14 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
     for tipo in TIPOS:
         if not any(p["tipo"] == tipo for p in perguntas):
             continue
-        medidas = METRICAS_POR_TIPO[tipo]
-        t += [f"## {n_secao}. Perguntas {PLURAL[tipo]} (contagens \"x/n\" e médias)", ""]
-        corpo = [[nome] + [celula(lista, c, f, tipo) for c, _, f in medidas] for nome, lista in resultados.items()]
-        t += tabela_md(["Configuração"] + [rotulo for _, rotulo, _ in medidas], corpo)
+        t += [f"## {n_secao}. Perguntas {PLURAL[tipo]} (médias)", ""]
+        for prefixo, rotulo, ks in INDICES_POR_TIPO[tipo]:
+            t += [f"### Recuperação de {rotulo}", ""]
+            for familia, titulo in FAMILIAS:
+                corpo = [[nome] + [celula(lista, f"{prefixo}_{familia}@{k}", "media", tipo) for k in ks] for nome, lista in resultados.items()]
+                t += [f"**{titulo}**", ""] + tabela_md(["Configuração"] + [f"k = {k}" for k in ks], corpo)
+            corpo = [[nome, celula(lista, f"{prefixo}_rr", "media", tipo)] for nome, lista in resultados.items()]
+            t += ["**MRR**", ""] + tabela_md(["Configuração", "MRR"], corpo)
         n_secao += 1
     modelos = {c["modelo_embedding"] for c in exp["configs"].values()}
     if len(modelos) > 1:
@@ -739,7 +725,8 @@ def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str) -> l
     t += [
         "- Amostra pequena: com 20 perguntas por tipo, cada pergunta vale 5 pontos percentuais. Os números comparam as configurações nesta amostra, sem teste estatístico, e não permitem afirmar superioridade estatística de uma sobre outra.",
         "- O critério de relevância dos trechos é a evidência literal; um trecho útil sem essa frase conta como erro.",
-        "- Nas tabelas, a regra de pontuação (melhor registro de resumo ou entidades) e a expansão por chave estrangeira são as mesmas em todos os métodos; o RRF nas tabelas é uma extensão exploratória do que o MimirRAG faz com trechos.",
+        "- Nas tabelas, a regra de pontuação (melhor registro de resumo ou entidades) é a mesma em todos os métodos e a tabela `companhias` fica fora da medição; o RRF nas tabelas é uma extensão exploratória do que o MimirRAG faz com trechos.",
+        "- Com uma única evidência por pergunta, a Precision@k dos trechos tem máximo 1/k (por exemplo, 0,2 com k = 5). O nDCG vem da ranx, com o desconto 1/log2(i+1), diferente do de Järvelin da fundamentação.",
     ]
     if nivel == "pipeline":
         t += [

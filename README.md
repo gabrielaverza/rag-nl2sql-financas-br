@@ -305,7 +305,7 @@ deles.
 | Arquivo | Função |
 |---|---|
 | `executar_experimentos.py` | Executor dos experimentos descritos em `experimentos.json`, em dois níveis (abaixo); é o ponto de entrada de todas as medições |
-| `metricas.py` | Fórmulas usadas pelo executor: Recall, MRR, Hit e nDCG, EX (estrito e aceitando outras companhias que combinam com o nome) e formatação dos relatórios |
+| `metricas.py` | Fórmulas usadas pelo executor: a chamada à biblioteca `ranx` (Precision@k, Recall@k, nDCG@k e MRR), o EX estrito e o EX adaptado, e a formatação dos relatórios |
 | `verificacoes.py` | Testes de sanidade com o LLM: `sintese` (respostas com o SQL de referência e recusas fora do escopo), `validador` (número trocado e fato inventado devem ser reprovados, resposta correta aprovada) e `formatador` (proveniência, aviso de fidelidade baixa e recusa) |
 | `validar_perguntas.py` | Confere o arquivo de perguntas (campos, tabelas, evidência nos trechos); com `--base`, confere também `base_dados`, `sql_referencia` e `base_normativo` |
 | `medir_tempo_busca.py` | Tempo de partida e por pergunta de cada busca |
@@ -319,12 +319,15 @@ nomeadas. Cada configuração é uma lista de trocas `chave=valor` sobre o
 por tipo, `k`, divisor, pronomes, stemmer).
 
 - **Nível `recuperacao`** (sem LLM, exceto o divisor): para cada configuração e pergunta, mede se a busca
-  traz as tabelas e os trechos certos. Tabelas: todas as tabelas no top-k, Recall e MRR. Trechos: Hit@k,
-  Recall@k, nDCG@k e MRR. Híbridas: acerto conjunto de tabelas e trecho. As divisões das híbridas ficam em `metricas/divisoes_hibridas.json`, para todas as
-  configurações usarem as mesmas.
+  traz as tabelas e os trechos certos, com Precision@k, Recall@k, nDCG@k e MRR (biblioteca `ranx`,
+  relevância binária). Nas tabelas, a `companhias` fica fora da medição, porque o sistema a acrescenta
+  a todas as listas; nos trechos, é relevante o que contém a evidência da pergunta. O relatório mostra
+  médias por tipo, e as híbridas têm tabelas e trechos em separado. As divisões das híbridas ficam em
+  `metricas/divisoes_hibridas.json`, para todas as configurações usarem as mesmas.
 - **Nível `pipeline`** (com LLM): roda `main.py` em cada pergunta, por rodada e configuração, e mede
-  classe, EX (estrito e aceitando outras companhias que combinam com o nome), fidelidade, relevância,
-  aprovação e tempo por passo; o relatório traz também a matriz de confusão do classificador (tipo
+  classe, EX adaptado, EX estrito, fidelidade, relevância e tempo por passo (o EX adaptado também
+  aceita a coluna `DENOM_CIA` e linhas de companhias cujo nome tem a palavra que identifica a companhia
+  da pergunta); o relatório traz também a matriz de confusão do classificador (tipo
   real contra tipo previsto, uma por configuração). Com `"tabelas_ideais": true`, uma passada extra
   gera o SQL só com as tabelas esperadas, para separar o erro da busca do erro da geração.
 

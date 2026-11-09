@@ -5,15 +5,22 @@ Função: reúne as funções de métrica usadas pelo executor dos experimentos,
 só lugar com as fórmulas.
 
 Descrição geral do funcionamento:
-- Recuperação de tabelas (quantitativas e híbridas): Recall@k, cobertura total@k (todas as tabelas
-  esperadas na lista) e MRR.
-- Recuperação de trechos dos normativos (conceituais e híbridas): Hit@k, Recall@k, nDCG@k
-  e MRR. O nDCG usa a fórmula do monografia.tex (DCG com o desconto 1/log2(i) a partir da posição 2).
-- Híbridas: contagem das perguntas com as tabelas completas e o trecho relevante ao mesmo tempo no top-k.
+- Recuperação (tabelas do esquema e trechos dos normativos): Precision@k, Recall@k, nDCG@k e MRR,
+  calculadas pela biblioteca ranx a partir do ranking devolvido pela busca e do conjunto de itens
+  relevantes de cada pergunta (relevância binária). A ranx calcula o nDCG com o desconto 1/log2(i+1) em
+  todas as posições (a forma do TREC Eval), e não com o de Järvelin usado na equação da fundamentação
+  (rel1 + soma de rel_i/log2 i, a partir de i = 2); a divergência deve ser declarada.
+  Nas tabelas, a tabela companhias fica fora do ranking e dos itens relevantes: o sistema a acrescenta
+  por regra a todas as listas (chave estrangeira), então ela não mede a qualidade da busca.
 - Execução das consultas (EX): compara o resultado do SQL gerado com o da referência. Como em Zhong et
   al. (2020), resultados que só diferem pela ordem das colunas são equivalentes; a ordem das linhas é
-  ignorada e os números são arredondados em 2 casas. Há também a versão que aceita a coluna DENOM_CIA e
-  as linhas de outras companhias que combinam com o nome do LIKE.
+  ignorada e os números são arredondados em 2 casas. Há também o EX adaptado (sem artigo, declarado
+  como adaptação): o resultado gerado deve conter todas as linhas da referência; a coluna DENOM_CIA é
+  tolerada; uma linha a mais só vale se o DENOM_CIA dela tiver uma palavra que começa com um termo
+  que identifica a companhia dita na pergunta (como o LIKE do gerador de SQL). O termo é a palavra mais
+  rara, entre as da pergunta que são o início de uma palavra do nome da companhia de referência,
+  ignorando as palavras comuns nos nomes das companhias (as que aparecem em mais de 1% dos nomes). A
+  frequência vem dos nomes do banco.
 - Formatação: números com vírgula decimal e tabelas em Markdown, para os relatórios.
 
 Dependências: só a biblioteca padrão do Python. Não lê arquivos nem chama o LLM.
@@ -26,60 +33,44 @@ Executar: não é executado diretamente.
 """
 
 import itertools
-import math
 import re
+import unicodedata
+import warnings
 from collections import Counter
+
+from ranx import Qrels, Run, evaluate
+
+# A ranx (numba) emite um aviso de conversão de tipos que não afeta o resultado.
+warnings.filterwarnings("ignore", module="numba")
+warnings.filterwarnings("ignore", module="ranx")
 
 KS_TABELAS = (1, 3, 5)
 KS_TRECHOS = (1, 3, 5, 10, 20)
-KS_CONJUNTA = (3, 5)
+TABELA_COMUM = "companhias"
+# Palavra que aparece em mais que esta fração dos nomes de companhias é comum demais para identificar uma.
+FRACAO_PALAVRA_COMUM = 0.01
 
 
 # ---------------------------------------------------------------------------
-# 1) Métricas de recuperação de uma pergunta
+# 1) Métricas de recuperação de uma pergunta (biblioteca ranx)
 # ---------------------------------------------------------------------------
 
-# Desconto do nDCG do monografia.tex: 1 na primeira posição e 1/log2(i) depois.
-def desconto(posicao: int) -> float:
-    return 1.0 if posicao == 1 else 1 / math.log2(posicao)
-
-
-# Soma o ganho descontado de uma lista de relevâncias (0 ou 1).
-def dcg(relevancias: list) -> float:
-    return sum(r * desconto(i) for i, r in enumerate(relevancias, start=1))
-
-
-# Calcula Hit@k, Recall@k, nDCG@k e o inverso da posição do primeiro relevante.
-def metricas_trechos(relevancias: list[bool]) -> dict:
-    total = sum(relevancias)
-    ideal = sorted(relevancias, reverse=True)
-    resultado = {}
-    for k in KS_TRECHOS:
-        achados = sum(relevancias[:k])
-        resultado[f"glo_hit@{k}"] = float(achados > 0)
-        resultado[f"glo_recall@{k}"] = achados / total
-        resultado[f"glo_ndcg@{k}"] = dcg(relevancias[:k]) / dcg(ideal[:k])
-    resultado["glo_rr"] = 1 / next(i for i, r in enumerate(relevancias, start=1) if r)
-    return resultado
-
-
-# Calcula Recall@k, cobertura total@k e o inverso da posição da primeira tabela esperada.
-def metricas_tabelas(prefixo: str, ranking: list[str], listas: dict, alvo: list[str]) -> dict:
-    resultado = {}
-    for k in KS_TABELAS:
-        achadas = len(set(alvo) & set(listas[k]))
-        resultado[f"{prefixo}_recall@{k}"] = achadas / len(alvo)
-        resultado[f"{prefixo}_todos@{k}"] = float(achadas == len(alvo))
-    resultado[f"{prefixo}_rr"] = 1 / (min(ranking.index(t) for t in alvo) + 1)
-    return resultado
-
-
-# Acrescenta as métricas das híbridas: tabelas completas, trecho relevante e os dois juntos.
-def juntar_hibrida(m: dict):
-    for k in KS_CONJUNTA:
-        m[f"hib_tab@{k}"] = m[f"tab_todos@{k}"]
-        m[f"hib_glo@{k}"] = m[f"glo_hit@{k}"]
-        m[f"hib_conj@{k}"] = m[f"tab_todos@{k}"] * m[f"glo_hit@{k}"]
+# Calcula, com a ranx, Precision@k, Recall@k e nDCG@k para cada k e o inverso da posição do primeiro
+# item relevante (o MRR é a média desse valor sobre as perguntas). O ranking é a lista de ids na ordem
+# da busca; relevantes é o conjunto de ids relevantes da pergunta. As chaves levam o prefixo do índice
+# ("tab" para tabelas e "glo" para trechos).
+def metricas_recuperacao(prefixo: str, ranking: list[str], relevantes, ks: tuple) -> dict:
+    qrels = Qrels({"pergunta": {item: 1 for item in relevantes}})
+    # Notas decrescentes e distintas, para a ranx respeitar a ordem da busca sem empates.
+    run = Run({"pergunta": {item: float(len(ranking) - i) for i, item in enumerate(ranking)}})
+    nomes = {}
+    for k in ks:
+        nomes[f"{prefixo}_prec@{k}"] = f"precision@{k}"
+        nomes[f"{prefixo}_recall@{k}"] = f"recall@{k}"
+        nomes[f"{prefixo}_ndcg@{k}"] = f"ndcg@{k}"
+    nomes[f"{prefixo}_rr"] = "mrr"
+    notas = evaluate(qrels, run, list(nomes.values()))
+    return {chave: float(notas[metrica]) for chave, metrica in nomes.items()}
 
 
 # Troca qualquer sequência de espaços e quebras de linha por um espaço (para achar a evidência no trecho).
@@ -113,20 +104,71 @@ def resultados_equivalentes(gerado: list[tuple], referencia: list[tuple]) -> boo
     return False
 
 
-# Diz se o resultado gerado traz todas as linhas da referência e, além delas, só outras companhias
-# que também combinam com o nome do LIKE. A coluna DENOM_CIA é a única coluna extra aceita.
-def resultado_contem_referencia(colunas: list[str], gerado: list[tuple], referencia: list[tuple]) -> bool:
+# Devolve as palavras de um texto (nome de companhia ou pergunta), em maiúsculas, sem acento e com pelo
+# menos 3 letras ou dígitos.
+def palavras_do_nome(texto: str) -> set[str]:
+    sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().upper()
+    return {p for p in re.findall(r"[A-Z0-9]+", sem_acento) if len(p) >= 3}
+
+
+# Diz se alguma palavra do texto começa com algum dos termos (o mesmo efeito do LIKE '%termo%' sobre o nome).
+def casa_termos(texto: str, termos: set[str]) -> bool:
+    return any(palavra.startswith(termo) for palavra in palavras_do_nome(texto) for termo in termos)
+
+
+# Palavras dos nomes das companhias do banco, usadas para achar o termo que identifica a companhia dita
+# na pergunta.
+class NomesDeCompanhias:
+    def __init__(self, nomes: list[str], fracao_comum: float = FRACAO_PALAVRA_COMUM):
+        self.palavras = [palavras_do_nome(nome) for nome in nomes]
+        self.limite = fracao_comum * len(nomes)
+
+    # Em quantos nomes há uma palavra que começa com o termo.
+    def frequencia(self, termo: str) -> int:
+        return sum(1 for palavras in self.palavras if any(p.startswith(termo) for p in palavras))
+
+    # Devolve os termos que identificam as companhias da pergunta: para cada companhia de referência,
+    # a palavra mais rara entre as da pergunta que são o início de uma palavra do nome dela, sem as
+    # palavras comuns.
+    def termos(self, pergunta: str, companhias: list[str]) -> set[str]:
+        na_pergunta = palavras_do_nome(pergunta)
+        termos = set()
+        for nome in companhias:
+            do_nome = palavras_do_nome(nome)
+            candidatas = {p for p in na_pergunta if any(v.startswith(p) for v in do_nome)}
+            frequencias = {p: self.frequencia(p) for p in candidatas}
+            candidatas = {p for p, f in frequencias.items() if f <= self.limite}
+            if candidatas:
+                menor = min(frequencias[p] for p in candidatas)
+                termos |= {p for p in candidatas if frequencias[p] == menor}
+        return termos
+
+
+# EX adaptado. Vale se o resultado gerado é equivalente ao da referência (EX estrito) ou se traz todas as
+# linhas da referência, com a coluna DENOM_CIA tolerada, e as linhas a mais são de companhias cujo
+# DENOM_CIA tem uma palavra que começa com um dos termos que identificam a companhia da pergunta.
+def resultado_adaptado(colunas: list[str], gerado: list[tuple], referencia: list[tuple], termos: set[str]) -> bool:
+    if resultados_equivalentes(gerado, referencia):
+        return True
     if "DENOM_CIA" not in colunas or not gerado or not referencia:
         return False
     posicao = colunas.index("DENOM_CIA")
-    sem_nome = [tuple(v for i, v in enumerate(linha) if i != posicao) for linha in gerado]
-    for candidato in (gerado, sem_nome):
-        if len(candidato[0]) != len(referencia[0]):
+    alvo = Counter(repr(linha) for linha in normalizar_linhas(referencia))
+    for com_nome in (True, False):
+        linhas = gerado if com_nome else [tuple(v for i, v in enumerate(linha) if i != posicao) for linha in gerado]
+        if len(linhas[0]) != len(referencia[0]):
             continue
-        alvo = Counter(repr(linha) for linha in normalizar_linhas(referencia))
-        for ordem in itertools.permutations(range(len(candidato[0]))):
-            obtido = Counter(repr(linha) for linha in normalizar_linhas([tuple(l[i] for i in ordem) for l in candidato]))
-            if not alvo - obtido:
+        for ordem in itertools.permutations(range(len(linhas[0]))):
+            faltam = Counter(alvo)
+            extras_validas = True
+            for original, linha in zip(gerado, linhas):
+                chave = repr(normalizar_linhas([tuple(linha[i] for i in ordem)])[0])
+                if faltam[chave] > 0:
+                    faltam[chave] -= 1
+                elif not casa_termos(str(original[posicao]), termos):
+                    extras_validas = False
+                    break
+            if extras_validas and not +faltam:
                 return True
     return False
 
