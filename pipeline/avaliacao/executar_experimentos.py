@@ -79,9 +79,6 @@ sys.path.insert(0, os.path.join(PASTA, ".."))
 
 from metricas import (  # noqa: E402
     KS_TABELAS,
-    NOME_PISO,
-    TABELA_COMUM,
-    avaliar_piso,
     fmt,
     juntar_hibrida,
     metricas_tabelas,
@@ -160,11 +157,7 @@ PASSOS = ("classificador", "divisor", "sql", "sintese", "validacao")
 def escala_e_sentido(chave: str) -> tuple[str, str]:
     if chave.startswith("tempo_"):
         return "segundos", "menor é melhor"
-    if chave.startswith("tab_tam@"):
-        return "número de tabelas na lista", "neutro"
-    if chave in ("tab_zero", "glo_zero"):
-        return "0 ou 1", "menor é melhor"
-    binarias = ("tab_todos@", "tabsem_todos@", "glo_hit@", "hib_", "classe_certa", "ex_", "ideal_ex_", "sql_ok", "aprovado")
+    binarias = ("tab_todos@", "glo_hit@", "hib_", "classe_certa", "ex_", "ideal_ex_", "sql_ok", "aprovado")
     if chave.startswith(binarias):
         return "0 ou 1", "maior é melhor"
     return "0 a 1", "maior é melhor"
@@ -174,15 +167,11 @@ DESCRICAO_METRICAS = [
     ("Todas as tabelas no top-k (`tab_todos@k`)", "0 ou 1 por pergunta", "1 se todas as tabelas necessárias estão entre as k mais parecidas (mais as que elas referenciam por chave estrangeira). É a que limita o SQL. Maior é melhor."),
     ("Recall das tabelas (`tab_recall@k`)", "0 a 1", "Fração das tabelas necessárias que aparece na lista. Maior é melhor."),
     ("MRR das tabelas (`tab_rr`)", "0 a 1", "1 dividido pela posição da primeira tabela necessária no ranking de tabelas. Maior é melhor."),
-    ("Variantes `tabsem_*`", "igual às de tabelas", "As mesmas medidas sem contar a tabela `companhias`, que entra sempre pela chave estrangeira; mede só o acerto da demonstração."),
     ("Hit@k dos trechos (`glo_hit@k`)", "0 ou 1 por pergunta", "1 se há ao menos um trecho relevante entre os k primeiros. É a base do \"X de 20\". Maior é melhor."),
-    ("Recall e Precision dos trechos (`glo_recall@k`, `glo_prec@k`)", "0 a 1", "Fração dos trechos relevantes achados, e fração dos k trazidos que são relevantes."),
+    ("Recall dos trechos (`glo_recall@k`)", "0 a 1", "Fração dos trechos relevantes achados entre os k primeiros."),
     ("MRR dos trechos (`glo_rr`)", "0 a 1", "1 dividido pela posição do primeiro trecho relevante. Maior é melhor."),
     ("nDCG@k dos trechos (`glo_ndcg@k`)", "0 a 1", "Nota a ordem da lista dando mais peso a um acerto no topo (desconto 1/log2 da posição a partir da segunda). Maior é melhor; a principal na comparação de modelos."),
     ("Acerto conjunto das híbridas (`hib_conj@k`)", "0 ou 1 por pergunta", "1 se as tabelas completas e um trecho relevante aparecem ao mesmo tempo no top-k."),
-    ("`tab_zero`, `glo_zero`", "0 ou 1", "Só no BM25: 1 se o primeiro resultado tem nota zero, isto é, nenhuma palavra da pergunta aparece no índice. Menor é melhor."),
-    ("`tab_tam@k`", "número", "Tamanho da lista de tabelas (as k escolhidas mais as referenciadas)."),
-    ("Piso aleatório", "mesma escala", "Valor esperado de uma lista sorteada ao acaso, por fórmula exata. Mostra se o método está acima do acaso."),
     ("Classe certa (`classe_certa`)", "0 ou 1", "O classificador acertou o tipo da pergunta."),
     ("EX estrito (`ex_estrito`)", "0 ou 1", "O resultado do SQL gerado é igual ao do `sql_referencia` (ordem das colunas e das linhas ignorada, números com 2 casas). Só nas perguntas com SQL."),
     ("EX aceitando outras companhias (`ex_companhias`)", "0 ou 1", "Aceita também a coluna `DENOM_CIA` e linhas de outras companhias cujo nome combina com o `LIKE` (extensão do EX de Zhong et al., 2020)."),
@@ -321,14 +310,7 @@ class Recuperador:
             ranking = [r["fonte"] for r in completo]
             listas = {k: buscar_tabelas(indice, consulta, k, self.referenciadas) for k in KS_TABELAS}
             esperadas = p["tabelas_esperadas"]
-            sem_comum = [t for t in esperadas if t != TABELA_COMUM]
             m.update(metricas_tabelas("tab", ranking, listas, esperadas))
-            if sem_comum:
-                m.update(metricas_tabelas("tabsem", ranking, listas, sem_comum))
-            for k in KS_TABELAS:
-                m[f"tab_tam@{k}"] = float(len(listas[k]))
-            if metodo == "bm25":
-                m["tab_zero"] = float(completo[0]["pontuacao"] <= 0)
             posicoes["tabelas"] = {t: ranking.index(t) + 1 for t in esperadas}
         if p["evidencia"]:
             metodo = metodo_de_busca(config, "glossario", tipo)
@@ -340,8 +322,6 @@ class Recuperador:
             ranking_trechos = indice.buscar(consulta, self.n_trechos)
             relevancias = [r["id"] in self.relevantes[p["id"]] for r in ranking_trechos]
             m.update(metricas_trechos(relevancias))
-            if metodo == "bm25":
-                m["glo_zero"] = float(ranking_trechos[0]["pontuacao"] <= 0)
             posicoes["trechos"] = [i for i, r in enumerate(relevancias, start=1) if r][:5]
         if tipo == "hibrida" and p["tabelas_esperadas"] and p["evidencia"]:
             juntar_hibrida(m)
@@ -366,10 +346,6 @@ def rodar_recuperacao(exp: dict, perguntas: list[dict], refazer_divisoes: bool) 
         resultados[nome] = lista
         tempos[nome] = time.perf_counter() - inicio
     divisoes.salvar()
-    resultados[NOME_PISO] = [
-        avaliar_piso(p, recuperador.n_tabelas, recuperador.n_trechos, len(recuperador.relevantes.get(p["id"], ())))
-        for p in perguntas
-    ]
     return {"resultados": resultados, "tempos": tempos, "divisoes": usadas, "n_tabelas": recuperador.n_tabelas, "n_trechos": recuperador.n_trechos}
 
 
@@ -624,12 +600,12 @@ def agregar(lista: list[dict], chave: str, tipo: str | None = None):
 
 
 # Escreve uma célula "x/n" (contagem) ou a média, no formato do relatório.
-def celula(lista: list[dict], chave: str, forma: str, tipo: str | None, piso: bool = False) -> str:
+def celula(lista: list[dict], chave: str, forma: str, tipo: str | None) -> str:
     soma, n, media = agregar(lista, chave, tipo)
     if n == 0:
         return "n/d"
     if forma == "contagem":
-        return f"{fmt(soma) if piso else int(round(soma))}/{n}"
+        return f"{int(round(soma))}/{n}"
     return fmt(media)
 
 
@@ -663,7 +639,7 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
             continue
         medidas = METRICAS_POR_TIPO[tipo]
         t += [f"## {n_secao}. Perguntas {PLURAL[tipo]} (contagens \"x/n\" e médias)", ""]
-        corpo = [[nome] + [celula(lista, c, f, tipo, nome == NOME_PISO) for c, _, f in medidas] for nome, lista in resultados.items()]
+        corpo = [[nome] + [celula(lista, c, f, tipo) for c, _, f in medidas] for nome, lista in resultados.items()]
         t += tabela_md(["Configuração"] + [rotulo for _, rotulo, _ in medidas], corpo)
         n_secao += 1
     modelos = {c["modelo_embedding"] for c in exp["configs"].values()}

@@ -1,16 +1,15 @@
 """
-Etapa: Avaliação (funções de métrica e de comparação).
+Etapa: Avaliação (funções de métrica).
 
 Função: reúne as funções de métrica usadas pelo executor dos experimentos, para a avaliação ter um
 só lugar com as fórmulas.
 
 Descrição geral do funcionamento:
 - Recuperação de tabelas (quantitativas e híbridas): Recall@k, cobertura total@k (todas as tabelas
-  esperadas na lista) e MRR, com e sem a tabela companhias entre as esperadas.
-- Recuperação de trechos dos normativos (conceituais e híbridas): Hit@k, Recall@k, Precision@k, nDCG@k
+  esperadas na lista) e MRR.
+- Recuperação de trechos dos normativos (conceituais e híbridas): Hit@k, Recall@k, nDCG@k
   e MRR. O nDCG usa a fórmula do monografia.tex (DCG com o desconto 1/log2(i) a partir da posição 2).
 - Híbridas: contagem das perguntas com as tabelas completas e o trecho relevante ao mesmo tempo no top-k.
-- Piso aleatório: valor esperado de uma lista sorteada ao acaso, por fórmula exata (sem sorteio).
 - Execução das consultas (EX): compara o resultado do SQL gerado com o da referência. Como em Zhong et
   al. (2020), resultados que só diferem pela ordem das colunas são equivalentes; a ordem das linhas é
   ignorada e os números são arredondados em 2 casas. Há também a versão que aceita a coluna DENOM_CIA e
@@ -30,13 +29,10 @@ import itertools
 import math
 import re
 from collections import Counter
-from math import comb
 
 KS_TABELAS = (1, 3, 5)
 KS_TRECHOS = (1, 3, 5, 10, 20)
 KS_CONJUNTA = (3, 5)
-TABELA_COMUM = "companhias"
-NOME_PISO = "Piso aleatório"
 
 
 # ---------------------------------------------------------------------------
@@ -53,7 +49,7 @@ def dcg(relevancias: list) -> float:
     return sum(r * desconto(i) for i, r in enumerate(relevancias, start=1))
 
 
-# Calcula Hit@k, Recall@k, Precision@k, nDCG@k e o inverso da posição do primeiro relevante.
+# Calcula Hit@k, Recall@k, nDCG@k e o inverso da posição do primeiro relevante.
 def metricas_trechos(relevancias: list[bool]) -> dict:
     total = sum(relevancias)
     ideal = sorted(relevancias, reverse=True)
@@ -62,7 +58,6 @@ def metricas_trechos(relevancias: list[bool]) -> dict:
         achados = sum(relevancias[:k])
         resultado[f"glo_hit@{k}"] = float(achados > 0)
         resultado[f"glo_recall@{k}"] = achados / total
-        resultado[f"glo_prec@{k}"] = achados / k
         resultado[f"glo_ndcg@{k}"] = dcg(relevancias[:k]) / dcg(ideal[:k])
     resultado["glo_rr"] = 1 / next(i for i, r in enumerate(relevancias, start=1) if r)
     return resultado
@@ -85,8 +80,6 @@ def juntar_hibrida(m: dict):
         m[f"hib_tab@{k}"] = m[f"tab_todos@{k}"]
         m[f"hib_glo@{k}"] = m[f"glo_hit@{k}"]
         m[f"hib_conj@{k}"] = m[f"tab_todos@{k}"] * m[f"glo_hit@{k}"]
-        if f"tabsem_todos@{k}" in m:
-            m[f"hib_conjsem@{k}"] = m[f"tabsem_todos@{k}"] * m[f"glo_hit@{k}"]
 
 
 # Troca qualquer sequência de espaços e quebras de linha por um espaço (para achar a evidência no trecho).
@@ -95,61 +88,7 @@ def normalizar_texto(texto: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# 2) Piso aleatório (fórmulas exatas)
-# ---------------------------------------------------------------------------
-
-# Valor esperado de 1/posição do primeiro relevante, com m relevantes entre n itens em ordem aleatória.
-def piso_rr(n: int, m: int) -> float:
-    return sum(comb(n - j, m - 1) / comb(n, m) / j for j in range(1, n - m + 2))
-
-
-# Probabilidade de uma lista de k itens sorteados conter os r itens necessários, entre n.
-def piso_cobertura(n: int, k: int, r: int) -> float:
-    return comb(n - r, k - r) / comb(n, k) if k >= r else 0.0
-
-
-# Probabilidade de uma lista de k itens sorteados conter ao menos um dos m relevantes, entre n.
-def piso_hit(n: int, m: int, k: int) -> float:
-    return 1 - comb(n - m, k) / comb(n, k)
-
-
-# Valor esperado do nDCG@k de uma ordem aleatória, com m relevantes entre n itens.
-def piso_ndcg(n: int, m: int, k: int) -> float:
-    esperado = (m / n) * dcg([1] * k)
-    return esperado / dcg([1] * min(m, k))
-
-
-# Calcula o piso aleatório de uma pergunta, com as mesmas chaves das métricas dos métodos.
-def avaliar_piso(p: dict, n_tabelas: int, n_trechos: int, n_relevantes: int) -> dict:
-    m = {}
-    if p["tabelas_esperadas"]:
-        esperadas = p["tabelas_esperadas"]
-        comum = int(TABELA_COMUM in esperadas)
-        outras = len(esperadas) - comum
-        for k in KS_TABELAS:
-            # A tabela companhias entra sempre na lista (regra de chave estrangeira).
-            m[f"tab_recall@{k}"] = (comum + outras * k / n_tabelas) / len(esperadas)
-            m[f"tab_todos@{k}"] = piso_cobertura(n_tabelas, k, outras)
-            if outras:
-                m[f"tabsem_recall@{k}"] = k / n_tabelas
-                m[f"tabsem_todos@{k}"] = piso_cobertura(n_tabelas, k, outras)
-        m["tab_rr"] = piso_rr(n_tabelas, len(esperadas))
-        if outras:
-            m["tabsem_rr"] = piso_rr(n_tabelas, outras)
-    if p["evidencia"]:
-        for k in KS_TRECHOS:
-            m[f"glo_hit@{k}"] = piso_hit(n_trechos, n_relevantes, k)
-            m[f"glo_recall@{k}"] = k / n_trechos
-            m[f"glo_prec@{k}"] = n_relevantes / n_trechos
-            m[f"glo_ndcg@{k}"] = piso_ndcg(n_trechos, n_relevantes, k)
-        m["glo_rr"] = piso_rr(n_trechos, n_relevantes)
-    if p["tipo"] == "hibrida" and p["tabelas_esperadas"] and p["evidencia"]:
-        juntar_hibrida(m)
-    return {"id": p["id"], "tipo": p["tipo"], "m": m, "posicoes": {}}
-
-
-# ---------------------------------------------------------------------------
-# 3) Execução das consultas (EX)
+# 2) Execução das consultas (EX)
 # ---------------------------------------------------------------------------
 
 # Arredonda os números e ordena as linhas, para comparar resultados sem depender da ordem.
@@ -193,7 +132,7 @@ def resultado_contem_referencia(colunas: list[str], gerado: list[tuple], referen
 
 
 # ---------------------------------------------------------------------------
-# 4) Formatação dos relatórios
+# 3) Formatação dos relatórios
 # ---------------------------------------------------------------------------
 
 # Escreve um número com vírgula decimal, ou "n/d" se não houver.

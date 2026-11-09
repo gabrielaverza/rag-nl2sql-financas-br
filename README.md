@@ -61,7 +61,7 @@ rag-nl2sql-financas-br/
     │   └── main.py                     # orquestrador: pergunta -> resposta final
     └── avaliacao/
         ├── executar_experimentos.py    # executor dos experimentos (recuperação e pipeline completo)
-        ├── metricas.py                 # fórmulas de métrica, piso aleatório e EX
+        ├── metricas.py                 # fórmulas de métrica e EX
         ├── verificacoes.py             # testes de sanidade da síntese, do validador e do formatador
         ├── validar_perguntas.py        # confere o arquivo de perguntas e a base de cada uma
         └── medir_tempo_busca.py        # tempo de partida e por pergunta de cada busca
@@ -305,7 +305,7 @@ deles.
 | Arquivo | Função |
 |---|---|
 | `executar_experimentos.py` | Executor dos experimentos descritos em `experimentos.json`, em dois níveis (abaixo); é o ponto de entrada de todas as medições |
-| `metricas.py` | Fórmulas usadas pelo executor: Recall, MRR, Hit, nDCG e Precision, piso aleatório, EX (estrito e aceitando outras companhias que combinam com o nome) e formatação dos relatórios |
+| `metricas.py` | Fórmulas usadas pelo executor: Recall, MRR, Hit e nDCG, EX (estrito e aceitando outras companhias que combinam com o nome) e formatação dos relatórios |
 | `verificacoes.py` | Testes de sanidade com o LLM: `sintese` (respostas com o SQL de referência e recusas fora do escopo), `validador` (número trocado e fato inventado devem ser reprovados, resposta correta aprovada) e `formatador` (proveniência, aviso de fidelidade baixa e recusa) |
 | `validar_perguntas.py` | Confere o arquivo de perguntas (campos, tabelas, evidência nos trechos); com `--base`, confere também `base_dados`, `sql_referencia` e `base_normativo` |
 | `medir_tempo_busca.py` | Tempo de partida e por pergunta de cada busca |
@@ -320,8 +320,7 @@ por tipo, `k`, divisor, pronomes, stemmer).
 
 - **Nível `recuperacao`** (sem LLM, exceto o divisor): para cada configuração e pergunta, mede se a busca
   traz as tabelas e os trechos certos. Tabelas: todas as tabelas no top-k, Recall e MRR. Trechos: Hit@k,
-  Recall@k, Precision@k, nDCG@k e MRR. Híbridas: acerto conjunto de tabelas e trecho. Inclui o piso
-  aleatório. As divisões das híbridas ficam em `metricas/divisoes_hibridas.json`, para todas as
+  Recall@k, nDCG@k e MRR. Híbridas: acerto conjunto de tabelas e trecho. As divisões das híbridas ficam em `metricas/divisoes_hibridas.json`, para todas as
   configurações usarem as mesmas.
 - **Nível `pipeline`** (com LLM): roda `main.py` em cada pergunta, por rodada e configuração, e mede
   classe, EX (estrito e aceitando outras companhias que combinam com o nome), fidelidade, relevância,
