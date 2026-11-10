@@ -22,6 +22,16 @@
         {"nome": "E5-base-v2 (só inglês)", "sobrescritas": ["modelo_embedding=e5-base-v2", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
       ]
     },
+    "pipeline_exploratorio": {
+      "descricao": "Experimento 6.3, execução exploratória do pipeline completo: compara dois cenários de busca com o modelo E5-base, o divisor das perguntas híbridas ligado com o bloqueio de pronomes e a passada de tabelas ideais. No cenário 1 os dois índices usam embeddings; no cenário 2 o esquema usa embeddings e o glossário usa RRF sem stemmer. Uma rodada.",
+      "nivel": "pipeline",
+      "rodadas": 1,
+      "tabelas_ideais": true,
+      "configuracoes": [
+        {"nome": "Cenário 1: embeddings (esquema e glossário)", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "Cenário 2: embeddings (esquema) + RRF (glossário)", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
+      ]
+    },
     "teste_equivalencia": {
       "rascunho": true,
       "descricao": "Teste de equivalência do executor: com o divisor e o stemmer desligados, as métricas de recuperação devem sair idênticas antes e depois de uma mudança no código que não deveria alterá-las (compare o resultados.csv, ignorando a coluna da execução); as duas primeiras configurações cobrem a pergunta inteira e as duas últimas, o divisor ligado. Os resultados são de teste e não valem como resultado dos experimentos.",
