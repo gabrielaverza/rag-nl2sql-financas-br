@@ -9,7 +9,7 @@ Descrição geral do funcionamento:
 - O tipo decide o caminho: conceitual usa só o índice do glossário (normativos),
   quantitativa usa o índice de esquema e o SQL sobre as DFPs, e híbrida usa os dois.
 - Os exemplos NÃO fazem parte de dados/perguntas_validacao.json, para a avaliação não ser contaminada
-  (nenhum é uma pergunta do conjunto; a Cosan, porém, aparece nos exemplos e na pergunta q04).
+  (nenhum é uma pergunta do conjunto e nenhum usa companhia ou conceito normativo de alguma delas).
 - Se o LLM não devolver uma classe válida em TENTATIVAS chamadas, a pergunta é
   tratada como híbrida.
 
@@ -46,15 +46,15 @@ Responda somente com um JSON, por exemplo {"tipo": "conceitual"}. Os valores pos
 # (pergunta, classe). As classes estão intercaladas de propósito, para o modelo
 # não tender a repetir a última classe que viu.
 EXEMPLOS = [
-    ("Para que serve a demonstração do resultado do exercício?", "conceitual"),
-    ("Qual foi a receita líquida da Embraer em 2025?", "quantitativa"),
-    ("Explique o que é a DVA e mostre a riqueza gerada pela Braskem em 2025.", "hibrida"),
+    ("Para que serve a demonstração das mutações do patrimônio líquido?", "conceitual"),
+    ("Qual foi o resultado operacional da Embraer em 2025?", "quantitativa"),
+    ("Explique o que são reservas de lucros e mostre o saldo delas na Braskem em 2025.", "hibrida"),
     ("Qual a diferença entre demonstrações consolidadas e individuais?", "conceitual"),
-    ("Qual companhia teve o maior lucro líquido consolidado em 2025?", "quantitativa"),
-    ("Qual o ativo circulante da Localiza em 2025 e o que caracteriza um ativo como circulante?", "hibrida"),
+    ("Qual companhia tinha o maior ativo intangível consolidado ao fim de 2025?", "quantitativa"),
+    ("Qual o capital social da Localiza em 2025 e o que ele representa no balanço?", "hibrida"),
     ("O que são ajustes de avaliação patrimonial?", "conceitual"),
-    ("Qual a dívida de longo prazo da Cosan no balanço individual de 2025?", "quantitativa"),
-    ("Compare o patrimônio líquido consolidado da Localiza e da Cosan em 2025 e explique o que ele representa no balanço.", "hibrida"),
+    ("Qual o saldo de provisões da Sabesp no balanço individual de 2025?", "quantitativa"),
+    ("Compare o estoque consolidado da Cemig e da Sabesp em 2025 e explique como o estoque é apresentado no balanço.", "hibrida"),
 ]
 
 

@@ -8,7 +8,8 @@ Descrição geral do funcionamento:
 - Um LLM local recebe as regras de divisão e alguns exemplos (few-shot) e responde com um JSON
   {"parte_dados": ..., "parte_conceitual": ...}, como o classificador faz com a classe.
 - Os exemplos do prompt NÃO são perguntas do conjunto oficial (dados/perguntas_validacao.json) e usam
-  outras companhias e outros conceitos, para a avaliação não ser contaminada.
+  outras companhias e outros conceitos, para a avaliação não ser contaminada. Os do classificador
+  (classificador.py) seguem a mesma regra.
 - Cada parte é conferida: não pode estar vazia nem trazer muitas palavras que não estejam na pergunta
   (o LLM não deve inventar conceitos). A parte conceitual também não pode ter pronomes
   demonstrativos ou pessoais ("esse", "nessa", "ele"), que perdem o sentido longe da parte de dados e
@@ -65,20 +66,20 @@ Separe a pergunta nessas duas partes seguindo estas regras:
 Responda somente com um JSON no formato {"parte_dados": "<pergunta>", "parte_conceitual": "<pergunta>"}.
 
 Exemplos:
-Pergunta: Qual foi o lucro líquido da Embraer em 2025 e o que são notas explicativas?
-{"parte_dados": "Qual foi o lucro líquido da Embraer em 2025?", "parte_conceitual": "O que são notas explicativas?"}
+Pergunta: Qual foi o resultado operacional da Embraer em 2025 e o que são partes relacionadas?
+{"parte_dados": "Qual foi o resultado operacional da Embraer em 2025?", "parte_conceitual": "O que são partes relacionadas?"}
 
-Pergunta: Quanto a Magazine Luiza registrou de despesa financeira em 2025, e o que a demonstração do resultado deve apresentar segundo o CPC 26?
-{"parte_dados": "Quanto a Magazine Luiza registrou de despesa financeira em 2025?", "parte_conceitual": "O que a demonstração do resultado deve apresentar segundo o CPC 26?"}
+Pergunta: Quanto a Magazine Luiza tinha em estoques ao fim de 2025, e o que as políticas contábeis significativas devem divulgar segundo o CPC 26?
+{"parte_dados": "Quanto a Magazine Luiza tinha em estoques ao fim de 2025?", "parte_conceitual": "O que as políticas contábeis significativas devem divulgar segundo o CPC 26?"}
 
-Pergunta: Qual o total do ativo da Localiza e como são tratados os juros pagos na demonstração dos fluxos de caixa?
-{"parte_dados": "Qual o total do ativo da Localiza?", "parte_conceitual": "Como são tratados os juros pagos na demonstração dos fluxos de caixa?"}
+Pergunta: Qual o saldo de reservas de lucros da Localiza e como é apresentado o resultado por ação?
+{"parte_dados": "Qual o saldo de reservas de lucros da Localiza?", "parte_conceitual": "Como é apresentado o resultado por ação?"}
 
-Pergunta: Entre Braskem e Marfrig, qual teve maior lucro bruto em 2025, e o que diferencia uma demonstração individual de uma consolidada?
-{"parte_dados": "Entre Braskem e Marfrig, qual teve maior lucro bruto em 2025?", "parte_conceitual": "O que diferencia uma demonstração individual de uma consolidada?"}
+Pergunta: Entre Braskem e Marfrig, qual teve o maior ativo intangível em 2025, e o que diferencia uma demonstração individual de uma consolidada?
+{"parte_dados": "Entre Braskem e Marfrig, qual teve o maior ativo intangível em 2025?", "parte_conceitual": "O que diferencia uma demonstração individual de uma consolidada?"}
 
-Pergunta: Qual foi o resultado financeiro da Eletrobras em 2025 e o que ele representa?
-{"parte_dados": "Qual foi o resultado financeiro da Eletrobras em 2025?", "parte_conceitual": "O que representa o resultado financeiro?"}"""
+Pergunta: Qual foi o saldo de ajustes de avaliação patrimonial da Eletrobras em 2025 e o que ele representa?
+{"parte_dados": "Qual foi o saldo de ajustes de avaliação patrimonial da Eletrobras em 2025?", "parte_conceitual": "O que representam os ajustes de avaliação patrimonial?"}"""
 
 
 # Devolve o texto sem espaços nas pontas se for texto, ou string vazia caso contrário.
