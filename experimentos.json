@@ -11,6 +11,17 @@
         {"nome": "RRF sem stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
       ]
     },
+    "modelos": {
+      "descricao": "Experimento 6.2: impacto do modelo de embeddings (MiniLM, E5-small, E5-base, BGE-M3 e o E5-base-v2, só em inglês, como controle), com busca por embeddings nos dois índices e o divisor das perguntas híbridas ligado com o bloqueio de pronomes, só no nível de recuperação.",
+      "nivel": "recuperacao",
+      "configuracoes": [
+        {"nome": "MiniLM", "sobrescritas": ["modelo_embedding=minilm", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "E5-small", "sobrescritas": ["modelo_embedding=e5-small", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "E5-base", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "BGE-M3", "sobrescritas": ["modelo_embedding=bge-m3", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "E5-base-v2 (só inglês)", "sobrescritas": ["modelo_embedding=e5-base-v2", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
+      ]
+    },
     "teste_equivalencia": {
       "rascunho": true,
       "descricao": "Teste de equivalência do executor: com o divisor e o stemmer desligados, as métricas de recuperação devem sair idênticas antes e depois de uma mudança no código que não deveria alterá-las (compare o resultados.csv, ignorando a coluna da execução); as duas primeiras configurações cobrem a pergunta inteira e as duas últimas, o divisor ligado. Os resultados são de teste e não valem como resultado dos experimentos.",
