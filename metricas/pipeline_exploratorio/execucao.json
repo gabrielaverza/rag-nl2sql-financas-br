@@ -1,0 +1,98 @@
+{
+  "execucao": "20261110-104512",
+  "experimento": "pipeline_exploratorio",
+  "nivel": "pipeline",
+  "descricao": "Experimento 6.3, execução exploratória do pipeline completo: compara dois cenários de busca com o modelo E5-base, o divisor das perguntas híbridas ligado com o bloqueio de pronomes e a passada de tabelas ideais. No cenário 1 os dois índices usam embeddings; no cenário 2 o esquema usa embeddings e o glossário usa RRF sem stemmer. Uma rodada.",
+  "comando": "python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio",
+  "inicio": "2026-11-10T10:45:12",
+  "rascunho": false,
+  "ids": null,
+  "n_perguntas": 60,
+  "rodadas": 1,
+  "tabelas_ideais": true,
+  "git": {
+    "commit": "b3b401695f4f9b6f88ccd2ed52bb061c63ca1b71",
+    "commit_curto": "b3b4016",
+    "ramo": "revisao/experimentos-configuraveis",
+    "alteracoes_nao_commitadas": false,
+    "arquivos_alterados": []
+  },
+  "arquivos_sha256": {
+    "configuracao.json": "21b42ebfbac73b245325d5fa27a7d5e73f7929131c656a8ed4d4c8ea97c04e14",
+    "experimentos.json": "e503408ba6f2e45f1429359cfaebd34986a62a7f839d4238d17da3bf4e3805b6",
+    "dados/perguntas_validacao.json": "fb53c8fba07b8483d2c711b5ac6f218345b1702530c54ed0e00906d442a9fe3b",
+    "embeddings/esquema.json": "b29683ce2ba3d351081dd244399fc57110ffd50ed5bd8873b08a0715551738dd",
+    "metricas/divisoes_hibridas.json": "d001212b4fd6bfe7d4bd7eb6f128b3bf4cd57c5812e03cb97a37800383e67459",
+    "embeddings/index_esquema.json": "f02d3545b907a302d0cea7883eba177711369030ab6672e0843a5643594ab3dd",
+    "embeddings/index_glossario.json": "0e2927a168f155770bdf707638c69e75857cc9a2aee170ca82d00c07dd5c28c8",
+    "embeddings/index_bm25_esquema.json": "5ed65e2b229f7ff234e9aeedcaa5469793f9f12981d116030c171919a48aab14",
+    "embeddings/index_bm25_glossario.json": "d1bf42110f5d50b5e838a4b3f4af4ed952285638484ea726013425c404ddab56"
+  },
+  "modelos_embeddings": {
+    "e5-base": "intfloat/multilingual-e5-base"
+  },
+  "llm": {
+    "modelo": "qwen2.5-coder:7b",
+    "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "tamanho_bytes": 4683087561
+  },
+  "bibliotecas": {
+    "python": "3.13.7",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "sentence-transformers": "5.6.0",
+    "transformers": "5.12.1",
+    "torch": "2.12.0",
+    "rank-bm25": "0.2.2",
+    "nltk": "3.10.4",
+    "ollama": "0.6.2"
+  },
+  "configuracoes": {
+    "Cenário 1: embeddings (esquema e glossário)": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "Cenário 2: embeddings (esquema) + RRF (glossário)": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "rrf",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": false
+      }
+    }
+  },
+  "fim": "2026-11-10T11:37:01",
+  "duracao_s": 3109.0
+}
