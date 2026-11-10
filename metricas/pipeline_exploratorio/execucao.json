@@ -1,18 +1,18 @@
 {
-  "execucao": "20261110-104512",
+  "execucao": "20261110-141908",
   "experimento": "pipeline_exploratorio",
   "nivel": "pipeline",
   "descricao": "Experimento 6.3, execução exploratória do pipeline completo: compara dois cenários de busca com o modelo E5-base, o divisor das perguntas híbridas ligado com o bloqueio de pronomes e a passada de tabelas ideais. No cenário 1 os dois índices usam embeddings; no cenário 2 o esquema usa embeddings e o glossário usa RRF sem stemmer. Uma rodada.",
   "comando": "python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio",
-  "inicio": "2026-11-10T10:45:12",
+  "inicio": "2026-11-10T14:19:08",
   "rascunho": false,
   "ids": null,
   "n_perguntas": 60,
   "rodadas": 1,
   "tabelas_ideais": true,
   "git": {
-    "commit": "b3b401695f4f9b6f88ccd2ed52bb061c63ca1b71",
-    "commit_curto": "b3b4016",
+    "commit": "f6f496f49b12396b1bcd5d740888e48932c69cb5",
+    "commit_curto": "f6f496f",
     "ramo": "revisao/experimentos-configuraveis",
     "alteracoes_nao_commitadas": false,
     "arquivos_alterados": []
@@ -93,6 +93,6 @@
       }
     }
   },
-  "fim": "2026-11-10T11:37:01",
-  "duracao_s": 3109.0
+  "fim": "2026-11-10T15:16:19",
+  "duracao_s": 3430.1
 }
