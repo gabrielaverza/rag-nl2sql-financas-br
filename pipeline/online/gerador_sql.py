@@ -12,8 +12,13 @@ Descrição geral do funcionamento:
   junções), lido do esquema.json. O esquema completo não vai ao LLM.
 - Cada conta do plano de contas aparece com a descrição oficial e o filtro CD_CONTA pronto.
 - O LLM gera o SQL. O código só aceita um único SELECT e executa em modo somente leitura.
-- Se der erro ou o resultado vier vazio, o LLM recebe o problema e gera outro SQL, até o
-  limite de tentativas.
+- Antes de executar, o código confere o SQL: recusa CD_CVM escrito direto (o LLM inventa esses
+  códigos) e confere os nomes de companhia do LIKE contra a tabela companhias. Se o LIKE não casa
+  com nenhum nome mas o termo, sem acento, pontuação e espaço, casa com um ou mais, a condição é
+  trocada por DENOM_CIA IN (nomes exatos) e o SQL original fica em sql_original; se nada casa, o
+  LLM recebe o problema com os nomes parecidos.
+- Se der erro, o resultado vier vazio ou só com valores nulos (NULL, como o de SUM sobre nenhuma
+  linha), o LLM recebe o problema e gera outro SQL, até o limite de tentativas.
 - Opcionalmente, um dicionário de cache (parâmetro cache) guarda o SQL por (pergunta, tabelas do
   contexto) e o reaproveita em chamadas seguintes; sem ele, nada é guardado.
 
@@ -24,14 +29,16 @@ Dependências:
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
 
-Resultado: fornece gerar_sql(), executar_sql() e validar_sql().
+Resultado: fornece gerar_sql(), executar_sql(), validar_sql() e conferir_companhias().
 """
 
 import copy
+import difflib
 import json
 import re
 import sqlite3
 import time
+import unicodedata
 
 import ollama
 
@@ -51,8 +58,19 @@ PALAVRAS_PROIBIDAS = {
     "insert", "update", "delete", "drop", "alter", "create", "attach",
     "detach", "pragma", "vacuum", "reindex", "truncate",
 }
+PROBLEMA_VAZIO = "a consulta não retornou nenhuma linha"
+PROBLEMA_NULO = "a consulta só retornou valores nulos (NULL)"
+# CD_CVM comparado com um valor escrito no SQL, como CD_CVM = '1133' ou CD_CVM IN ('1133').
+CD_CVM_LITERAL = re.compile(r"\bCD_CVM\s*(?:=|<>|!=)\s*'?\d+'?|\bCD_CVM\s+IN\s*\(\s*'?\d", re.IGNORECASE)
+# Condição sobre o nome da companhia, com ou sem alias da tabela (companhias.DENOM_CIA LIKE '%X%').
+LIKE_COMPANHIA = re.compile(r"((?:\w+\.)?DENOM_CIA)\s+LIKE\s+'((?:[^']|'')*)'", re.IGNORECASE)
+# Acima disso o termo é genérico demais para trocar o LIKE pelos nomes exatos.
+MAX_NOMES_NA_REESCRITA = 5
+# Semelhança mínima (difflib) entre uma palavra do termo e uma palavra de nome, para sugerir o nome.
+LIMIAR_NOME_PARECIDO = 0.8
 
 _esquema = None
+_nomes = None
 
 
 # Lê o esquema uma vez só e o reaproveita nas consultas seguintes.
@@ -164,6 +182,85 @@ def executar_sql(sql: str, limite_linhas: int | None = LIMITE_LINHAS) -> tuple[l
         conn.close()
 
 
+# Devolve o texto só com letras e números maiúsculos, sem acento, para comparar nomes que diferem em
+# pontuação, espaço ou acento (por exemplo, "M. Dias Branco" e "M.DIAS BRANCO").
+def _normalizar_nome(texto: str) -> str:
+    sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().upper()
+    return re.sub(r"[^A-Z0-9]", "", sem_acento)
+
+
+# Escreve um texto como literal do SQL, dobrando as aspas simples.
+def _literal_sql(texto: str) -> str:
+    return "'" + texto.replace("'", "''") + "'"
+
+
+# Lê uma vez só os nomes das companhias do banco, cada um com a forma normalizada e as palavras normalizadas.
+def _carregar_nomes() -> list[tuple[str, str, list[str]]]:
+    global _nomes
+    if _nomes is None:
+        conn = sqlite3.connect(f"file:{CAMINHO_DB}?mode=ro", uri=True)
+        try:
+            nomes = [linha[0] for linha in conn.execute("SELECT DENOM_CIA FROM companhias")]
+        finally:
+            conn.close()
+        _nomes = [(n, _normalizar_nome(n), [p for p in map(_normalizar_nome, n.split()) if p]) for n in nomes]
+    return _nomes
+
+
+# Sugere até 5 nomes de companhia que têm uma palavra parecida com o termo inteiro ou com alguma palavra dele.
+def _nomes_parecidos(padrao: str, termo: str) -> list[str]:
+    candidatas = {termo} | {p for p in map(_normalizar_nome, re.split(r"\W+", padrao)) if len(p) >= 4}
+    pontuados = []
+    for nome, _, palavras in _carregar_nomes():
+        melhor = max((difflib.SequenceMatcher(None, c, p).ratio()
+                      for c in candidatas if len(c) >= 4 for p in palavras if len(p) >= 4), default=0)
+        if melhor >= LIMIAR_NOME_PARECIDO:
+            pontuados.append((melhor, nome))
+    return [nome for _, nome in sorted(pontuados, key=lambda x: -x[0])[:5]]
+
+
+# Confere o SQL antes de executar. Recusa CD_CVM escrito direto e confere os nomes do LIKE em
+# DENOM_CIA: se o LIKE não casa com nenhuma companhia mas o termo normalizado casa, troca a condição
+# por DENOM_CIA IN (nomes exatos). Devolve (sql, problema, reescritas): o problema é o texto que vai ao
+# LLM (ou None) e as reescritas são os termos trocados, cada um com os nomes encontrados.
+def conferir_companhias(sql: str) -> tuple[str, str | None, list[dict]]:
+    if CD_CVM_LITERAL.search(sql):
+        return sql, ("não escreva valores de CD_CVM diretamente, pois esses códigos não são confiáveis. "
+                     "Para filtrar a companhia, use companhias.DENOM_CIA LIKE com uma parte do nome "
+                     "que aparece na pergunta"), []
+    reescritas, problemas = [], []
+    conn = sqlite3.connect(f"file:{CAMINHO_DB}?mode=ro", uri=True)
+
+    def conferir(achado):
+        coluna, padrao = achado.group(1), achado.group(2).replace("''", "'")
+        # O LIKE do SQLite não ignora pontuação nem acento: só confere se ele casa com algum nome.
+        if conn.execute("SELECT COUNT(*) FROM companhias WHERE DENOM_CIA LIKE ?", (padrao,)).fetchone()[0]:
+            return achado.group(0)
+        termo = _normalizar_nome(padrao.replace("%", "").replace("_", ""))
+        if not termo:
+            return achado.group(0)
+        exibido = padrao.strip("%")
+        encontrados = [nome for nome, normal, _ in _carregar_nomes() if termo in normal]
+        if 1 <= len(encontrados) <= MAX_NOMES_NA_REESCRITA:
+            reescritas.append({"padrao": padrao, "nomes": encontrados})
+            return f"{coluna} IN ({', '.join(_literal_sql(n) for n in encontrados)})"
+        if encontrados:
+            problemas.append(f"o nome '{exibido}' casa com {len(encontrados)} companhias (por exemplo "
+                             f"{', '.join(encontrados[:3])}). Use uma parte mais específica do nome")
+            return achado.group(0)
+        parecidos = _nomes_parecidos(padrao, termo)
+        dica = f" (nomes parecidos: {', '.join(parecidos)})" if parecidos else ""
+        problemas.append(f"nenhuma companhia tem '{exibido}' no nome{dica}. "
+                         "Use uma parte do nome como ela aparece no banco")
+        return achado.group(0)
+
+    try:
+        novo = LIKE_COMPANHIA.sub(conferir, sql)
+    finally:
+        conn.close()
+    return novo, ("; ".join(problemas) if problemas else None), reescritas
+
+
 # Gera o SQL da pergunta e o executa. Com um dicionário em cache, o SQL de um par (pergunta, lista de
 # tabelas do contexto) já gerado nele é reaproveitado, sem nova chamada ao LLM; o executor de
 # experimentos usa isso para comparar configurações que recuperam as mesmas tabelas.
@@ -185,7 +282,7 @@ def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
     resultado = {
         "pergunta": pergunta,
         "tabelas_contexto": [e["tabela"] for e in entradas],
-        "sql": None, "colunas": [], "linhas": [], "status": "erro", "tentativas": [],
+        "sql": None, "sql_original": None, "colunas": [], "linhas": [], "status": "erro", "tentativas": [],
     }
     mensagens = [
         {"role": "system", "content": montar_instrucoes(montar_contexto(entradas))},
@@ -204,13 +301,21 @@ def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
         try:
             sql = json.loads(conteudo)["sql"]
             tentativa["sql"] = sql
-            colunas, linhas = executar_sql(validar_sql(sql))
-            if linhas:
-                resultado.update(sql=sql, colunas=colunas, linhas=linhas, status="ok")
+            sql_executado, problema, reescritas = conferir_companhias(sql)
+            if problema:
+                raise ValueError(problema)
+            if reescritas:
+                tentativa["reescrita"] = reescritas
+                resultado["sql_original"] = sql
+            colunas, linhas = executar_sql(validar_sql(sql_executado))
+            # SUM sobre nenhuma linha devolve uma linha com NULL: também conta como resultado vazio.
+            so_nulos = bool(linhas) and all(valor is None for linha in linhas for valor in linha)
+            if linhas and not so_nulos:
+                resultado.update(sql=sql_executado, colunas=colunas, linhas=linhas, status="ok")
                 resultado["tentativas"].append(tentativa)
                 return resultado
-            tentativa["problema"] = "a consulta não retornou nenhuma linha"
-            resultado.update(sql=sql, colunas=colunas, linhas=[], status="vazio")
+            tentativa["problema"] = PROBLEMA_NULO if so_nulos else PROBLEMA_VAZIO
+            resultado.update(sql=sql_executado, colunas=colunas, linhas=[], status="vazio")
         except (json.JSONDecodeError, KeyError, TypeError):
             tentativa["problema"] = "a resposta não era um JSON com o campo sql"
             resultado["status"] = "erro"
@@ -219,9 +324,13 @@ def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
             resultado.update(sql=tentativa["sql"], status="erro")
         resultado["tentativas"].append(tentativa)
 
-        if tentativa["problema"] == "a consulta não retornou nenhuma linha":
+        if tentativa["problema"] == PROBLEMA_VAZIO:
             pedido = ("A consulta anterior executou, mas não retornou nenhuma linha. "
                       "Revise as condições e as junções e responda de novo só com o JSON.")
+        elif tentativa["problema"] == PROBLEMA_NULO:
+            pedido = ("A consulta anterior executou, mas só retornou valores nulos (NULL), o que indica que "
+                      "nenhuma linha atendeu às condições. Revise as condições, os nomes e as junções e "
+                      "responda de novo só com o JSON.")
         else:
             pedido = (f"A consulta anterior falhou: {tentativa['problema']}. "
                       "Corrija e responda de novo só com o JSON.")
