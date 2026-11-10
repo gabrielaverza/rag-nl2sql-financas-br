@@ -1,0 +1,176 @@
+{
+  "execucao": "20261110-095437",
+  "experimento": "modelos",
+  "nivel": "recuperacao",
+  "descricao": "Experimento 6.2: impacto do modelo de embeddings (MiniLM, E5-small, E5-base, BGE-M3 e o E5-base-v2, só em inglês, como controle), com busca por embeddings nos dois índices e o divisor das perguntas híbridas ligado com o bloqueio de pronomes, só no nível de recuperação.",
+  "comando": "python pipeline/avaliacao/executar_experimentos.py modelos",
+  "inicio": "2026-11-10T09:54:37",
+  "rascunho": false,
+  "ids": null,
+  "n_perguntas": 60,
+  "rodadas": 1,
+  "tabelas_ideais": false,
+  "git": {
+    "commit": "f685fc05f2877617f58fa6ec30c0ecbfe3c57f87",
+    "commit_curto": "f685fc0",
+    "ramo": "revisao/experimentos-configuraveis",
+    "alteracoes_nao_commitadas": false,
+    "arquivos_alterados": []
+  },
+  "arquivos_sha256": {
+    "configuracao.json": "21b42ebfbac73b245325d5fa27a7d5e73f7929131c656a8ed4d4c8ea97c04e14",
+    "experimentos.json": "bb5e46d0a3d5c3b4b640f8608ea93f8fe9dd90b35a4bc0872334f83c0f238e96",
+    "dados/perguntas_validacao.json": "fb53c8fba07b8483d2c711b5ac6f218345b1702530c54ed0e00906d442a9fe3b",
+    "embeddings/esquema.json": "b29683ce2ba3d351081dd244399fc57110ffd50ed5bd8873b08a0715551738dd",
+    "metricas/divisoes_hibridas.json": "d001212b4fd6bfe7d4bd7eb6f128b3bf4cd57c5812e03cb97a37800383e67459",
+    "embeddings/index_esquema.json": "f02d3545b907a302d0cea7883eba177711369030ab6672e0843a5643594ab3dd",
+    "embeddings/index_glossario.json": "0e2927a168f155770bdf707638c69e75857cc9a2aee170ca82d00c07dd5c28c8",
+    "embeddings/index_bm25_esquema.json": "5ed65e2b229f7ff234e9aeedcaa5469793f9f12981d116030c171919a48aab14",
+    "embeddings/index_bm25_glossario.json": "d1bf42110f5d50b5e838a4b3f4af4ed952285638484ea726013425c404ddab56",
+    "embeddings/modelos\\bge-m3\\index_esquema.json": "cef97730ef0ad9bcfd71ab143061d8098ecf718bb8717fef218dae3030780e28",
+    "embeddings/modelos\\bge-m3\\index_glossario.json": "dbb7e103dee8a464c79246883eda99ce0f6887322379d3634929ae4e53c15488",
+    "embeddings/modelos\\e5-base-v2\\index_esquema.json": "7dc4bf53e1b44f56bcc2e6393baf240ce32bec45f86ec2d6e22843b36607b941",
+    "embeddings/modelos\\e5-base-v2\\index_glossario.json": "af8c235182f2600ad3f4672696574a94489107c2ca655eeaaa2e801645e74f7a",
+    "embeddings/modelos\\e5-small\\index_esquema.json": "0f7db958fe9613df69394f56b814abfe5c5f87e56ede3bf5b86023236b5863a2",
+    "embeddings/modelos\\e5-small\\index_glossario.json": "913c3448353e0248fcb70e0017fcdb759e607b1f886b64fa39858e87e41837d5",
+    "embeddings/modelos\\minilm\\index_esquema.json": "74e7e2a9e32f30ddb245ef8328a604c7a78e882dd86e5f3ce7d99afbb4768c8e",
+    "embeddings/modelos\\minilm\\index_glossario.json": "a96ab214a15aaf089b29e10b3407034b1ccc7554eef80704f2b237ce8aa1c913"
+  },
+  "modelos_embeddings": {
+    "bge-m3": "BAAI/bge-m3",
+    "e5-base": "intfloat/multilingual-e5-base",
+    "e5-base-v2": "intfloat/e5-base-v2",
+    "e5-small": "intfloat/multilingual-e5-small",
+    "minilm": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+  },
+  "llm": {
+    "modelo": "qwen2.5-coder:7b",
+    "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "tamanho_bytes": 4683087561
+  },
+  "bibliotecas": {
+    "python": "3.13.7",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "sentence-transformers": "5.6.0",
+    "transformers": "5.12.1",
+    "torch": "2.12.0",
+    "rank-bm25": "0.2.2",
+    "nltk": "3.10.4",
+    "ollama": "0.6.2"
+  },
+  "configuracoes": {
+    "MiniLM": {
+      "modelo_embedding": "minilm",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "E5-small": {
+      "modelo_embedding": "e5-small",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "E5-base": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "BGE-M3": {
+      "modelo_embedding": "bge-m3",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "E5-base-v2 (só inglês)": {
+      "modelo_embedding": "e5-base-v2",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    }
+  },
+  "fim": "2026-11-10T09:55:53",
+  "duracao_s": 75.2
+}
