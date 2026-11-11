@@ -17,6 +17,9 @@ Descrição geral do funcionamento:
   com nenhum nome mas o termo, sem acento, pontuação e espaço, casa com um ou mais, a condição é
   trocada por DENOM_CIA IN (nomes exatos) e o SQL original fica em sql_original; se nada casa, o
   LLM recebe o problema com os nomes parecidos.
+- Também antes de executar, o código confere se cada CD_CONTA existe no plano da tabela em que é
+  usado (se não existe nela mas existe em outra tabela do contexto, o LLM recebe o aviso com a
+  tabela certa) e recusa SQL que usa VL_CONTA sem ESCALA_MOEDA, pedindo a conversão para reais.
 - Se der erro, o resultado vier vazio ou só com valores nulos (NULL, como o de SUM sobre nenhuma
   linha), o LLM recebe o problema e gera outro SQL, até o limite de tentativas.
 - Opcionalmente, um dicionário de cache (parâmetro cache) guarda o SQL por (pergunta, tabelas do
@@ -29,7 +32,8 @@ Dependências:
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
 
-Resultado: fornece gerar_sql(), executar_sql(), validar_sql() e conferir_companhias().
+Resultado: fornece gerar_sql(), executar_sql(), validar_sql(), conferir_companhias(), conferir_contas() e
+conferir_escala().
 """
 
 import copy
@@ -64,6 +68,12 @@ PROBLEMA_NULO = "a consulta só retornou valores nulos (NULL)"
 CD_CVM_LITERAL = re.compile(r"\bCD_CVM\s*(?:=|<>|!=)\s*'?\d+'?|\bCD_CVM\s+IN\s*\(\s*'?\d", re.IGNORECASE)
 # Condição sobre o nome da companhia, com ou sem alias da tabela (companhias.DENOM_CIA LIKE '%X%').
 LIKE_COMPANHIA = re.compile(r"((?:\w+\.)?DENOM_CIA)\s+LIKE\s+'((?:[^']|'')*)'", re.IGNORECASE)
+# Tabela depois de FROM ou JOIN, com o alias opcional (FROM DRE_con d, JOIN DRE_con AS d).
+TABELA_E_ALIAS = re.compile(
+    r"\b(?:FROM|JOIN)\s+(\w+)(?:\s+(?:AS\s+)?(?!ON\b|WHERE\b|JOIN\b|LEFT\b|INNER\b|GROUP\b|ORDER\b|LIMIT\b|USING\b|UNION\b|CROSS\b)(\w+))?",
+    re.IGNORECASE)
+# Condição sobre o código da conta, com ou sem o nome ou alias da tabela: CD_CONTA = '3.01' ou CD_CONTA IN ('3.01', '3.02').
+CONDICAO_CONTA = re.compile(r"(?:(\w+)\.)?CD_CONTA\s*(?:=\s*'([^']+)'|IN\s*\(([^)]*)\))", re.IGNORECASE)
 # Acima disso o termo é genérico demais para trocar o LIKE pelos nomes exatos.
 MAX_NOMES_NA_REESCRITA = 5
 # Semelhança mínima (difflib) entre uma palavra do termo e uma palavra de nome, para sugerir o nome.
@@ -261,6 +271,40 @@ def conferir_companhias(sql: str) -> tuple[str, str | None, list[dict]]:
     return novo, ("; ".join(problemas) if problemas else None), reescritas
 
 
+# Confere se cada CD_CONTA do SQL existe no plano da tabela em que é usado. O aviso só sai quando o código não
+# está no plano dessa tabela e está no de outra tabela do contexto: o plano guarda só as contas fixas, então
+# um código fora dele não é necessariamente errado (companhias têm contas próprias). Devolve o problema ou None.
+def conferir_contas(sql: str, plano: dict[str, set[str]]) -> str | None:
+    por_nome, usadas = {}, set()
+    for tabela, alias in TABELA_E_ALIAS.findall(sql):
+        if tabela in plano:
+            usadas.add(tabela)
+            por_nome[tabela] = tabela
+            if alias:
+                por_nome[alias] = tabela
+    problemas = []
+    for qualificador, unico, lista in CONDICAO_CONTA.findall(sql):
+        # Sem qualificador, só dá para saber a tabela se o SQL usa uma única tabela com plano de contas.
+        tabela = por_nome.get(qualificador) if qualificador else (next(iter(usadas)) if len(usadas) == 1 else None)
+        if not tabela or not plano[tabela]:
+            continue
+        codigos = [unico] if unico else [c.strip().strip("'") for c in lista.split(",")]
+        for codigo in codigos:
+            outras = [t for t, contas in plano.items() if t != tabela and codigo in contas]
+            if codigo and codigo not in plano[tabela] and outras:
+                problemas.append(f"a conta '{codigo}' não existe em {tabela}, mas existe em {', '.join(outras)}. "
+                                 f"Use uma conta que exista em {tabela} ou faça a consulta na tabela que tem essa conta")
+    return "; ".join(dict.fromkeys(problemas)) if problemas else None
+
+
+# Recusa o SQL que usa VL_CONTA sem ESCALA_MOEDA: as companhias reportam em milhares ou em reais, e a regra
+# do prompt é devolver sempre em reais. Devolve o problema ou None.
+def conferir_escala(sql: str) -> str | None:
+    if re.search(r"\bVL_CONTA\b", sql, re.IGNORECASE) and not re.search(r"\bESCALA_MOEDA\b", sql, re.IGNORECASE):
+        return "a consulta usa VL_CONTA sem converter a escala. Converta o valor para reais usando ESCALA_MOEDA, como nas regras"
+    return None
+
+
 # Gera o SQL da pergunta e o executa. Com um dicionário em cache, o SQL de um par (pergunta, lista de
 # tabelas do contexto) já gerado nele é reaproveitado, sem nova chamada ao LLM; o executor de
 # experimentos usa isso para comparar configurações que recuperam as mesmas tabelas.
@@ -284,6 +328,7 @@ def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
         "tabelas_contexto": [e["tabela"] for e in entradas],
         "sql": None, "sql_original": None, "colunas": [], "linhas": [], "status": "erro", "tentativas": [],
     }
+    plano = {e["tabela"]: {c["codigo"] for c in e["contas"]} for e in entradas}
     mensagens = [
         {"role": "system", "content": montar_instrucoes(montar_contexto(entradas))},
         {"role": "user", "content": pergunta},
@@ -302,8 +347,9 @@ def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
             sql = json.loads(conteudo)["sql"]
             tentativa["sql"] = sql
             sql_executado, problema, reescritas = conferir_companhias(sql)
-            if problema:
-                raise ValueError(problema)
+            problemas = [p for p in (problema, conferir_contas(sql_executado, plano), conferir_escala(sql_executado)) if p]
+            if problemas:
+                raise ValueError("; ".join(problemas))
             if reescritas:
                 tentativa["reescrita"] = reescritas
                 resultado["sql_original"] = sql
