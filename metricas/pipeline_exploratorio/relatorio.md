@@ -1,7 +1,7 @@
 # Experimento pipeline_exploratorio: pipeline completo
 
-- Gerado em 10/11/2026 15:16 por `python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio`.
-- Execução `20261110-141908`, commit `f6f496f`. A ficha completa está em `execucao.json`.
+- Gerado em 11/11/2026 10:37 por `python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio`.
+- Execução `20261111-093954`, commit `4800659`. A ficha completa está em `execucao.json`.
 - Experimento 6.3, execução exploratória do pipeline completo: compara dois cenários de busca com o modelo E5-base, o divisor das perguntas híbridas ligado com o bloqueio de pronomes e a passada de tabelas ideais. No cenário 1 os dois índices usam embeddings; no cenário 2 o esquema usa embeddings e o glossário usa RRF sem stemmer. Uma rodada.
 - Conjunto: `dados/perguntas_validacao.json`, 60 perguntas; 1 rodada(s).
 - O cache de SQL vale entre as configurações da mesma rodada e é refeito a cada rodada. A passada de tabelas ideais gera o SQL só com as tabelas de `tabelas_esperadas`.
@@ -10,29 +10,29 @@
 
 | Configuração | Classe certa | EX adaptado | EX estrito | EX adaptado com tabelas ideais | EX estrito com tabelas ideais | Tempo total por pergunta (s) |
 |---|---|---|---|---|---|---|
-| Cenário 1: embeddings (esquema e glossário) | 60/60 | 9/40 | 4/40 | 9/40 | 3/40 | 29,39 |
-| Cenário 2: embeddings (esquema) + RRF (glossário) | 60/60 | 9/40 | 4/40 | 9/40 | 3/40 | 17,45 |
+| Cenário 1: embeddings (esquema e glossário) | 60/60 | 24/40 | 10/40 | 22/40 | 7/40 | 29,57 |
+| Cenário 2: embeddings (esquema) + RRF (glossário) | 60/60 | 24/40 | 10/40 | 22/40 | 7/40 | 16,42 |
 
 ## 2. Perguntas quantitativas
 
 | Configuração | Classe certa | EX adaptado | EX estrito | EX adaptado com tabelas ideais | EX estrito com tabelas ideais | Tempo total por pergunta (s) |
 |---|---|---|---|---|---|---|
-| Cenário 1: embeddings (esquema e glossário) | 20/20 | 7/20 | 4/20 | 7/20 | 3/20 | 35,99 |
-| Cenário 2: embeddings (esquema) + RRF (glossário) | 20/20 | 7/20 | 4/20 | 7/20 | 3/20 | 14,01 |
+| Cenário 1: embeddings (esquema e glossário) | 20/20 | 12/20 | 6/20 | 11/20 | 6/20 | 37,97 |
+| Cenário 2: embeddings (esquema) + RRF (glossário) | 20/20 | 12/20 | 6/20 | 11/20 | 6/20 | 13,88 |
 
 ## 3. Perguntas conceituais
 
 | Configuração | Classe certa | Tempo total por pergunta (s) |
 |---|---|---|
-| Cenário 1: embeddings (esquema e glossário) | 20/20 | 16,36 |
-| Cenário 2: embeddings (esquema) + RRF (glossário) | 20/20 | 18,26 |
+| Cenário 1: embeddings (esquema e glossário) | 20/20 | 15,46 |
+| Cenário 2: embeddings (esquema) + RRF (glossário) | 20/20 | 16,22 |
 
 ## 4. Perguntas híbridas
 
 | Configuração | Classe certa | EX adaptado | EX estrito | EX adaptado com tabelas ideais | EX estrito com tabelas ideais | Tempo total por pergunta (s) |
 |---|---|---|---|---|---|---|
-| Cenário 1: embeddings (esquema e glossário) | 20/20 | 2/20 | 0/20 | 2/20 | 0/20 | 35,81 |
-| Cenário 2: embeddings (esquema) + RRF (glossário) | 20/20 | 2/20 | 0/20 | 2/20 | 0/20 | 20,08 |
+| Cenário 1: embeddings (esquema e glossário) | 20/20 | 12/20 | 4/20 | 11/20 | 1/20 | 35,30 |
+| Cenário 2: embeddings (esquema) + RRF (glossário) | 20/20 | 12/20 | 4/20 | 11/20 | 1/20 | 19,15 |
 
 ## 5. Matriz de confusão do classificador
 
@@ -58,8 +58,8 @@ Cada linha é o tipo real da pergunta e cada coluna, o tipo que o classificador 
 
 | Configuração | classificador | divisor | sql | sintese | validacao |
 |---|---|---|---|---|---|
-| Cenário 1: embeddings (esquema e glossário) | 6,20 | 2,28 | 18,35 | 7,41 | 2,76 |
-| Cenário 2: embeddings (esquema) + RRF (glossário) | 6,33 | 2,28 | 0,04 | 7,41 | 2,90 |
+| Cenário 1: embeddings (esquema e glossário) | 5,93 | 2,27 | 18,66 | 7,35 | 3,09 |
+| Cenário 2: embeddings (esquema) + RRF (glossário) | 5,65 | 2,26 | 0,04 | 6,78 | 3,19 |
 
 ## 7. Métricas e escalas
 
