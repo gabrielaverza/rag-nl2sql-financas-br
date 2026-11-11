@@ -124,6 +124,8 @@ python pipeline/online/main.py "pergunta" --set divisor.ativo=false   # troca um
 python pipeline/avaliacao/validar_perguntas.py dados/perguntas_validacao.json --base   # confere o conjunto
 python pipeline/avaliacao/executar_experimentos.py --listar                            # experimentos disponíveis
 python pipeline/avaliacao/executar_experimentos.py metodos                             # embeddings, BM25 e RRF
+python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio               # pipeline completo, dois cenários de busca
+python pipeline/avaliacao/ragas_avaliacao.py pipeline_exploratorio                     # RAGAS sobre o respostas.json do experimento
 python pipeline/avaliacao/verificacoes.py todas                                        # testes de sanidade (usam o LLM)
 ```
 
@@ -248,15 +250,18 @@ entidades (colunas, contas e relações não entram na pontuação), e as tabela
 acompanhadas das que elas referenciam por chave estrangeira (hoje, `companhias`). No glossário, a
 busca devolve os trechos mais parecidos. O BM25 usa k1 = 2 e b = 0,5.
 
-**Classificador.** Um LLM local recebe a definição de cada classe e 9 exemplos e responde um JSON
+**Classificador.** Um LLM local recebe a definição de cada classe e 23 exemplos e responde um JSON
 `{"tipo": ...}`. O tipo decide o caminho: conceitual usa o glossário, quantitativa usa o esquema e o
-SQL, e híbrida usa os dois. Se o LLM não devolver uma classe válida em 2 tentativas, a pergunta é
+SQL, e híbrida usa os dois. Os exemplos têm híbridas de estruturas variadas e também quantitativas e
+conceituais de forma parecida, mas sem as duas partes, para o modelo não tratar o "e" ou o nome de
+uma companhia como sinal de pergunta híbrida. Se o LLM não devolver uma classe válida em 2 tentativas, a pergunta é
 tratada como híbrida.
 
 **Divisor.** Só nas perguntas híbridas e com `divisor.ativo`. O LLM separa a pergunta em parte de dados
 e parte conceitual (5 exemplos no prompt); a parte conceitual não pode ter pronome ("nesse valor"), e,
 se tiver, o LLM é chamado de novo. Se a divisão falhar, as duas partes viram a pergunta inteira. As
-tabelas continuam sendo buscadas com a pergunta inteira e os trechos, com a parte conceitual.
+tabelas continuam sendo buscadas com a pergunta inteira, os trechos são buscados com a parte conceitual e o
+gerador de SQL recebe só a parte de dados.
 
 **Gerador de SQL.** Para as perguntas quantitativas e híbridas. O contexto do LLM traz só as tabelas
 escolhidas, lidas do `esquema.json`: colunas, tipos, valores possíveis, junções e o plano de contas.
@@ -270,9 +275,20 @@ As regras do prompt tratam de consolidado (`_con`) como padrão, `ORDEM_EXERC`, 
 `LIKE` em `DENOM_CIA` e valores sempre em reais (`CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000
 ELSE VL_CONTA END`). Um nome pode combinar com mais de uma companhia (`%JBS%` traz JBS S.A. e JBS N.V.):
 o SQL devolve uma linha por companhia, com `DENOM_CIA` na primeira coluna. O código só aceita um único
-`SELECT`, com limite de tempo, e devolve o erro ao LLM (ou avisa que o resultado veio vazio) por até 3
-tentativas. `gerar_sql` também aceita a lista de tabelas, sem usar a busca, e um dicionário de cache
-que reaproveita o SQL de um mesmo par (pergunta, tabelas do contexto).
+`SELECT`, executado em modo somente leitura e com limite de tempo, e confere o SQL antes de executar:
+
+- recusa `CD_CVM` escrito direto (o LLM inventa esses códigos) e confere os nomes do `LIKE` em
+  `DENOM_CIA`: se o `LIKE` literal não casa com nenhuma companhia, mas o termo, sem acento, pontuação e
+  espaço, casa com uma ou mais, a condição é trocada por `DENOM_CIA IN (nomes exatos)` e o SQL original
+  fica em `sql_original`; se nada casa, o LLM recebe um aviso com nomes parecidos;
+- confere se cada `CD_CONTA` existe no plano da tabela em que é usado (o aviso só sai se o código existe
+  no plano de outra tabela do contexto, pois o plano guarda só as contas fixas);
+- recusa `VL_CONTA` sem `ESCALA_MOEDA`, pedindo a conversão para reais.
+
+Erro de execução, resultado vazio e resultado só com valores nulos (como o `SUM` sobre nenhuma linha)
+voltam ao LLM com o problema, por até 3 tentativas. `gerar_sql` aceita também a lista de tabelas, sem usar
+a busca, o texto que o LLM recebe (`pergunta_sql`; as tabelas são sempre buscadas com a pergunta) e um
+dicionário de cache que reaproveita o SQL de um mesmo par (texto, tabelas do contexto).
 
 **Síntese.** O LLM responde só com o que recebe. Conceitual: os trechos mais parecidos; quantitativa: o
 resultado do SQL, com cada valor rotulado pelo nome da coluna e os números no padrão brasileiro;
@@ -291,7 +307,8 @@ empresa e código CVM, demonstração financeira e exercício social. Também en
 documentos usados (numa recusa, nenhum documento é listado). Fidelidade abaixo do limiar gera um aviso.
 
 **Fluxo (`main.py`).** `executar(pergunta)` classifica e segue o caminho do tipo: divide a pergunta
-híbrida, gera o SQL (quantitativa e híbrida), sintetiza, valida e formata. Se o SQL falha em todas as
+híbrida, gera o SQL (quantitativa e híbrida; na híbrida dividida, só com a parte de dados), sintetiza,
+valida e formata. Se o SQL falha em todas as
 tentativas, a quantitativa recebe uma mensagem de falha e a híbrida é respondida só com os normativos,
 com um aviso. Pela linha de comando: `--interativo` e `--arquivo` carregam o sistema uma vez e
 respondem várias perguntas, `--configuracao` troca o arquivo de configuração e `--set` troca um valor.
@@ -344,6 +361,7 @@ sobrescritos a cada execução:
 | `resultados.csv` | Uma linha por rodada, configuração, pergunta e métrica |
 | `resumo.csv` | Uma linha por configuração, tipo e métrica (soma, média, mínimo e máximo entre rodadas) |
 | `respostas.json` | Só no nível `pipeline`: respostas, SQL e divisões de cada pergunta |
+| `ragas.csv` e `ragas.md` | Só no nível `pipeline`, depois de `ragas_avaliacao.py`: fidelidade e relevância da resposta e conferência dos números |
 | `execucao.json` | A ficha que identifica o teste: comando, commit do código (com aviso de alterações não commitadas), impressão digital (SHA-256) da configuração, dos experimentos, das perguntas e dos índices, modelos, versões das bibliotecas, configurações efetivas, rodadas e duração |
 
 Cada execução recebe um identificador (data e hora, `AAAAMMDD-HHMMSS`) que aparece no cabeçalho do
@@ -361,6 +379,14 @@ git show metodos-v1:metricas/metodos/relatorio.md
 Execuções de teste (`--ids`, ou `"rascunho": true` no experimento) vão para `metricas/rascunhos/<nome>/`,
 pasta ignorada pelo git, e o relatório as marca como rascunho. `medir_tempo_busca.py` grava o relatório
 dele nessa mesma pasta.
+
+**Experimentos executados.** Cada execução oficial está no commit que guarda a sua pasta e tem uma tag.
+
+| Experimento | Nível | O que compara | Tags |
+|---|---|---|---|
+| `metodos` | `recuperacao` | embeddings, BM25 e RRF, o BM25 e o RRF com e sem radicalizador | `metodos-v1` |
+| `modelos` | `recuperacao` | cinco modelos de embeddings (`minilm`, `e5-small`, `e5-base`, `bge-m3` e `e5-base-v2`) | `modelos-v1` |
+| `pipeline_exploratorio` | `pipeline` | dois cenários de busca (embeddings nos dois índices; embeddings no esquema e RRF sem radicalizador no glossário), com a passada de tabelas ideais | `pipeline_exploratorio-v1` a `-v3` |
 
 O experimento `teste_equivalencia` serve para conferir que uma mudança no código não alterou as
 métricas de recuperação: rode-o antes e depois, e compare os `resultados.csv` (a coluna `execucao` é a
