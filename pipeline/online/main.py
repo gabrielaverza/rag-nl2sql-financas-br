@@ -9,7 +9,7 @@ Descrição geral do funcionamento:
    separa a parte de dados e a parte conceitual. As tabelas continuam sendo buscadas com a
    pergunta inteira; os trechos dos normativos são buscados com a parte conceitual.
 3. Caminho quantitativo ou híbrido: seleção de contexto e geração de SQL, com autocorreção
-   (gerador_sql.py).
+   (gerador_sql.py). Na híbrida dividida, o gerador recebe só a parte de dados.
 4. Síntese da resposta em linguagem natural (sintetizador.py).
 5. Validação: relevância do contexto e fidelidade da resposta (validador.py).
 6. Formatação final com proveniência (formatador.py).
@@ -99,7 +99,10 @@ def executar(pergunta: str, cache_sql: dict | None = None) -> dict:
     resultado_sql = None
     if classe in ("quantitativa", "hibrida"):
         inicio = time.time()
-        resultado_sql = gerar_sql(pergunta, tipo=classe, cache=cache_sql)
+        # O gerador de SQL recebe só a parte de dados da pergunta híbrida dividida; as tabelas são buscadas
+        # com a pergunta inteira.
+        pergunta_sql = divisao["parte_dados"] if divisao and divisao["dividida"] else None
+        resultado_sql = gerar_sql(pergunta, tipo=classe, cache=cache_sql, pergunta_sql=pergunta_sql)
         tempos["sql"] = time.time() - inicio
 
     inicio = time.time()

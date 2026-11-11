@@ -8,6 +8,9 @@ Descrição geral do funcionamento:
   pergunta (k_tabelas e o método vêm de configuracao.json), mais as tabelas que elas referenciam
   por chave estrangeira (companhias). Também é possível passar a lista de tabelas, sem usar a
   busca (usado para medir o gerador com tabelas ideais).
+- Nas perguntas híbridas divididas pelo divisor, o LLM recebe só a parte de dados (parâmetro pergunta_sql):
+  a parte conceitual o levava a responder a explicação com colunas a mais e a escolher a conta errada. As
+  tabelas continuam sendo buscadas com a pergunta inteira.
 - O contexto traz só essas tabelas (colunas, tipos, valores possíveis, plano de contas e
   junções), lido do esquema.json. O esquema completo não vai ao LLM.
 - Cada conta do plano de contas aparece com a descrição oficial e o filtro CD_CONTA pronto.
@@ -305,16 +308,19 @@ def conferir_escala(sql: str) -> str | None:
     return None
 
 
-# Gera o SQL da pergunta e o executa. Com um dicionário em cache, o SQL de um par (pergunta, lista de
-# tabelas do contexto) já gerado nele é reaproveitado, sem nova chamada ao LLM; o executor de
-# experimentos usa isso para comparar configurações que recuperam as mesmas tabelas.
+# Gera o SQL da pergunta e o executa. As tabelas do contexto são sempre buscadas com a pergunta; o texto que o
+# LLM recebe para escrever o SQL é pergunta_sql, quando dado (a parte de dados de uma pergunta híbrida dividida),
+# ou a própria pergunta. Com um dicionário em cache, o SQL de um par (texto, lista de tabelas do contexto) já
+# gerado nele é reaproveitado, sem nova chamada ao LLM; o executor de experimentos usa isso para comparar
+# configurações que recuperam as mesmas tabelas.
 def gerar_sql(pergunta: str, k: int | None = None, tabelas: list[str] | None = None, tipo: str | None = None,
-              cache: dict | None = None) -> dict:
+              cache: dict | None = None, pergunta_sql: str | None = None) -> dict:
     entradas = selecionar_contexto(pergunta, k, tabelas, tipo)
-    chave = (pergunta, tuple(e["tabela"] for e in entradas))
+    texto = pergunta_sql or pergunta
+    chave = (texto, tuple(e["tabela"] for e in entradas))
     if cache is not None and chave in cache:
         return copy.deepcopy(cache[chave])
-    resultado = _gerar_e_executar(pergunta, entradas)
+    resultado = _gerar_e_executar(texto, entradas)
     if cache is not None:
         cache[chave] = copy.deepcopy(resultado)
     return resultado
