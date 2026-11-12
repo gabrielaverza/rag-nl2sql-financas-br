@@ -1,148 +1,1336 @@
 [
   {
-    "id": "v01",
-    "pergunta": "Qual foi o lucro líquido da WEG em 2025?",
+    "id": "q01",
+    "pergunta": "Qual foi a receita líquida consolidada da Marcopolo em 2025?",
     "tipo": "quantitativa",
     "tabelas_esperadas": [
       "DRE_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'MARCOPOLO S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "MARCOPOLO S.A.",
+        "cd_cvm": "008451",
+        "tabela": "DRE_con",
+        "cd_conta": "3.01"
+      }
+    ]
   },
   {
-    "id": "v02",
-    "pergunta": "Quanto a Natura tinha de caixa e equivalentes de caixa no fim de 2025?",
+    "id": "q02",
+    "pergunta": "Quanto a Grendene tinha em caixa e equivalentes de caixa no fim de 2025, no balanço consolidado?",
     "tipo": "quantitativa",
     "tabelas_esperadas": [
       "BPA_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'GRENDENE S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "GRENDENE S.A.",
+        "cd_cvm": "019615",
+        "tabela": "BPA_con",
+        "cd_conta": "1.01.01"
+      }
+    ]
   },
   {
-    "id": "v03",
-    "pergunta": "Qual o patrimônio líquido consolidado da Suzano?",
-    "tipo": "quantitativa",
-    "tabelas_esperadas": [
-      "BPP_con",
-      "companhias"
-    ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
-  },
-  {
-    "id": "v04",
-    "pergunta": "Quanto caixa a Raia Drogasil gerou nas atividades operacionais em 2025?",
-    "tipo": "quantitativa",
-    "tabelas_esperadas": [
-      "DFC_MI_con",
-      "companhias"
-    ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'RAIA DROGASIL S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
-  },
-  {
-    "id": "v05",
-    "pergunta": "Qual foi o resultado financeiro da Klabin em 2025?",
+    "id": "q03",
+    "pergunta": "Qual foi o lucro bruto consolidado da M. Dias Branco em 2025?",
     "tipo": "quantitativa",
     "tabelas_esperadas": [
       "DRE_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'KLABIN S.A.') AND CD_CONTA = '3.06' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'M.DIAS BRANCO S.A. IND COM DE ALIMENTOS') AND CD_CONTA = '3.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "M.DIAS BRANCO S.A. IND COM DE ALIMENTOS",
+        "cd_cvm": "020338",
+        "tabela": "DRE_con",
+        "cd_conta": "3.03"
+      }
+    ]
   },
   {
-    "id": "v06",
-    "pergunta": "Qual foi a receita da Lojas Renner no balanço individual, só da controladora, em 2025?",
+    "id": "q04",
+    "pergunta": "Quanto caixa as operações da Cosan geraram em 2025, no consolidado?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'COSAN S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "COSAN S.A.",
+        "cd_cvm": "019836",
+        "tabela": "DFC_MI_con",
+        "cd_conta": "6.01"
+      }
+    ]
+  },
+  {
+    "id": "q05",
+    "pergunta": "Qual era o patrimônio líquido da TIM ao fim de 2025, nas demonstrações individuais?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPP_ind",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'TIM S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "TIM S.A.",
+        "cd_cvm": "024929",
+        "tabela": "BPP_ind",
+        "cd_conta": "2.03"
+      }
+    ]
+  },
+  {
+    "id": "q06",
+    "pergunta": "Quanto a Multiplan teve de despesas financeiras em 2025, no consolidado?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'MULTIPLAN - EMPREEND IMOBILIARIOS S.A.') AND CD_CONTA = '3.06.02' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "MULTIPLAN - EMPREEND IMOBILIARIOS S.A.",
+        "cd_cvm": "020982",
+        "tabela": "DRE_con",
+        "cd_conta": "3.06.02"
+      }
+    ]
+  },
+  {
+    "id": "q07",
+    "pergunta": "Qual o valor do imobilizado consolidado da Rumo no fim de 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'RUMO S.A.') AND CD_CONTA = '1.02.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "RUMO S.A.",
+        "cd_cvm": "017450",
+        "tabela": "BPA_con",
+        "cd_conta": "1.02.03"
+      }
+    ]
+  },
+  {
+    "id": "q08",
+    "pergunta": "Qual foi o valor adicionado total a distribuir consolidado da Totvs em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DVA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'TOTVS S.A.') AND CD_CONTA = '7.07' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "TOTVS S.A.",
+        "cd_cvm": "019992",
+        "tabela": "DVA_con",
+        "cd_conta": "7.07"
+      }
+    ]
+  },
+  {
+    "id": "q09",
+    "pergunta": "Entre MRV e Direcional, qual teve o maior lucro líquido consolidado em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT c.DENOM_CIA, CASE WHEN d.ESCALA_MOEDA = 'MIL' THEN d.VL_CONTA * 1000 ELSE d.VL_CONTA END FROM DRE_con d JOIN companhias c ON c.CD_CVM = d.CD_CVM WHERE c.DENOM_CIA IN ('MRV ENGENHARIA E PARTICIPACOES S.A.', 'DIRECIONAL ENGENHARIA S.A.') AND d.CD_CONTA = '3.11' AND d.ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "MRV ENGENHARIA E PARTICIPACOES S.A.",
+        "cd_cvm": "020915",
+        "tabela": "DRE_con",
+        "cd_conta": "3.11"
+      },
+      {
+        "companhia": "DIRECIONAL ENGENHARIA S.A.",
+        "cd_cvm": "021350",
+        "tabela": "DRE_con",
+        "cd_conta": "3.11"
+      }
+    ]
+  },
+  {
+    "id": "q10",
+    "pergunta": "Qual foi o lucro líquido da controladora Ultrapar em 2025, nas demonstrações individuais?",
     "tipo": "quantitativa",
     "tabelas_esperadas": [
       "DRE_ind",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'LOJAS RENNER S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'ULTRAPAR PARTICIPACOES S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "ULTRAPAR PARTICIPACOES S.A.",
+        "cd_cvm": "018465",
+        "tabela": "DRE_ind",
+        "cd_conta": "3.11"
+      }
+    ]
   },
   {
-    "id": "v07",
-    "pergunta": "Quanto a Gerdau tinha de empréstimos e financiamentos de curto prazo em 2025?",
+    "id": "q11",
+    "pergunta": "Qual foi a receita operacional líquida consolidada da Hypera em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'HYPERA S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "HYPERA S.A.",
+        "cd_cvm": "021431",
+        "tabela": "DRE_con",
+        "cd_conta": "3.01"
+      }
+    ]
+  },
+  {
+    "id": "q12",
+    "pergunta": "Quanto o Fleury tinha em caixa e equivalentes de caixa, no consolidado, ao fim de 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'FLEURY S.A.') AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "FLEURY S.A.",
+        "cd_cvm": "021881",
+        "tabela": "BPA_con",
+        "cd_conta": "1.01.01"
+      }
+    ]
+  },
+  {
+    "id": "q13",
+    "pergunta": "Qual foi o resultado líquido consolidado da Tupy em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'TUPY S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "TUPY S.A.",
+        "cd_cvm": "006343",
+        "tabela": "DRE_con",
+        "cd_conta": "3.11"
+      }
+    ]
+  },
+  {
+    "id": "q14",
+    "pergunta": "Quanto caixa as atividades operacionais da Vibra Energia geraram em 2025, no consolidado?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'VIBRA ENERGIA S/A') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "VIBRA ENERGIA S/A",
+        "cd_cvm": "024295",
+        "tabela": "DFC_MI_con",
+        "cd_conta": "6.01"
+      }
+    ]
+  },
+  {
+    "id": "q15",
+    "pergunta": "Qual era o ativo total consolidado da Hapvida ao fim de 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'HAPVIDA PARTICIPAÇÕES E INVESTIMENTOS S.A.') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "HAPVIDA PARTICIPAÇÕES E INVESTIMENTOS S.A.",
+        "cd_cvm": "024392",
+        "tabela": "BPA_con",
+        "cd_conta": "1"
+      }
+    ]
+  },
+  {
+    "id": "q16",
+    "pergunta": "Qual era o patrimônio líquido consolidado da Vivara ao fim de 2025?",
     "tipo": "quantitativa",
     "tabelas_esperadas": [
       "BPP_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'GERDAU S.A.') AND CD_CONTA = '2.01.04' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": []
-  },
-  {
-    "id": "v08",
-    "pergunta": "O que são atividades de investimento no fluxo de caixa?",
-    "tipo": "conceitual",
-    "tabelas_esperadas": [],
-    "sql_referencia": null,
-    "evidencia": [
-      "Atividades de investimento são as referentes à aquisição e à venda de ativos de longo prazo"
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'VIVARA PARTICIPAÇÕES S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "VIVARA PARTICIPAÇÕES S.A.",
+        "cd_cvm": "024805",
+        "tabela": "BPP_con",
+        "cd_conta": "2.03"
+      }
     ]
   },
   {
-    "id": "v09",
-    "pergunta": "Quando uma dívida deve ser tratada como de curto prazo no balanço?",
-    "tipo": "conceitual",
-    "tabelas_esperadas": [],
-    "sql_referencia": null,
-    "evidencia": [
-      "O passivo deve ser classificado como circulante quando satisfizer qualquer dos seguintes critérios"
+    "id": "q17",
+    "pergunta": "Qual era o passivo circulante consolidado da Cury ao fim de 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "BPP_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'CURY CONSTRUTORA E INCORPORADORA S.A.') AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "CURY CONSTRUTORA E INCORPORADORA S.A.",
+        "cd_cvm": "025100",
+        "tabela": "BPP_con",
+        "cd_conta": "2.01"
+      }
     ]
   },
   {
-    "id": "v10",
-    "pergunta": "O que são atividades operacionais na demonstração de fluxo de caixa?",
-    "tipo": "conceitual",
-    "tabelas_esperadas": [],
-    "sql_referencia": null,
-    "evidencia": [
-      "Atividades operacionais são as principais atividades geradoras de receita da entidade"
-    ]
-  },
-  {
-    "id": "v11",
-    "pergunta": "Quanto a WEG distribuiu para pessoal em 2025 e o que é o valor adicionado que está sendo distribuído?",
-    "tipo": "hibrida",
+    "id": "q18",
+    "pergunta": "Qual foi o valor adicionado total a distribuir consolidado da Santos Brasil em 2025?",
+    "tipo": "quantitativa",
     "tabelas_esperadas": [
       "DVA_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'WEG S.A.') AND CD_CONTA = '7.08.01' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": [
-      "Valor adicionado representa a riqueza criada pela empresa"
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SANTOS BRASIL PARTICIPACOES S.A.') AND CD_CONTA = '7.07' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "SANTOS BRASIL PARTICIPACOES S.A.",
+        "cd_cvm": "017892",
+        "tabela": "DVA_con",
+        "cd_conta": "7.07"
+      }
     ]
   },
   {
-    "id": "v12",
-    "pergunta": "Qual foi o caixa líquido das atividades de investimento da Suzano em 2025 e o que entra nessa atividade?",
-    "tipo": "hibrida",
+    "id": "q19",
+    "pergunta": "Qual foi o lucro líquido da Romi, nas demonstrações individuais da controladora, em 2025?",
+    "tipo": "quantitativa",
     "tabelas_esperadas": [
-      "DFC_MI_con",
+      "DRE_ind",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SUZANO S.A.') AND CD_CONTA = '6.02' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "evidencia": [
-      "Atividades de investimento são as referentes à aquisição e à venda de ativos de longo prazo"
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_ind WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'ROMI S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "ROMI S.A.",
+        "cd_cvm": "007510",
+        "tabela": "DRE_ind",
+        "cd_conta": "3.11"
+      }
     ]
   },
   {
-    "id": "v13",
-    "pergunta": "Qual o passivo circulante da Natura e o que faz um passivo ser circulante?",
+    "id": "q20",
+    "pergunta": "Entre Tegma e Mills, qual teve a maior receita líquida consolidada em 2025?",
+    "tipo": "quantitativa",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT c.DENOM_CIA, CASE WHEN d.ESCALA_MOEDA = 'MIL' THEN d.VL_CONTA * 1000 ELSE d.VL_CONTA END FROM DRE_con d JOIN companhias c ON c.CD_CVM = d.CD_CVM WHERE c.DENOM_CIA IN ('TEGMA GESTAO LOGISTICA S.A.', 'MILLS LOCAÇÃO, SERVIÇOS E LOGÍSTICA S.A.') AND d.CD_CONTA = '3.01' AND d.ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [],
+    "base_dados": [
+      {
+        "companhia": "TEGMA GESTAO LOGISTICA S.A.",
+        "cd_cvm": "020800",
+        "tabela": "DRE_con",
+        "cd_conta": "3.01"
+      },
+      {
+        "companhia": "MILLS LOCAÇÃO, SERVIÇOS E LOGÍSTICA S.A.",
+        "cd_cvm": "022012",
+        "tabela": "DRE_con",
+        "cd_conta": "3.01"
+      }
+    ]
+  },
+  {
+    "id": "c01",
+    "pergunta": "O que caracteriza uma atividade de financiamento na demonstração dos fluxos de caixa?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Atividades de financiamento são aquelas que resultam em mudanças no tamanho e na composição do capital próprio e no capital de terceiros da entidade."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 3,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_020"
+      ],
+      "dispositivo": "item 6"
+    }
+  },
+  {
+    "id": "c02",
+    "pergunta": "Em que tipo de fluxo de caixa são classificados, em regra, os juros pagos e recebidos por uma instituição financeira?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Os juros pagos e recebidos e os dividendos e os juros sobre o capital próprio recebidos são comumente classificados como fluxos de caixa operacionais em instituições financeiras."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 8,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_066"
+      ],
+      "dispositivo": "item 33"
+    }
+  },
+  {
+    "id": "c03",
+    "pergunta": "O que é o valor adicionado recebido em transferência?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Valor adicionado recebido em transferência representa a riqueza que não tenha sido criada pela própria entidade, e sim por terceiros, e que a ela é transferida"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 2,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_013"
+      ],
+      "dispositivo": "item 9"
+    }
+  },
+  {
+    "id": "c04",
+    "pergunta": "Como a receita de venda é reconhecida para fins da demonstração do valor adicionado?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Receita de venda de mercadorias, produtos e serviços representa os valores reconhecidos na contabilidade a esse título pelo regime de competência e incluídos na Demonstração do Resultado do Período"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 2,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_009"
+      ],
+      "dispositivo": "item 9"
+    }
+  },
+  {
+    "id": "c05",
+    "pergunta": "Sob qual pressuposto as demonstrações contábeis devem ser elaboradas, em regra?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "As demonstrações contábeis devem ser elaboradas no pressuposto da continuidade, a menos que a administração tenha intenção de liquidar a entidade ou cessar seus negócios"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 12,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_078"
+      ],
+      "dispositivo": "item 25"
+    }
+  },
+  {
+    "id": "c06",
+    "pergunta": "De que depende a materialidade de uma informação nas demonstrações contábeis?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "A materialidade depende da natureza ou magnitude da informação, ou de ambas."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 4,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_022"
+      ],
+      "dispositivo": "item 7"
+    }
+  },
+  {
+    "id": "c07",
+    "pergunta": "Em que condições uma entidade pode compensar ativos e passivos ou receitas e despesas?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "A entidade não deve compensar ativos e passivos ou receitas e despesas, a menos que a compensação seja exigida ou permitida por um Pronunciamento Técnico, Interpretação ou Orientação do CPC."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 13,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_088"
+      ],
+      "dispositivo": "item 32"
+    }
+  },
+  {
+    "id": "c08",
+    "pergunta": "Em quantos dias após o fim de cada trimestre a companhia deve entregar o formulário de informações trimestrais?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "entregue pelo emissor no prazo de 45 (quarenta e cinco) dias contados da data de encerramento de cada trimestre."
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 21,
+      "trecho_id": [
+        "glossario_resol080consolid_083"
+      ],
+      "dispositivo": "art. 31, inciso II"
+    }
+  },
+  {
+    "id": "c09",
+    "pergunta": "Que documentos devem acompanhar as demonstrações financeiras anuais da companhia?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "As demonstrações financeiras devem ser acompanhadas de: I – relatório da administração; II – relatório do auditor independente"
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 19,
+      "trecho_id": [
+        "glossario_resol080consolid_075"
+      ],
+      "dispositivo": "art. 27, § 1º"
+    }
+  },
+  {
+    "id": "c10",
+    "pergunta": "Com que frequência o conjunto completo das demonstrações contábeis deve ser apresentado?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "O conjunto completo das demonstrações contábeis deve ser apresentado pelo menos anualmente (inclusive informação comparativa)"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 14,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_095"
+      ],
+      "dispositivo": "item 36"
+    }
+  },
+  {
+    "id": "c11",
+    "pergunta": "Uma compra de imobilizado paga com ações, sem saída de caixa, aparece na demonstração dos fluxos de caixa?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Transações de investimento e financiamento que não envolvem o uso de caixa ou equivalentes de caixa devem ser excluídas da demonstração dos fluxos de"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 11,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_084"
+      ],
+      "dispositivo": "item 43"
+    }
+  },
+  {
+    "id": "c12",
+    "pergunta": "O que a empresa precisa mostrar para conciliar o caixa da demonstração dos fluxos de caixa com o balanço?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "A entidade deve divulgar os componentes de caixa e equivalentes de caixa e deve apresentar uma conciliação dos montantes em sua demonstração dos fluxos de caixa com os respectivos itens apresentados no balanço patrimonial."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 13,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_103"
+      ],
+      "dispositivo": "item 45"
+    }
+  },
+  {
+    "id": "c13",
+    "pergunta": "Como a empresa deve informar saldos de caixa que o grupo não pode usar?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "A entidade deve divulgar, acompanhados de comentário da administração, os saldos significativos de caixa e equivalentes de caixa mantidos pela entidade que não estejam disponíveis para uso pelo grupo."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 14,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_106"
+      ],
+      "dispositivo": "item 48"
+    }
+  },
+  {
+    "id": "c14",
+    "pergunta": "Quanto deve somar o grupo de remuneração de capitais próprios na DVA?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Remuneração de capitais próprios – valores relativos à remuneração atribuída aos sócios e acionistas. O total desse grupo deve ser igual ao resultado líquido do exercício, reportado na Demonstração do Resultado do Período."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 5,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_034"
+      ],
+      "dispositivo": "item 15"
+    }
+  },
+  {
+    "id": "c15",
+    "pergunta": "Quem recebe a remuneração de capitais de terceiros na DVA?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "Remuneração de capitais de terceiros – valores pagos ou creditados aos financiadores externos de capital."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 4,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_031"
+      ],
+      "dispositivo": "item 15"
+    }
+  },
+  {
+    "id": "c16",
+    "pergunta": "Uma empresa pode apresentar um prejuízo incomum como item extraordinário na demonstração do resultado?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "A entidade não deve apresentar rubricas ou itens de receitas ou despesas como itens extraordinários, quer na demonstração do resultado abrangente, quer na demonstração do resultado do período, quer nas notas explicativas."
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 30,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_213"
+      ],
+      "dispositivo": "item 87"
+    }
+  },
+  {
+    "id": "c17",
+    "pergunta": "Em que condições um ativo é classificado como circulante no balanço patrimonial?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "O ativo deve ser classificado como circulante quando satisfizer qualquer dos seguintes critérios"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 21,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_147"
+      ],
+      "dispositivo": "item 66"
+    }
+  },
+  {
+    "id": "c18",
+    "pergunta": "Que informação sobre estimativas incertas a empresa precisa divulgar nas notas explicativas?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "A entidade deve divulgar, nas notas explicativas, informação acerca dos pressupostos relativos ao futuro e outras fontes principais de incerteza nas estimativas ao término do período de reporte que possuam risco significativo de provocar ajuste material nos valores contábeis de ativos e passivos ao longo do próximo exercício"
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 41,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_272"
+      ],
+      "dispositivo": "item 125"
+    }
+  },
+  {
+    "id": "c19",
+    "pergunta": "Em quantos dias úteis após a assembleia geral ordinária a ata deve ser enviada à CVM?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "ata da assembleia geral ordinária, em até 7 (sete) dias úteis de sua realização, acompanhada"
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 13,
+      "trecho_id": [
+        "glossario_resol080consolid_050"
+      ],
+      "dispositivo": "art. 22, inciso IX"
+    }
+  },
+  {
+    "id": "c20",
+    "pergunta": "Quando uma companhia aberta deve entregar suas demonstrações financeiras à CVM?",
+    "tipo": "conceitual",
+    "tabelas_esperadas": [],
+    "sql_referencia": null,
+    "evidencia": [
+      "O emissor deve entregar as demonstrações financeiras à CVM na data em que forem colocadas à disposição do público."
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 19,
+      "trecho_id": [
+        "glossario_resol080consolid_075"
+      ],
+      "dispositivo": "art. 27"
+    }
+  },
+  {
+    "id": "h01",
+    "pergunta": "Qual foi o lucro líquido consolidado da Equatorial em 2025, e em quanto tempo após o fim do exercício a companhia deve entregar o formulário de referência atualizado?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'EQUATORIAL S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "O emissor deve entregar o formulário de referência atualizado anualmente, em até 5 (cinco) meses contados da data de encerramento do exercício social."
+    ],
+    "base_dados": [
+      {
+        "companhia": "EQUATORIAL S.A.",
+        "cd_cvm": "020010",
+        "tabela": "DRE_con",
+        "cd_conta": "3.11"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 15,
+      "trecho_id": [
+        "glossario_resol080consolid_058"
+      ],
+      "dispositivo": "art. 25, § 1º"
+    }
+  },
+  {
+    "id": "h02",
+    "pergunta": "Qual foi o ativo total consolidado da Usiminas em 2025, e a entidade precisa divulgar informação comparativa do período anterior?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "BPA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'USINAS SID DE MINAS GERAIS S.A.-USIMINAS') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "a entidade deve divulgar informação comparativa com respeito ao período anterior para todos os montantes apresentados nas demonstrações contábeis do período corrente."
+    ],
+    "base_dados": [
+      {
+        "companhia": "USINAS SID DE MINAS GERAIS S.A.-USIMINAS",
+        "cd_cvm": "014320",
+        "tabela": "BPA_con",
+        "cd_conta": "1"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 15,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_097"
+      ],
+      "dispositivo": "item 38"
+    }
+  },
+  {
+    "id": "h03",
+    "pergunta": "Quanto a Cyrela registrou de resultado financeiro em 2025, e o que são os outros resultados abrangentes?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'CYRELA BRAZIL REALTY S.A.EMPREEND E PART') AND CD_CONTA = '3.06' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Outros resultados abrangentes compreendem itens de receita e despesa (incluindo ajustes de reclassificação), que não são reconhecidos na demonstração do resultado"
+    ],
+    "base_dados": [
+      {
+        "companhia": "CYRELA BRAZIL REALTY S.A.EMPREEND E PART",
+        "cd_cvm": "014460",
+        "tabela": "DRE_con",
+        "cd_conta": "3.06"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 5,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_028"
+      ],
+      "dispositivo": "item 7, alíneas a) a h)"
+    }
+  },
+  {
+    "id": "h04",
+    "pergunta": "Qual foi o custo dos produtos vendidos consolidado da Randon em 2025, e o que a demonstração do valor adicionado inclui nesse custo?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'RANDONCORP S.A.') AND CD_CONTA = '3.02' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Custo dos produtos, das mercadorias e dos serviços vendidos – inclui os valores das matérias- primas adquiridas junto a terceiros e contidas no custo do produto vendido, das mercadorias e dos serviços vendidos adquiridos de terceiros; não inclui gastos com pessoal próprio."
+    ],
+    "base_dados": [
+      {
+        "companhia": "RANDONCORP S.A.",
+        "cd_cvm": "014109",
+        "tabela": "DRE_con",
+        "cd_conta": "3.02"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 3,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_021"
+      ],
+      "dispositivo": "item 14"
+    }
+  },
+  {
+    "id": "h05",
+    "pergunta": "Qual o saldo de empréstimos e financiamentos de curto prazo da Azul no fim de 2025, e como os empréstimos bancários costumam ser classificados no fluxo de caixa?",
     "tipo": "hibrida",
     "tabelas_esperadas": [
       "BPP_con",
       "companhias"
     ],
-    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NATURA COSMÉTICOS S.A.') AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AZUL S.A.') AND CD_CONTA = '2.01.04' AND ORDEM_EXERC = 'ÚLTIMO'",
     "evidencia": [
-      "O passivo deve ser classificado como circulante quando satisfizer qualquer dos seguintes critérios"
-    ]
+      "Empréstimos bancários são geralmente considerados como atividades de financiamento."
+    ],
+    "base_dados": [
+      {
+        "companhia": "AZUL S.A.",
+        "cd_cvm": "024112",
+        "tabela": "BPP_con",
+        "cd_conta": "2.01.04"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 4,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_023"
+      ],
+      "dispositivo": "item 8"
+    }
+  },
+  {
+    "id": "h06",
+    "pergunta": "Qual foi o caixa líquido das atividades de financiamento da Minerva em 2025, e como podem ser classificados os dividendos pagos?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'MINERVA S.A.') AND CD_CONTA = '6.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Os dividendos e os juros sobre o capital próprio pagos podem ser classificados como fluxo de caixa de financiamento porque são custos da obtenção de recursos financeiros"
+    ],
+    "base_dados": [
+      {
+        "companhia": "MINERVA S.A.",
+        "cd_cvm": "020931",
+        "tabela": "DFC_MI_con",
+        "cd_conta": "6.03"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 9,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_067"
+      ],
+      "dispositivo": "item 34"
+    }
+  },
+  {
+    "id": "h07",
+    "pergunta": "Qual era o patrimônio líquido consolidado da Smartfit ao fim de 2025, e que declaração os diretores devem dar sobre as demonstrações financeiras?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "BPP_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SMARTFIT ESCOLA DE GINÁSTICA E DANÇA S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "declaração dos diretores responsáveis por fazer elaborar as demonstrações financeiras nos termos da lei ou do estatuto social de que reviram, discutiram e concordam com as demonstrações financeiras"
+    ],
+    "base_dados": [
+      {
+        "companhia": "SMARTFIT ESCOLA DE GINÁSTICA E DANÇA S.A.",
+        "cd_cvm": "024260",
+        "tabela": "BPP_con",
+        "cd_conta": "2.03"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 19,
+      "trecho_id": [
+        "glossario_resol080consolid_077"
+      ],
+      "dispositivo": "art. 27, § 1º, inciso VI"
+    }
+  },
+  {
+    "id": "h08",
+    "pergunta": "Qual foi a receita líquida consolidada da Movida em 2025, e em que moeda devem ser registrados os fluxos de caixa de transações em moeda estrangeira?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'MOVIDA PARTICIPACOES SA') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Os fluxos de caixa advindos de transações em moeda estrangeira devem ser registrados na moeda funcional da entidade"
+    ],
+    "base_dados": [
+      {
+        "companhia": "MOVIDA PARTICIPACOES SA",
+        "cd_cvm": "023825",
+        "tabela": "DRE_con",
+        "cd_conta": "3.01"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 8,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_059"
+      ],
+      "dispositivo": "item 25"
+    }
+  },
+  {
+    "id": "h09",
+    "pergunta": "Qual foi o lucro bruto consolidado da Lojas Quero-Quero em 2025, e a classificação dos itens pode mudar de um período para outro?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'LOJAS QUERO QUERO S.A.') AND CD_CONTA = '3.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "A apresentação e a classificação de itens nas demonstrações contábeis devem ser mantidas de um período para outro"
+    ],
+    "base_dados": [
+      {
+        "companhia": "LOJAS QUERO QUERO S.A.",
+        "cd_cvm": "025038",
+        "tabela": "DRE_con",
+        "cd_conta": "3.03"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 17,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_113"
+      ],
+      "dispositivo": "item 45"
+    }
+  },
+  {
+    "id": "h10",
+    "pergunta": "Qual foi o valor adicionado total a distribuir da Gol em 2025, e o que a DVA inclui como depreciação, amortização e exaustão?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DVA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'GOL LINHAS AEREAS INTELIGENTES S.A.') AND CD_CONTA = '7.07' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Depreciação, amortização e exaustão – inclui a despesa ou o custo contabilizados no período."
+    ],
+    "base_dados": [
+      {
+        "companhia": "GOL LINHAS AEREAS INTELIGENTES S.A.",
+        "cd_cvm": "019569",
+        "tabela": "DVA_con",
+        "cd_conta": "7.07"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 4,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_023"
+      ],
+      "dispositivo": "item 14"
+    }
+  },
+  {
+    "id": "h11",
+    "pergunta": "Quanto a BRF registrou de imposto de renda e contribuição social em 2025, e como os tributos sobre o lucro são classificados na demonstração dos fluxos de caixa?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'BRF S.A.') AND CD_CONTA = '3.08' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Os tributos sobre o lucro (IR e CSLL) resultam de transações que originam fluxos de caixa que são classificados como atividades operacionais, de investimento ou de financiamento na demonstração dos fluxos de caixa."
+    ],
+    "base_dados": [
+      {
+        "companhia": "BRF S.A.",
+        "cd_cvm": "016292",
+        "tabela": "DRE_con",
+        "cd_conta": "3.08"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 9,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_071"
+      ],
+      "dispositivo": "item 36"
+    }
+  },
+  {
+    "id": "h12",
+    "pergunta": "Quanto a SLC Agrícola distribuiu em impostos, taxas e contribuições na DVA de 2025, e o que a DVA inclui nesse grupo?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DVA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'SLC AGRICOLA S.A.') AND CD_CONTA = '7.08.02' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Impostos, taxas e contribuições – valores relativos ao imposto de renda, contribuição social sobre o lucro, contribuições ao INSS (incluídos aqui os valores do Seguro de Acidentes do Trabalho e ao Sistema “S”) que sejam ônus do empregador, bem como os demais impostos e contribuições a que a empresa esteja"
+    ],
+    "base_dados": [
+      {
+        "companhia": "SLC AGRICOLA S.A.",
+        "cd_cvm": "020745",
+        "tabela": "DVA_con",
+        "cd_conta": "7.08.02"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 4,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_027"
+      ],
+      "dispositivo": "item 15"
+    }
+  },
+  {
+    "id": "h13",
+    "pergunta": "Quanto a Cogna registrou de despesas com vendas em 2025, e de que depende a escolha entre apresentar despesas por função ou por natureza?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'COGNA EDUCAÇÃO S.A.') AND CD_CONTA = '3.04.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "A escolha entre o método da função das despesas e o método da natureza das despesas depende de fatores históricos e setoriais e da natureza da entidade."
+    ],
+    "base_dados": [
+      {
+        "companhia": "COGNA EDUCAÇÃO S.A.",
+        "cd_cvm": "017973",
+        "tabela": "DRE_con",
+        "cd_conta": "3.04.01"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 34,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_234"
+      ],
+      "dispositivo": "item 105"
+    }
+  },
+  {
+    "id": "h14",
+    "pergunta": "Qual foi a remuneração de capitais de terceiros da Copasa na DVA de 2025, e o que a DVA inclui como juros?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DVA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'CIA SANEAMENTO DE MINAS GERAIS-COPASA MG') AND CD_CONTA = '7.08.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Juros – inclui as despesas financeiras, inclusive as variações cambiais passivas, relativas a quaisquer tipos de empréstimos e financiamentos junto a instituições financeiras, empresas do grupo ou outras formas de obtenção de recursos."
+    ],
+    "base_dados": [
+      {
+        "companhia": "CIA SANEAMENTO DE MINAS GERAIS-COPASA MG",
+        "cd_cvm": "019445",
+        "tabela": "DVA_con",
+        "cd_conta": "7.08.03"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_09_r1_demonstracao_valor_adicionado.pdf",
+      "pagina": 4,
+      "trecho_id": [
+        "glossario_cpc_09_r1_demonstracao_valor_adicionado_032"
+      ],
+      "dispositivo": "item 15"
+    }
+  },
+  {
+    "id": "h15",
+    "pergunta": "Qual foi o caixa líquido das atividades de investimento da Iochpe-Maxion em 2025, e que pagamentos de caixa são fluxos de investimento?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'IOCHPE MAXION S.A.') AND CD_CONTA = '6.02' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "pagamentos em caixa para aquisição de ativo imobilizado, intangíveis e outros ativos de"
+    ],
+    "base_dados": [
+      {
+        "companhia": "IOCHPE MAXION S.A.",
+        "cd_cvm": "011932",
+        "tabela": "DFC_MI_con",
+        "cd_conta": "6.02"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 5,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_036"
+      ],
+      "dispositivo": "item 16"
+    }
+  },
+  {
+    "id": "h16",
+    "pergunta": "Qual foi o lucro líquido consolidado da Neoenergia em 2025, e quando o emissor deve enviar o material apresentado em reuniões com analistas?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'NEOENERGIA S.A.') AND CD_CONTA = '3.11' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "material apresentado em reuniões com analistas e agentes do mercado, no mesmo dia da reunião ou apresentação"
+    ],
+    "base_dados": [
+      {
+        "companhia": "NEOENERGIA S.A.",
+        "cd_cvm": "015539",
+        "tabela": "DRE_con",
+        "cd_conta": "3.11"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 23,
+      "trecho_id": [
+        "glossario_resol080consolid_093"
+      ],
+      "dispositivo": "art. 33, inciso XIV"
+    }
+  },
+  {
+    "id": "h17",
+    "pergunta": "Qual foi a receita líquida consolidada da Engie Brasil Energia em 2025, e em quantos dias úteis o emissor da categoria B deve enviar o estatuto social consolidado após a assembleia que alterou o estatuto?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DRE_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DRE_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'ENGIE BRASIL ENERGIA S.A.') AND CD_CONTA = '3.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "estatuto social consolidado, em até 7 (sete) dias úteis contados da data da assembleia que deliberou a alteração de estatuto"
+    ],
+    "base_dados": [
+      {
+        "companhia": "ENGIE BRASIL ENERGIA S.A.",
+        "cd_cvm": "017329",
+        "tabela": "DRE_con",
+        "cd_conta": "3.01"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 28,
+      "trecho_id": [
+        "glossario_resol080consolid_117"
+      ],
+      "dispositivo": "art. 34, inciso XXII"
+    }
+  },
+  {
+    "id": "h18",
+    "pergunta": "Qual era o patrimônio líquido consolidado da Yduqs ao fim de 2025, e que informação sobre dividendos a entidade deve apresentar?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "BPP_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPP_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'YDUQS PARTICIPACOES S.A.') AND CD_CONTA = '2.03' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "A entidade deve apresentar, na demonstração das mutações do patrimônio líquido ou nas notas explicativas, o montante de dividendos reconhecidos como distribuição aos proprietários durante o período e o respectivo montante dos dividendos por ação."
+    ],
+    "base_dados": [
+      {
+        "companhia": "YDUQS PARTICIPACOES S.A.",
+        "cd_cvm": "021016",
+        "tabela": "BPP_con",
+        "cd_conta": "2.03"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+      "pagina": 35,
+      "trecho_id": [
+        "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_241"
+      ],
+      "dispositivo": "item 107"
+    }
+  },
+  {
+    "id": "h19",
+    "pergunta": "Qual era o ativo total consolidado da Vamos ao fim de 2025, e que dever os administradores do emissor têm em relação à legislação do mercado de valores mobiliários?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "BPA_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM BPA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'VAMOS LOCAÇÃO DE CAMINHÕES, MÁQUINAS E EQUIPAMENTOS S.A.') AND CD_CONTA = '1' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "Os administradores do emissor têm o dever de zelar, dentro de suas competências legais e",
+      "estatutárias, para que o emissor cumpra a legislação e regulamentação do mercado de valores mobiliários."
+    ],
+    "base_dados": [
+      {
+        "companhia": "VAMOS LOCAÇÃO DE CAMINHÕES, MÁQUINAS E EQUIPAMENTOS S.A.",
+        "cd_cvm": "024716",
+        "tabela": "BPA_con",
+        "cd_conta": "1"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "resol080consolid.pdf",
+      "pagina": 35,
+      "trecho_id": [
+        "glossario_resol080consolid_142",
+        "glossario_resol080consolid_143"
+      ],
+      "dispositivo": "art. 46"
+    }
+  },
+  {
+    "id": "h20",
+    "pergunta": "Quanto caixa as atividades operacionais da Azzas 2154 geraram em 2025, e o que o método direto divulga?",
+    "tipo": "hibrida",
+    "tabelas_esperadas": [
+      "DFC_MI_con",
+      "companhias"
+    ],
+    "sql_referencia": "SELECT CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END FROM DFC_MI_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA = 'AZZAS 2154 S.A.') AND CD_CONTA = '6.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "evidencia": [
+      "o método direto, segundo o qual as principais classes de recebimentos brutos e pagamentos brutos são divulgadas"
+    ],
+    "base_dados": [
+      {
+        "companhia": "AZZAS 2154 S.A.",
+        "cd_cvm": "022349",
+        "tabela": "DFC_MI_con",
+        "cd_conta": "6.01"
+      }
+    ],
+    "base_normativo": {
+      "arquivo": "cpc_03_r2_demonstracao_fluxos_de_caixa.pdf",
+      "pagina": 6,
+      "trecho_id": [
+        "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_045"
+      ],
+      "dispositivo": "item 18"
+    }
   }
 ]

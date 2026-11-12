@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 dados/*.db
+embeddings/modelos/
+dados/*_inativo.json
+metricas/*_inativo.*
+metricas/rascunhos/

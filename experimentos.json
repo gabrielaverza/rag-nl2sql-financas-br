@@ -1,0 +1,59 @@
+{
+  "experimentos": {
+    "metodos": {
+      "descricao": "Experimento 6.1: impacto do método de busca (embeddings, BM25 e RRF, o BM25 com e sem stemmer), com o divisor das perguntas híbridas ligado e o bloqueio de pronomes, só no nível de recuperação. Modelo de embeddings: e5-base.",
+      "nivel": "recuperacao",
+      "configuracoes": [
+        {"nome": "Embeddings", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "BM25 com stemmer", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=true", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "BM25 sem stemmer", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "RRF com stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=true", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "RRF sem stemmer", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
+      ]
+    },
+    "modelos": {
+      "descricao": "Experimento 6.2: impacto do modelo de embeddings (MiniLM, E5-small, E5-base, BGE-M3 e o E5-base-v2, só em inglês, como controle), com busca por embeddings nos dois índices e o divisor das perguntas híbridas ligado com o bloqueio de pronomes, só no nível de recuperação.",
+      "nivel": "recuperacao",
+      "configuracoes": [
+        {"nome": "MiniLM", "sobrescritas": ["modelo_embedding=minilm", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "E5-small", "sobrescritas": ["modelo_embedding=e5-small", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "E5-base", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "BGE-M3", "sobrescritas": ["modelo_embedding=bge-m3", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "E5-base-v2 (só inglês)", "sobrescritas": ["modelo_embedding=e5-base-v2", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
+      ]
+    },
+    "pipeline_exploratorio": {
+      "descricao": "Experimento 6.3, execução exploratória do pipeline completo: compara dois cenários de busca com o modelo E5-base, o divisor das perguntas híbridas ligado com o bloqueio de pronomes e a passada de tabelas ideais. No cenário 1 os dois índices usam embeddings; no cenário 2 o esquema usa embeddings e o glossário usa RRF sem stemmer. Uma rodada.",
+      "nivel": "pipeline",
+      "rodadas": 1,
+      "tabelas_ideais": true,
+      "configuracoes": [
+        {"nome": "Cenário 1: embeddings (esquema e glossário)", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]},
+        {"nome": "Cenário 2: embeddings (esquema) + RRF (glossário)", "sobrescritas": ["modelo_embedding=e5-base", "busca.esquema.metodo=embeddings", "busca.glossario.metodo=rrf", "busca.esquema.por_tipo={}", "busca.glossario.por_tipo={}", "bm25.radicalizar=false", "divisor.ativo=true", "divisor.bloquear_pronomes=true"]}
+      ]
+    },
+    "teste_equivalencia": {
+      "rascunho": true,
+      "descricao": "Teste de equivalência do executor: com o divisor e o stemmer desligados, as métricas de recuperação devem sair idênticas antes e depois de uma mudança no código que não deveria alterá-las (compare o resultados.csv, ignorando a coluna da execução); as duas primeiras configurações cobrem a pergunta inteira e as duas últimas, o divisor ligado. Os resultados são de teste e não valem como resultado dos experimentos.",
+      "nivel": "recuperacao",
+      "configuracoes": [
+        {"nome": "E5 (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=false", "bm25.radicalizar=false"]},
+        {"nome": "BM25 sem stemmer (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=bm25", "busca.glossario.metodo=bm25", "divisor.ativo=false", "bm25.radicalizar=false"]},
+        {"nome": "RRF (pergunta inteira)", "sobrescritas": ["busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "divisor.ativo=false", "bm25.radicalizar=false"]},
+        {"nome": "E5 (mista, divisor ligado)", "sobrescritas": ["busca.esquema.metodo=embeddings", "busca.glossario.metodo=embeddings", "divisor.ativo=true", "bm25.radicalizar=false"]},
+        {"nome": "RRF (mista, divisor ligado)", "sobrescritas": ["busca.esquema.metodo=rrf", "busca.glossario.metodo=rrf", "divisor.ativo=true", "bm25.radicalizar=false"]}
+      ]
+    },
+    "teste_pipeline": {
+      "rascunho": true,
+      "descricao": "Teste do nível pipeline completo, para rodar em poucas perguntas (use --ids). Mostra o funcionamento do cache de SQL, da passada de tabelas ideais e das rodadas. Não é resultado dos experimentos.",
+      "nivel": "pipeline",
+      "rodadas": 1,
+      "tabelas_ideais": true,
+      "configuracoes": [
+        {"nome": "Padrão", "sobrescritas": []},
+        {"nome": "Sem divisor", "sobrescritas": ["divisor.ativo=false"]}
+      ]
+    }
+  }
+}

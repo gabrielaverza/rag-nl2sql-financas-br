@@ -4,7 +4,11 @@ Etapa: Online.
 Função: busca por similaridade nos índices vetoriais de esquema e de glossário.
 
 Descrição geral do funcionamento:
-- O multilingual-E5-base gera o vetor da pergunta, com o prefixo "query: " que o modelo exige.
+- O modelo de embeddings vem de configuracao.json (padrão e5-base, que usa o prefixo "query: "
+  que o E5 exige). A ficha do modelo (pipeline/modelos_embedding.py) dá o identificador e o
+  prefixo, os mesmos usados no offline para gerar os índices.
+- O índice do modelo padrão fica em embeddings/ (versionado); o dos outros modelos, em
+  embeddings/modelos/<chave>/ (gerado por pipeline/offline/rodar_offline.py, ignorado pelo git).
 - O produto interno com os vetores do índice indica os registros mais parecidos.
   Como todos os vetores são normalizados, ele equivale à similaridade de cosseno.
 - No índice de esquema, cada tabela é pontuada pelo melhor registro de resumo ou
@@ -15,49 +19,73 @@ Descrição geral do funcionamento:
 Dependências:
 - embeddings/index_esquema.json, embeddings/index_glossario.json e
   embeddings/esquema.json (gerados por pipeline/offline/);
+- configuracao.json (lido por configuracao.py) e pipeline/modelos_embedding.py;
 - bibliotecas numpy e sentence-transformers;
-- modelo multilingual-E5-base em cache local (se não estiver, é baixado, cerca de 1,1 GB).
+- o modelo escolhido em cache local. Carregar o modelo nunca baixa nada: se faltar, o erro
+  mostra o comando (o download é feito pelos scripts offline, com --baixar-modelos).
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
 
 Resultado: fornece vetorizar(), a classe Indice (buscar e buscar_por_fonte),
-buscar_tabelas() e os caminhos dos índices.
+buscar_tabelas(), caminho_indice() e os caminhos dos índices do modelo padrão.
 """
 
 import json
+import os
+import sys
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
-MODELO_EMBEDDING = "intfloat/multilingual-e5-base"
-# O E5 foi treinado com esses prefixos; sem eles a qualidade da busca cai.
-PREFIXO_PERGUNTA = "query: "
+# Os módulos compartilhados ficam em pipeline/, fora da pasta deste script.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import modelos_embedding  # noqa: E402
+
+import configuracao  # noqa: E402
+
 CAMINHO_INDICE_ESQUEMA = "embeddings/index_esquema.json"
 CAMINHO_INDICE_GLOSSARIO = "embeddings/index_glossario.json"
 CAMINHO_ESQUEMA = "embeddings/esquema.json"
+PASTA_MODELOS = "embeddings/modelos"
 
 # Colunas, contas e relações são parecidas entre as demonstrações e puxavam a
 # busca para tabelas erradas, por isso ficam fora da pontuação da tabela.
 SECOES_FORA_DA_PONTUACAO = ("Relações", "Colunas", "Contas")
 
-_modelo = None
+_chave_modelo = None
 
 
-# Carrega o modelo de embeddings uma única vez e o reaproveita nas buscas seguintes.
-def carregar_modelo() -> SentenceTransformer:
-    global _modelo
-    if _modelo is None:
-        # Usa o cache local para não depender da rede; só baixa se não houver cache.
-        try:
-            _modelo = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
-        except OSError:
-            _modelo = SentenceTransformer(MODELO_EMBEDDING)
-    return _modelo
+# Devolve a chave do modelo de embeddings em uso: a de configuracao.json, ou a definida por definir_modelo().
+def modelo_configurado() -> str:
+    global _chave_modelo
+    if _chave_modelo is None:
+        _chave_modelo = configuracao.carregar()["modelo_embedding"]
+    return _chave_modelo
 
 
-# Transforma a pergunta em um vetor normalizado (tamanho 1).
-def vetorizar(texto: str) -> np.ndarray:
-    return carregar_modelo().encode(PREFIXO_PERGUNTA + texto, normalize_embeddings=True)
+# Troca o modelo de embeddings em uso (os experimentos e a busca configurável chamam isto).
+def definir_modelo(chave: str):
+    global _chave_modelo
+    modelos_embedding.obter_ficha(chave)
+    _chave_modelo = chave
+
+
+# Devolve onde está o índice vetorial ("esquema" ou "glossario") do modelo: o caminho versionado
+# para o padrão, e a pasta ignorada pelo git para os outros (a mesma regra dos scripts offline).
+def caminho_indice(indice: str, chave_modelo: str | None = None) -> str:
+    chave_modelo = chave_modelo or modelo_configurado()
+    if chave_modelo == modelos_embedding.MODELO_PADRAO:
+        return CAMINHO_INDICE_ESQUEMA if indice == "esquema" else CAMINHO_INDICE_GLOSSARIO
+    return os.path.join(PASTA_MODELOS, chave_modelo, f"index_{indice}.json")
+
+
+# Carrega o modelo de embeddings em uso uma única vez (o registro guarda o modelo carregado).
+def carregar_modelo(chave_modelo: str | None = None):
+    return modelos_embedding.carregar_modelo(chave_modelo or modelo_configurado())
+
+
+# Transforma a pergunta em um vetor normalizado (tamanho 1), com o prefixo de pergunta do modelo.
+def vetorizar(texto: str, chave_modelo: str | None = None) -> np.ndarray:
+    return modelos_embedding.vetorizar_pergunta(texto, chave_modelo or modelo_configurado())
 
 
 # Lê do esquema.json, para cada tabela, as tabelas que ela referencia por chave estrangeira.

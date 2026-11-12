@@ -1,0 +1,164 @@
+{
+  "execucao": "20261109-222123",
+  "experimento": "metodos",
+  "nivel": "recuperacao",
+  "descricao": "Experimento 6.1: impacto do método de busca (embeddings, BM25 e RRF, o BM25 com e sem stemmer), com o divisor das perguntas híbridas ligado e o bloqueio de pronomes, só no nível de recuperação. Modelo de embeddings: e5-base.",
+  "comando": "python pipeline/avaliacao/executar_experimentos.py metodos",
+  "inicio": "2026-11-09T22:21:23",
+  "rascunho": false,
+  "ids": null,
+  "n_perguntas": 60,
+  "rodadas": 1,
+  "tabelas_ideais": false,
+  "git": {
+    "commit": "d6406f79e1717960afb1bf1c8d7e8bd0cf2c8180",
+    "commit_curto": "d6406f7",
+    "ramo": "revisao/experimentos-configuraveis",
+    "alteracoes_nao_commitadas": false,
+    "arquivos_alterados": []
+  },
+  "arquivos_sha256": {
+    "configuracao.json": "21b42ebfbac73b245325d5fa27a7d5e73f7929131c656a8ed4d4c8ea97c04e14",
+    "experimentos.json": "14f3a39fdd1c280053b1ff7f7f1ab71dcfa31ccc337930afd2fa0a94873dfdeb",
+    "dados/perguntas_validacao.json": "fb53c8fba07b8483d2c711b5ac6f218345b1702530c54ed0e00906d442a9fe3b",
+    "embeddings/esquema.json": "b29683ce2ba3d351081dd244399fc57110ffd50ed5bd8873b08a0715551738dd",
+    "metricas/divisoes_hibridas.json": "d001212b4fd6bfe7d4bd7eb6f128b3bf4cd57c5812e03cb97a37800383e67459",
+    "embeddings/index_esquema.json": "f02d3545b907a302d0cea7883eba177711369030ab6672e0843a5643594ab3dd",
+    "embeddings/index_glossario.json": "0e2927a168f155770bdf707638c69e75857cc9a2aee170ca82d00c07dd5c28c8",
+    "embeddings/index_bm25_esquema.json": "5ed65e2b229f7ff234e9aeedcaa5469793f9f12981d116030c171919a48aab14",
+    "embeddings/index_bm25_glossario.json": "d1bf42110f5d50b5e838a4b3f4af4ed952285638484ea726013425c404ddab56"
+  },
+  "modelos_embeddings": {
+    "e5-base": "intfloat/multilingual-e5-base"
+  },
+  "llm": {
+    "modelo": "qwen2.5-coder:7b",
+    "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "tamanho_bytes": 4683087561
+  },
+  "bibliotecas": {
+    "python": "3.13.7",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "sentence-transformers": "5.6.0",
+    "transformers": "5.12.1",
+    "torch": "2.12.0",
+    "rank-bm25": "0.2.2",
+    "nltk": "3.10.4",
+    "ollama": "0.6.2"
+  },
+  "configuracoes": {
+    "Embeddings": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "embeddings",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "BM25 com stemmer": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "bm25",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "bm25",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "BM25 sem stemmer": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "bm25",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "bm25",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": false
+      }
+    },
+    "RRF com stemmer": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "rrf",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "rrf",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": true
+      }
+    },
+    "RRF sem stemmer": {
+      "modelo_embedding": "e5-base",
+      "busca": {
+        "esquema": {
+          "metodo": "rrf",
+          "por_tipo": {}
+        },
+        "glossario": {
+          "metodo": "rrf",
+          "por_tipo": {}
+        }
+      },
+      "k_tabelas": 3,
+      "k_trechos": 3,
+      "divisor": {
+        "ativo": true,
+        "bloquear_pronomes": true
+      },
+      "bm25": {
+        "radicalizar": false
+      }
+    }
+  },
+  "fim": "2026-11-09T22:21:56",
+  "duracao_s": 32.2
+}

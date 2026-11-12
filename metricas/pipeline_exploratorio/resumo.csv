@@ -1,0 +1,75 @@
+experimento,execucao,configuracao,tipo,metrica,escala,n_perguntas,rodadas,soma_media,media,minimo,maximo
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,classe_certa,0 ou 1,20,1,20.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,classe_certa,0 ou 1,60,1,60.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,ex_adaptado,0 ou 1,20,1,12.0000,0.600000,0.600000,0.600000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,ex_adaptado,0 ou 1,40,1,24.0000,0.600000,0.600000,0.600000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,ex_estrito,0 ou 1,20,1,6.0000,0.300000,0.300000,0.300000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,ex_estrito,0 ou 1,40,1,10.0000,0.250000,0.250000,0.250000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,ideal_ex_adaptado,0 ou 1,20,1,11.0000,0.550000,0.550000,0.550000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,ideal_ex_adaptado,0 ou 1,40,1,22.0000,0.550000,0.550000,0.550000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,ideal_ex_estrito,0 ou 1,20,1,6.0000,0.300000,0.300000,0.300000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,ideal_ex_estrito,0 ou 1,40,1,7.0000,0.175000,0.175000,0.175000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,tempo_classificador,segundos,20,1,132.1628,6.608141,6.608141,6.608141
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,tempo_classificador,segundos,60,1,355.6413,5.927356,5.927356,5.927356
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,tempo_sintese,segundos,20,1,143.2743,7.163714,7.163714,7.163714
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,tempo_sintese,segundos,60,1,440.7451,7.345751,7.345751,7.345751
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,tempo_sql,segundos,20,1,434.6394,21.731972,21.731972,21.731972
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,tempo_sql,segundos,40,1,746.3857,18.659644,18.659644,18.659644
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,tempo_total,segundos,20,1,759.3344,37.966720,37.966720,37.966720
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,tempo_total,segundos,60,1,1774.4232,29.573720,29.573720,29.573720
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),quantitativa,tempo_validacao,segundos,20,1,48.8681,2.443405,2.443405,2.443405
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,tempo_validacao,segundos,60,1,185.5927,3.093212,3.093212,3.093212
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),conceitual,classe_certa,0 ou 1,20,1,20.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),conceitual,tempo_classificador,segundos,20,1,107.9781,5.398907,5.398907,5.398907
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),conceitual,tempo_sintese,segundos,20,1,129.4698,6.473488,6.473488,6.473488
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),conceitual,tempo_total,segundos,20,1,309.1431,15.457155,15.457155,15.457155
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),conceitual,tempo_validacao,segundos,20,1,71.6945,3.584725,3.584725,3.584725
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,classe_certa,0 ou 1,20,1,20.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,ex_adaptado,0 ou 1,20,1,12.0000,0.600000,0.600000,0.600000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,ex_estrito,0 ou 1,20,1,4.0000,0.200000,0.200000,0.200000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,ideal_ex_adaptado,0 ou 1,20,1,11.0000,0.550000,0.550000,0.550000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,ideal_ex_estrito,0 ou 1,20,1,1.0000,0.050000,0.050000,0.050000
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,tempo_classificador,segundos,20,1,115.5004,5.775019,5.775019,5.775019
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,tempo_divisor,segundos,20,1,45.3445,2.267223,2.267223,2.267223
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),todos,tempo_divisor,segundos,20,1,45.3445,2.267223,2.267223,2.267223
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,tempo_sintese,segundos,20,1,168.0010,8.400052,8.400052,8.400052
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,tempo_sql,segundos,20,1,311.7463,15.587316,15.587316,15.587316
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,tempo_total,segundos,20,1,705.9457,35.297284,35.297284,35.297284
+pipeline_exploratorio,20261111-093954,Cenário 1: embeddings (esquema e glossário),hibrida,tempo_validacao,segundos,20,1,65.0301,3.251506,3.251506,3.251506
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,classe_certa,0 ou 1,20,1,20.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,classe_certa,0 ou 1,60,1,60.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,ex_adaptado,0 ou 1,20,1,12.0000,0.600000,0.600000,0.600000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,ex_adaptado,0 ou 1,40,1,24.0000,0.600000,0.600000,0.600000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,ex_estrito,0 ou 1,20,1,6.0000,0.300000,0.300000,0.300000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,ex_estrito,0 ou 1,40,1,10.0000,0.250000,0.250000,0.250000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,ideal_ex_adaptado,0 ou 1,20,1,11.0000,0.550000,0.550000,0.550000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,ideal_ex_adaptado,0 ou 1,40,1,22.0000,0.550000,0.550000,0.550000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,ideal_ex_estrito,0 ou 1,20,1,6.0000,0.300000,0.300000,0.300000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,ideal_ex_estrito,0 ou 1,40,1,7.0000,0.175000,0.175000,0.175000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,tempo_classificador,segundos,20,1,109.8886,5.494432,5.494432,5.494432
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,tempo_classificador,segundos,60,1,338.9851,5.649752,5.649752,5.649752
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,tempo_sintese,segundos,20,1,117.7843,5.889217,5.889217,5.889217
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,tempo_sintese,segundos,60,1,406.8110,6.780183,6.780183,6.780183
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,tempo_sql,segundos,20,1,0.7591,0.037957,0.037957,0.037957
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,tempo_sql,segundos,40,1,1.6074,0.040185,0.040185,0.040185
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,tempo_total,segundos,20,1,277.6964,13.884819,13.884819,13.884819
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,tempo_total,segundos,60,1,985.1897,16.419828,16.419828,16.419828
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),quantitativa,tempo_validacao,segundos,20,1,48.8143,2.440716,2.440716,2.440716
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,tempo_validacao,segundos,60,1,191.6650,3.194417,3.194417,3.194417
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),conceitual,classe_certa,0 ou 1,20,1,20.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),conceitual,tempo_classificador,segundos,20,1,114.3028,5.715142,5.715142,5.715142
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),conceitual,tempo_sintese,segundos,20,1,133.1260,6.656302,6.656302,6.656302
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),conceitual,tempo_total,segundos,20,1,324.4916,16.224582,16.224582,16.224582
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),conceitual,tempo_validacao,segundos,20,1,77.0621,3.853105,3.853105,3.853105
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,classe_certa,0 ou 1,20,1,20.0000,1.000000,1.000000,1.000000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,ex_adaptado,0 ou 1,20,1,12.0000,0.600000,0.600000,0.600000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,ex_estrito,0 ou 1,20,1,4.0000,0.200000,0.200000,0.200000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,ideal_ex_adaptado,0 ou 1,20,1,11.0000,0.550000,0.550000,0.550000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,ideal_ex_estrito,0 ou 1,20,1,1.0000,0.050000,0.050000,0.050000
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,tempo_classificador,segundos,20,1,114.7937,5.739683,5.739683,5.739683
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,tempo_divisor,segundos,20,1,45.2683,2.263415,2.263415,2.263415
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),todos,tempo_divisor,segundos,20,1,45.2683,2.263415,2.263415,2.263415
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,tempo_sintese,segundos,20,1,155.9006,7.795030,7.795030,7.795030
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,tempo_sql,segundos,20,1,0.8483,0.042413,0.042413,0.042413
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,tempo_total,segundos,20,1,383.0017,19.150084,19.150084,19.150084
+pipeline_exploratorio,20261111-093954,Cenário 2: embeddings (esquema) + RRF (glossário),hibrida,tempo_validacao,segundos,20,1,65.7886,3.289430,3.289430,3.289430

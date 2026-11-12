@@ -1,59 +1,68 @@
 """
 Etapa: Offline.
 
-Função: constrói o índice de esquema usado pelo estágio online.
+Função: documenta o esquema do banco e constrói o índice vetorial de esquema usado pelo estágio online.
 
 Descrição geral do funcionamento:
-- Documenta o esquema do banco dfp.db e gera um índice vetorial com um
-  registro por aspecto de cada tabela (resumo e propósito, entidades,
-  relações, colunas e contas).
+- Documenta o esquema do banco dfp.db (embeddings/esquema.json) e, a partir dele, gera o corpus de
+  esquema (com gerar_corpus.py) e um índice vetorial com um registro por aspecto de cada tabela
+  (resumo e propósito, entidades, relações, colunas e contas).
 - A estrutura (colunas, tipos, chaves e relações) vem direto do SQLite.
 - O plano de contas e os valores possíveis de colunas de poucos valores
   distintos também vêm direto do banco, sem LLM.
 - O qwen2.5-coder:7b escreve só os textos em português (resumo, propósito,
   entidades e descrição das colunas).
-- O multilingual-E5-base gera os embeddings, com o prefixo "passage: " que o
-  modelo exige.
+- O modelo de embeddings escolhido (opção --modelo, padrão e5-base) gera os vetores, com o
+  prefixo de trecho da ficha dele. Os registros vêm do corpus (embeddings/corpus_esquema.json),
+  que é o mesmo qualquer que seja o modelo.
+- Antes de tudo, confere se os modelos necessários estão no cache local; só baixa os que
+  faltam, e só com --baixar-modelos.
 
 Dependências:
-- dados/dfp.db (gerado por pipeline/offline/carregar_dfp.py);
-- servidor Ollama em execução com o modelo qwen2.5-coder:7b baixado;
-- bibliotecas ollama e sentence-transformers;
-- modelo multilingual-E5-base já em cache local (carregado com local_files_only).
+- dados/dfp.db (gerado por pipeline/offline/carregar_dfp.py), exceto com --so-indice;
+- servidor Ollama em execução com o modelo qwen2.5-coder:7b baixado, exceto com --so-indice;
+- com --so-indice, embeddings/corpus_esquema.json (gerado por pipeline/offline/gerar_corpus.py);
+- bibliotecas ollama, transformers e sentence-transformers;
+- pipeline/modelos_embedding.py e os modelos em cache local.
 
-Parâmetros: argumentos opcionais de linha de comando com os nomes das tabelas
-a processar. Sem argumentos, processa todas. Com --so-indice, reaproveita o
-esquema.json existente e só regera o índice vetorial, sem banco nem LLM
-(usado ao trocar o modelo de embeddings).
+Parâmetros: nomes de tabelas (opcionais) para processar só elas; sem nomes, processa todas.
+--so-indice reaproveita o corpus existente e só regera o índice vetorial, sem banco nem LLM. --modelo CHAVE escolhe o modelo de embeddings (padrão e5-base; as chaves estão em
+pipeline/modelos_embedding.py); outro modelo exige --so-indice, porque o esquema.json é um
+só, comum a todos. --baixar-modelos autoriza o download dos modelos que faltarem.
 
-Resultado: gera embeddings/esquema.json, com uma entrada por tabela, e
-embeddings/index_esquema.json, com os registros vetoriais no formato
-id/fonte/conteudo/embedding, com a fonte igual ao nome da tabela. No modo de
-teste, os dois arquivos ganham o sufixo _teste.
+Resultado: gera embeddings/esquema.json, com uma entrada por tabela, o corpus de esquema e o
+índice vetorial no formato id/fonte/conteudo/embedding, com a fonte igual ao nome da tabela. Com o modelo
+padrão, o índice é embeddings/index_esquema.json (versionado); com outro modelo, é
+embeddings/modelos/<chave>/index_esquema.json (pasta ignorada pelo git). No modo de teste
+(tabelas indicadas), os três arquivos ganham o sufixo _teste.
 
 Executar de dentro de rag-nl2sql-financas-br/:
     python pipeline/offline/gerar_indice_esquema.py               (todas as tabelas)
     python pipeline/offline/gerar_indice_esquema.py DRE_con       (teste: só as tabelas indicadas)
-    python pipeline/offline/gerar_indice_esquema.py --so-indice   (só o índice, a partir do esquema.json)
+    python pipeline/offline/gerar_indice_esquema.py --so-indice   (só o índice, a partir do corpus)
+    python pipeline/offline/gerar_indice_esquema.py --so-indice --modelo minilm
 """
 
+import argparse
 import json
+import os
 import sqlite3
 import sys
 
 import ollama
-from sentence_transformers import SentenceTransformer
+
+# Os módulos compartilhados ficam em pipeline/, fora da pasta deste script.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import modelos_embedding  # noqa: E402
+
+import gerar_corpus  # noqa: E402
 
 CAMINHO_DB = "dados/dfp.db"
-CAMINHO_ESQUEMA = "embeddings/esquema.json"
-CAMINHO_INDICE = "embeddings/index_esquema.json"
+CAMINHO_ESQUEMA = gerar_corpus.CAMINHO_ESQUEMA
+CAMINHO_CORPUS = gerar_corpus.CAMINHO_CORPUS_ESQUEMA
+CAMINHO_INDICE_PADRAO = "embeddings/index_esquema.json"
+PASTA_MODELOS = "embeddings/modelos"
 MODELO_LLM = "qwen2.5-coder:7b"
-MODELO_EMBEDDING = "intfloat/multilingual-e5-base"
-# O E5 foi treinado com esse prefixo nos textos indexados; sem ele a qualidade da busca cai.
-PREFIXO_TRECHO = "passage: "
-
-# Tamanho máximo, em tokens do modelo de embeddings, de cada registro do índice.
-LIMITE_TOKENS = 120
 
 TENTATIVAS_LLM = 3
 
@@ -365,107 +374,52 @@ def validar_esquema(esquema: list[dict], estrutura: dict) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# 4) Índice vetorial (registros de até 120 tokens)
+# 4) Índice vetorial (a partir do corpus)
 # ---------------------------------------------------------------------------
 
-# Junta os itens em textos com o mesmo prefixo que cabem no limite de tokens.
-def empacotar(prefixo: str, itens: list[str], separador: str, contar) -> list[str]:
-    textos, atual = [], []
-    for item in itens:
-        candidato = prefixo + separador.join(atual + [item])
-        if atual and contar(candidato) > LIMITE_TOKENS:
-            textos.append(prefixo + separador.join(atual))
-            atual = [item]
-        else:
-            atual.append(item)
-    if atual:
-        textos.append(prefixo + separador.join(atual))
-    return textos
+# Devolve onde o índice do modelo é gravado: o caminho versionado para o padrão, uma pasta ignorada para os outros.
+def caminho_do_indice(chave_modelo: str) -> str:
+    if chave_modelo == modelos_embedding.MODELO_PADRAO:
+        return CAMINHO_INDICE_PADRAO
+    return os.path.join(PASTA_MODELOS, chave_modelo, "index_esquema.json")
 
 
-# Tira palavras do fim do texto até ele caber no limite de tokens.
-def cortar_no_limite(texto: str, contar) -> str:
-    palavras = texto.split(" ")
-    while contar(" ".join(palavras)) > LIMITE_TOKENS and len(palavras) > 1:
-        palavras.pop()
-    return " ".join(palavras)
-
-
-# Gera os textos do índice de uma tabela, um para cada aspecto da descrição.
-def textos_do_indice(entrada: dict, contar) -> list[str]:
-    t = entrada["tabela"]
-    textos = []
-
-    itens = [x for x in (entrada["resumo"], entrada["proposito"]) if x]
-    textos += empacotar(f"Tabela {t}. ", itens, " ", contar) if itens else []
-
-    if entrada["entidades"]:
-        textos += empacotar(f"Tabela {t}. Entidades: ", entrada["entidades"], ", ", contar)
-
-    frases = []
-    for r in entrada["chaves_de_juncao"]:
-        if r["sentido"] == "referencia":
-            frases.append(f"{t}.{r['coluna']} referencia {r['tabela_relacionada']}.{r['coluna_relacionada']}")
-        else:
-            frases.append(f"{r['tabela_relacionada']}.{r['coluna_relacionada']} referencia {t}.{r['coluna']}")
-    if frases:
-        textos += empacotar(f"Tabela {t}. Relações: ", frases, "; ", contar)
-
-    itens = []
-    for c in entrada["colunas"]:
-        item = f"{c['nome']} ({c['descricao']})" if c["descricao"] else c["nome"]
-        if c["valores_possiveis"]:
-            item += f" [valores: {', '.join(c['valores_possiveis'])}]"
-        itens.append(item)
-    textos += empacotar(f"Tabela {t}. Colunas: ", itens, "; ", contar)
-
-    if entrada["contas"]:
-        itens = [f"{c['codigo']} {c['descricao']}" for c in entrada["contas"]]
-        textos += empacotar(f"Tabela {t}. Contas: ", itens, "; ", contar)
-
-    return [cortar_no_limite(texto, contar) for texto in textos]
-
-
-# Gera os embeddings dos textos de uma tabela e monta os registros do índice.
-def montar_registros(entrada: dict, modelo_embedding: SentenceTransformer) -> list[dict]:
-    tokenizador = modelo_embedding.tokenizer
-    contar = lambda texto: len(tokenizador.tokenize(texto))
-    textos = textos_do_indice(entrada, contar)
-    vetores = modelo_embedding.encode([PREFIXO_TRECHO + t for t in textos])
-    base = entrada["tabela"].lower().replace(" ", "_")
-    return [
-        {
-            "id": f"esquema_{base}_{numero:03d}",
-            "fonte": entrada["tabela"],
-            "conteudo": texto,
-            "embedding": vetor.tolist(),
-        }
-        for numero, (texto, vetor) in enumerate(zip(textos, vetores), start=1)
-    ]
-
-
-# ---------------------------------------------------------------------------
-
-# Regera só o índice vetorial a partir do esquema.json existente, sem banco nem LLM.
-def gerar_so_indice():
-    # local_files_only evita depender da rede a cada carga do modelo.
-    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
-    with open(CAMINHO_ESQUEMA, encoding="utf-8") as f:
-        esquema = json.load(f)
-    registros = []
-    for entrada in esquema:
-        registros.extend(montar_registros(entrada, modelo_embedding))
-    with open(CAMINHO_INDICE, "w", encoding="utf-8") as f:
+# Junta o vetor de cada registro do corpus de esquema e grava o índice.
+def gravar_indice(corpus: list[dict], chave_modelo: str, caminho_saida: str) -> str:
+    registros = modelos_embedding.registros_com_vetores(corpus, chave_modelo)
+    os.makedirs(os.path.dirname(caminho_saida), exist_ok=True)
+    with open(caminho_saida, "w", encoding="utf-8") as f:
         json.dump(registros, f, ensure_ascii=False, indent=2)
-    print(f"Índice salvo em {CAMINHO_INDICE} ({len(registros)} registros, a partir de {len(esquema)} tabelas)")
+    print(f"Índice salvo em {caminho_saida} ({len(registros)} registros, modelo {chave_modelo})")
+    return caminho_saida
+
+
+# Regera só o índice vetorial a partir do corpus existente, sem banco nem LLM.
+def gerar_so_indice(chave_modelo: str, baixar_modelos: bool, caminho_saida: str | None = None) -> str:
+    # O início de toda execução confere o cache; sem --baixar-modelos, só avisa o que falta.
+    modelos_embedding.garantir_modelos([chave_modelo, modelos_embedding.MODELO_FRAGMENTACAO], baixar_modelos)
+    with open(CAMINHO_CORPUS, encoding="utf-8") as f:
+        corpus = json.load(f)
+    return gravar_indice(corpus, chave_modelo, caminho_saida or caminho_do_indice(chave_modelo))
 
 
 # Gera o esquema e o índice para todas as tabelas, ou só para as pedidas na linha de comando.
 def main():
-    if "--so-indice" in sys.argv[1:]:
-        gerar_so_indice()
+    parser = argparse.ArgumentParser(description="Gera o esquema.json e o índice de esquema.")
+    parser.add_argument("tabelas", nargs="*", help="nomes de tabelas, para processar só elas (modo de teste)")
+    parser.add_argument("--so-indice", action="store_true", help="regera só o índice, a partir do esquema.json")
+    parser.add_argument("--modelo", default=modelos_embedding.MODELO_PADRAO, choices=list(modelos_embedding.MODELOS))
+    parser.add_argument("--baixar-modelos", action="store_true", help="autoriza baixar os modelos que faltarem")
+    args = parser.parse_args()
+
+    if args.so_indice:
+        gerar_so_indice(args.modelo, args.baixar_modelos)
         return
-    tabelas_pedidas = sys.argv[1:]
+    if args.modelo != modelos_embedding.MODELO_PADRAO:
+        parser.error("outro modelo exige --so-indice: o esquema.json é um só, comum a todos os modelos")
+    tabelas_pedidas = args.tabelas
+    # Antes de abrir o banco e chamar o LLM, confere os modelos de embeddings.
+    modelos_embedding.garantir_modelos([args.modelo, modelos_embedding.MODELO_FRAGMENTACAO], args.baixar_modelos)
 
     conn = sqlite3.connect(CAMINHO_DB)
     estrutura = ler_estrutura_banco(conn)
@@ -478,11 +432,11 @@ def main():
     # No modo de teste os arquivos ganham o sufixo _teste, para não apagar os completos.
     sufixo = "_teste" if tabelas_pedidas else ""
     caminho_esquema = CAMINHO_ESQUEMA.replace(".json", f"{sufixo}.json")
-    caminho_indice = CAMINHO_INDICE.replace(".json", f"{sufixo}.json")
+    caminho_corpus = CAMINHO_CORPUS.replace(".json", f"{sufixo}.json")
+    caminho_indice = CAMINHO_INDICE_PADRAO.replace(".json", f"{sufixo}.json")
 
-    # local_files_only evita depender da rede a cada carga do modelo.
-    modelo_embedding = SentenceTransformer(MODELO_EMBEDDING, local_files_only=True)
-    esquema, registros = [], []
+    tokenizador = modelos_embedding.carregar_tokenizador(modelos_embedding.MODELO_FRAGMENTACAO)
+    esquema = []
 
     for tabela in tabelas:
         print(f"Tabela {tabela}")
@@ -495,9 +449,8 @@ def main():
             print(f"    ATENÇÃO, problemas que ficaram: {problemas}")
         entrada = montar_entrada_esquema(tabela, estrutura[tabela], relacoes, descricao, contas, valores)
         esquema.append(entrada)
-        novos = montar_registros(entrada, modelo_embedding)
-        registros.extend(novos)
-        print(f"    {len(relacoes)} relações, {len(contas)} contas, {len(novos)} registros no índice")
+        novos = gerar_corpus.gerar_corpus_esquema([entrada], tokenizador)
+        print(f"    {len(relacoes)} relações, {len(contas)} contas, {len(novos)} registros no corpus")
 
     conn.close()
 
@@ -511,11 +464,11 @@ def main():
 
     with open(caminho_esquema, "w", encoding="utf-8") as f:
         json.dump(esquema, f, ensure_ascii=False, indent=2)
-    with open(caminho_indice, "w", encoding="utf-8") as f:
-        json.dump(registros, f, ensure_ascii=False, indent=2)
-
     print(f"Esquema salvo em {caminho_esquema} ({len(esquema)} tabelas)")
-    print(f"Índice salvo em {caminho_indice} ({len(registros)} registros)")
+
+    corpus = gerar_corpus.gerar_corpus_esquema(esquema, tokenizador)
+    gerar_corpus.gravar_corpus(corpus, caminho_corpus)
+    gravar_indice(corpus, args.modelo, caminho_indice)
 
 
 if __name__ == "__main__":

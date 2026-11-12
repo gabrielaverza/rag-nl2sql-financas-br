@@ -8,8 +8,12 @@ Descrição geral do funcionamento:
   responde com um JSON {"tipo": ...}.
 - O tipo decide o caminho: conceitual usa só o índice do glossário (normativos),
   quantitativa usa o índice de esquema e o SQL sobre as DFPs, e híbrida usa os dois.
-- Os exemplos NÃO fazem parte de dados/perguntas_dfp.json nem de
-  dados/perguntas_validacao.json, para a avaliação não ser contaminada.
+- Os exemplos NÃO fazem parte de dados/perguntas_validacao.json, para a avaliação não ser contaminada
+  (nenhum é uma pergunta do conjunto e nenhum usa companhia ou conceito normativo de alguma delas).
+- As híbridas dos exemplos têm estruturas variadas (dados e depois explicação, explicação e depois
+  dados, duas frases, comparação entre companhias, pergunta de regra e citação de norma). Há também
+  quantitativas e conceituais de forma parecida, mas sem as duas partes, para o modelo não tratar o
+  "e" ou o nome de uma companhia como sinal de pergunta híbrida.
 - Se o LLM não devolver uma classe válida em TENTATIVAS chamadas, a pergunta é
   tratada como híbrida.
 
@@ -44,17 +48,33 @@ Classifique a pergunta em uma destas classes:
 Responda somente com um JSON, por exemplo {"tipo": "conceitual"}. Os valores possíveis são "conceitual", "quantitativa" e "hibrida"."""
 
 # (pergunta, classe). As classes estão intercaladas de propósito, para o modelo
-# não tender a repetir a última classe que viu.
+# não tender a repetir a última classe que viu. As híbridas variam de estrutura e a
+# parte conceitual nem sempre trata da conta pedida; as quantitativas e conceituais
+# com "e" ou com nome de companhia mostram que isso sozinho não torna a pergunta híbrida.
 EXEMPLOS = [
-    ("Para que serve a demonstração do resultado do exercício?", "conceitual"),
-    ("Qual foi a receita líquida da Embraer em 2025?", "quantitativa"),
-    ("Explique o que é a DVA e mostre a riqueza gerada pela Braskem em 2025.", "hibrida"),
+    ("Para que serve a demonstração das mutações do patrimônio líquido?", "conceitual"),
+    ("Qual foi o resultado operacional da Embraer em 2025?", "quantitativa"),
+    ("Explique o que são reservas de lucros e mostre o saldo delas na Braskem em 2025.", "hibrida"),
+    ("Quanto a Eneva tinha de caixa e equivalentes de caixa ao fim de 2025? Explique também o que é uma mudança de política contábil.", "hibrida"),
     ("Qual a diferença entre demonstrações consolidadas e individuais?", "conceitual"),
-    ("Qual companhia teve o maior lucro líquido consolidado em 2025?", "quantitativa"),
-    ("Qual o ativo circulante da Localiza em 2025 e o que caracteriza um ativo como circulante?", "hibrida"),
+    ("Qual companhia tinha o maior ativo intangível consolidado ao fim de 2025?", "quantitativa"),
+    ("Qual o capital social da Localiza em 2025 e o que ele representa no balanço?", "hibrida"),
+    ("Entre a CSN e a Light, qual teve o maior ativo total consolidado em 2025, e o que são instrumentos financeiros derivativos?", "hibrida"),
     ("O que são ajustes de avaliação patrimonial?", "conceitual"),
-    ("Qual a dívida de longo prazo da Cosan no balanço individual de 2025?", "quantitativa"),
-    ("Compare o patrimônio líquido consolidado da Localiza e da Cosan em 2025 e explique o que ele representa no balanço.", "hibrida"),
+    ("Qual o saldo de provisões da Sabesp no balanço individual de 2025?", "quantitativa"),
+    ("Compare o estoque consolidado da Cemig e da Sabesp em 2025 e explique como o estoque é apresentado no balanço.", "hibrida"),
+    ("Como uma entidade deve tratar os eventos ocorridos após o período de reporte, e qual foi o lucro líquido consolidado da Light em 2025?", "hibrida"),
+    ("O que é o ajuste a valor presente e quando ele deve ser aplicado?", "conceitual"),
+    ("Qual foi a receita líquida e o lucro líquido consolidados da CSN em 2025?", "quantitativa"),
+    ("Qual foi o resultado de equivalência patrimonial da Raízen em 2025, e o que a entidade deve divulgar sobre ações em tesouraria?", "hibrida"),
+    ("Qual o saldo de arrendamentos a pagar da CSN no fim de 2025, e a entidade pode reconhecer uma provisão sem obrigação presente?", "hibrida"),
+    ("Segundo a CVM, uma companhia aberta como a Light precisa ter um comitê de auditoria?", "conceitual"),
+    ("Quanto a Eneva pagou de tributos sobre o lucro em 2025, no consolidado, e qual foi a variação em relação a 2024?", "quantitativa"),
+    ("Quanto a Magazine Luiza pagou de juros sobre o capital próprio em 2025, e o que o conselho fiscal deve examinar nas demonstrações?", "hibrida"),
+    ("Segundo a Resolução CVM 80, em que casos o emissor deve divulgar fato relevante, e qual foi a receita líquida consolidada da Eneva em 2025?", "hibrida"),
+    ("O que caracteriza um segmento operacional?", "conceitual"),
+    ("Entre a CSN e a Light, qual teve a maior dívida bruta consolidada em 2025?", "quantitativa"),
+    ("Qual era a dívida bruta consolidada da Energisa ao fim de 2025, e em que prazo a companhia deve divulgar o aviso aos acionistas sobre a disponibilização das demonstrações?", "hibrida"),
 ]
 
 

@@ -1,0 +1,11 @@
+{
+  "modelo_embedding": "e5-base",
+  "busca": {
+    "esquema": {"metodo": "embeddings", "por_tipo": {}},
+    "glossario": {"metodo": "embeddings", "por_tipo": {}}
+  },
+  "k_tabelas": 3,
+  "k_trechos": 3,
+  "divisor": {"ativo": true, "bloquear_pronomes": true},
+  "bm25": {"radicalizar": true}
+}
