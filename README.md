@@ -388,6 +388,68 @@ dele nessa mesma pasta.
 | `modelos` | `recuperacao` | cinco modelos de embeddings (`minilm`, `e5-small`, `e5-base`, `bge-m3` e `e5-base-v2`) | `modelos-v1` |
 | `pipeline_exploratorio` | `pipeline` | dois cenários de busca (embeddings nos dois índices; embeddings no esquema e RRF sem radicalizador no glossário), com a passada de tabelas ideais | `pipeline_exploratorio-v1` a `-v3` |
 
+**Resultados dos experimentos.** Conjunto oficial de 60 perguntas, com as médias sobre as 40 perguntas
+de cada índice (tabelas: 20 quantitativas e 20 híbridas; trechos: 20 conceituais e 20 híbridas), uma
+rodada por execução e sem teste estatístico: com 20 perguntas por tipo, cada pergunta vale 0,05, então
+diferenças de uma pergunta não são interpretáveis. As ressalvas completas estão na última seção do
+`relatorio.md` de cada experimento.
+
+*`metodos`: método de busca* (E5-base, divisor ligado; fonte: `metricas/metodos/relatorio.md` e
+`resumo.csv`, tag `metodos-v1`).
+
+| Método | Tabelas: Recall@3 | nDCG@3 | MRR | Trechos: Recall@3 | nDCG@5 | MRR |
+|---|---|---|---|---|---|---|
+| Embeddings | 0,78 | 0,62 | 0,60 | 0,71 | 0,65 | 0,65 |
+| BM25 com radicalizador | 0,60 | 0,44 | 0,45 | 0,74 | 0,68 | 0,67 |
+| BM25 sem radicalizador | 0,50 | 0,34 | 0,37 | 0,79 | 0,71 | 0,68 |
+| RRF com radicalizador | 0,75 | 0,59 | 0,58 | 0,74 | 0,72 | 0,72 |
+| RRF sem radicalizador | 0,72 | 0,57 | 0,57 | 0,79 | 0,74 | 0,73 |
+
+*`modelos`: modelo de embeddings* (busca por embeddings nos dois índices, divisor ligado; fonte:
+`metricas/modelos/relatorio.md` e `resumo.csv`, tag `modelos-v1`). O `e5-base-v2` é o controle só em inglês.
+
+| Modelo | Tabelas: Recall@3 | nDCG@3 | MRR | Trechos: Recall@3 | nDCG@5 | MRR |
+|---|---|---|---|---|---|---|
+| `minilm` | 0,47 | 0,40 | 0,47 | 0,49 | 0,49 | 0,49 |
+| `e5-small` | 0,53 | 0,43 | 0,49 | 0,66 | 0,63 | 0,62 |
+| `e5-base` | 0,78 | 0,62 | 0,60 | 0,71 | 0,65 | 0,65 |
+| `bge-m3` | 0,65 | 0,57 | 0,61 | 0,64 | 0,61 | 0,59 |
+| `e5-base-v2` | 0,57 | 0,48 | 0,52 | 0,51 | 0,52 | 0,47 |
+
+*`pipeline_exploratorio`: pipeline completo* (60 perguntas, dois cenários de busca, com a passada de
+tabelas ideais; fonte: `metricas/pipeline_exploratorio/relatorio.md`, `ragas.md` e `ragas.csv`, tag
+`pipeline_exploratorio-v3`). Os dois cenários têm o mesmo SQL e a mesma classe, porque o cenário 2
+reaproveita o SQL do cenário 1; só o texto da resposta muda.
+
+| Configuração | Classe certa | EX adaptado | EX estrito | EX adaptado com tabelas ideais |
+|---|---|---|---|---|
+| Cenário 1: embeddings nos dois índices | 60/60 | 24/40 | 10/40 | 22/40 |
+| Cenário 2: embeddings no esquema e RRF sem radicalizador no glossário | 60/60 | 24/40 | 10/40 | 22/40 |
+
+Por tipo, nos dois cenários: quantitativas 12/20 e híbridas 12/20 no EX adaptado; 6/20 e 4/20 no EX
+estrito.
+
+| Resposta em texto | Cenário 1 | Cenário 2 |
+|---|---|---|
+| Conceituais: fidelidade (RAGAS) | 0,80 | 0,73 |
+| Conceituais: relevância da resposta (RAGAS) | 0,78 | 0,82 |
+| Híbridas: fidelidade (RAGAS) | 0,25 | 0,31 |
+| Híbridas: relevância da resposta (RAGAS) | 0,47 | 0,52 |
+| Híbridas: números do resultado no texto (por código) | 0,93 | 0,93 |
+| Quantitativas: números do resultado no texto (por código) | 0,96 | 0,96 |
+
+A nota da RAGAS mede se o texto é sustentado pelo contexto que o sistema recebeu, e não se o dado está
+certo; o juiz é o mesmo modelo que escreve as respostas.
+
+Execuções do `pipeline_exploratorio` guardadas em tags (cenário 1; o `relatorio.md` de cada uma fica
+acessível com `git show <tag>:metricas/pipeline_exploratorio/relatorio.md`):
+
+| Tag | Commit do código | Classe certa | EX adaptado | EX estrito | EX adaptado com tabelas ideais |
+|---|---|---|---|---|---|
+| `pipeline_exploratorio-v1` | `b3b4016` | 52/60 | 9/40 | 4/40 | 9/40 |
+| `pipeline_exploratorio-v2` | `f6f496f` | 60/60 | 9/40 | 4/40 | 9/40 |
+| `pipeline_exploratorio-v3` | `4800659` | 60/60 | 24/40 | 10/40 | 22/40 |
+
 O experimento `teste_equivalencia` serve para conferir que uma mudança no código não alterou as
 métricas de recuperação: rode-o antes e depois, e compare os `resultados.csv` (a coluna `execucao` é a
 única que muda).
