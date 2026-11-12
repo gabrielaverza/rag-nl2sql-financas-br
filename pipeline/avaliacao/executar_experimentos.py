@@ -14,8 +14,7 @@ Descrição geral do funcionamento:
 - O conjunto de perguntas é sempre dados/perguntas_validacao.json (60 perguntas, o conjunto oficial).
 - Nível recuperação: para cada configuração e pergunta, busca as tabelas (quantitativas e híbridas) e
   os trechos dos normativos (conceituais e híbridas) com o método da configuração e calcula as métricas
-  de metricas.py (todas as tabelas no top-k, Recall, MRR, Hit@k, Precision@k, nDCG@k e o
-  acerto conjunto das híbridas). Com o divisor ligado, as híbridas buscam as tabelas com a pergunta
+  de metricas.py (Precision@k, Recall@k, nDCG@k e MRR). Com o divisor ligado, as híbridas buscam as tabelas com a pergunta
   inteira e os trechos com a parte conceitual (condição "mista"). As divisões são feitas uma vez e
   guardadas em metricas/divisoes_hibridas.json, para todas as configurações usarem as mesmas.
 - Nível pipeline: para cada rodada, configuração e pergunta, chama executar() de main.py e mede a
