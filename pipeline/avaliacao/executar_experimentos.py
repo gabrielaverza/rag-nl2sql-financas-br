@@ -11,7 +11,8 @@ Descrição geral do funcionamento:
   rodadas e a passada de tabelas ideais. Cada configuração é uma lista de trocas "chave=valor" sobre o
   configuracao.json, no formato do --set (configuracao.py), então qualquer chave pode variar: modelo de
   embeddings, método de busca por índice e por tipo, k, divisor, bloqueio de pronomes, radicalizador.
-- O conjunto de perguntas é sempre dados/perguntas_validacao.json (60 perguntas, o conjunto oficial).
+- O conjunto de perguntas de cada experimento vem da chave "perguntas" do experimento em experimentos.json;
+  sem ela, vale dados/perguntas_validacao.json (60 perguntas, o conjunto oficial dos demais experimentos).
 - Nível recuperação: para cada configuração e pergunta, busca as tabelas (quantitativas e híbridas) e
   os trechos dos normativos (conceituais e híbridas) com o método da configuração e calcula as métricas
   de metricas.py (Precision@k, Recall@k, nDCG@k e MRR). Com o divisor ligado, as híbridas buscam as tabelas com a pergunta
@@ -20,18 +21,21 @@ Descrição geral do funcionamento:
 - Nível pipeline: para cada rodada, configuração e pergunta, chama executar() de main.py e mede a
   classe prevista, o EX (estrito e adaptado, que aceita a coluna DENOM_CIA e linhas de companhias com o nome da pergunta), a
   o tempo de cada passo; guarda no respostas.json o texto da resposta, o contexto e o resultado do SQL,
-  que o ragas_avaliacao.py usa para a RAGAS (fidelidade e relevância da resposta). O SQL gerado
+  que o ragas_avaliacao.py usa para a RAGAS (fidelidade e relevância da resposta); também mede a
+  relevância do contexto (nota do validador do sistema, só onde houve trechos). O SQL gerado
   fica em um cache por (pergunta, tabelas do contexto) que vale entre as configurações da mesma
   rodada e é refeito a cada rodada, para a variação do LLM aparecer nas rodadas. Com
   "tabelas_ideais": true, uma passada extra gera o SQL só com as tabelas de tabelas_esperadas.
 - Sem teste estatístico: o relatório mostra as métricas de cada configuração, por tipo de pergunta
-  (contagens "x/n" e médias), e quem compara é o leitor, como em BEIR, E5 e BGE-M3. Com 20 perguntas por
-  tipo, cada pergunta vale 5 pontos percentuais; os números comparam as configurações nesta amostra.
+  (contagens "x/n" e médias), e quem compara é o leitor, como em BEIR, E5 e BGE-M3. Cada pergunta vale
+  100/n pontos percentuais dentro do seu tipo (5 com 20 perguntas); os números comparam as configurações
+  nesta amostra.
 
 Dependências:
 - pipeline/avaliacao/metricas.py; pipeline/online/busca*.py, divisor.py e main.py; os índices e o
   esquema em embeddings/ (os de outros modelos, em embeddings/modelos/<chave>/),
-  dados/perguntas_validacao.json, dados/dfp.db e experimentos.json;
+  o arquivo de perguntas do experimento (dados/perguntas_validacao.json ou o da chave "perguntas"),
+  dados/dfp.db e experimentos.json;
 - servidor Ollama com o modelo qwen2.5-coder:7b (divisor e nível pipeline).
 
 Parâmetros: o nome do experimento, e opcionalmente --rodadas N (nível pipeline), --ids q01,c01,...
@@ -103,7 +107,7 @@ from fusao_rrf import IndiceHibrido
 from modelos_embedding import MODELO_PADRAO
 
 CAMINHO_EXPERIMENTOS = "experimentos.json"
-CAMINHO_PERGUNTAS = "dados/perguntas_validacao.json"
+CAMINHO_PERGUNTAS_PADRAO = "dados/perguntas_validacao.json"
 PASTA_SAIDA = "metricas"
 PASTA_RASCUNHOS = os.path.join(PASTA_SAIDA, "rascunhos")
 CAMINHO_DIVISOES = "/".join((PASTA_SAIDA, "divisoes_hibridas.json"))
@@ -123,6 +127,7 @@ METRICAS_PIPELINE = [
     ("ex_estrito", "EX estrito", "contagem"),
     ("ideal_ex_adaptado", "EX adaptado com tabelas ideais", "contagem"),
     ("ideal_ex_estrito", "EX estrito com tabelas ideais", "contagem"),
+    ("relevancia_contexto", "Relevância do contexto", "media"),
     ("tempo_total", "Tempo total por pergunta (s)", "media"),
 ]
 PASSOS = ("classificador", "divisor", "sql", "sintese", "validacao")
@@ -151,6 +156,7 @@ DESCRICAO_METRICAS = [
     ("EX estrito (`ex_estrito`)", "0 ou 1", "O resultado do SQL gerado é igual ao do `sql_referencia` (ordem das colunas e das linhas ignorada, números com 2 casas). Só nas perguntas com SQL."),
     ("EX adaptado (`ex_adaptado`)", "0 ou 1", "Vale se o EX estrito vale ou se o resultado traz todas as linhas da referência (a coluna `DENOM_CIA` é tolerada) e as linhas a mais são de companhias cujo `DENOM_CIA` contém a palavra que identifica a companhia dita na pergunta. Adaptação do EX de Zhong et al. (2020), sem artigo; mais permissiva que o EX estrito."),
     ("Tabelas ideais (`ideal_ex_*`)", "0 ou 1", "EX do SQL gerado quando o gerador recebe as tabelas certas (`tabelas_esperadas`) em vez das da busca. É um teto, e a diferença para o EX normal mostra quanto da perda vem da busca."),
+    ("Relevância do contexto (`relevancia_contexto`)", "0 a 1", "Fração dos trechos do glossário recuperados que o LLM julga úteis para responder a pergunta (validador do sistema, `validador.py`). Só nas conceituais e híbridas com trechos. O juiz é o mesmo modelo que escreve as respostas, e não é a `ContextRelevance` da biblioteca ragas. Maior é melhor."),
     ("Tempos (`tempo_*`)", "segundos", "Tempo da pergunta inteira e de cada passo do fluxo. Menor é melhor."),
 ]
 
@@ -159,9 +165,9 @@ DESCRICAO_METRICAS = [
 # 2) Perguntas, experimentos e divisões
 # ---------------------------------------------------------------------------
 
-# Lê o conjunto oficial e, se pedido, só as perguntas de uma lista de ids.
-def carregar_perguntas(ids: list[str] | None) -> list[dict]:
-    with open(CAMINHO_PERGUNTAS, encoding="utf-8") as f:
+# Lê o arquivo de perguntas do experimento e, se pedido, só as perguntas de uma lista de ids.
+def carregar_perguntas(caminho: str, ids: list[str] | None) -> list[dict]:
+    with open(caminho, encoding="utf-8") as f:
         perguntas = json.load(f)
     if ids:
         desconhecidos = [i for i in ids if i not in {p["id"] for p in perguntas}]
@@ -179,6 +185,9 @@ def carregar_experimento(caminho: str, nome: str) -> dict:
         raise ValueError(f"experimento {nome!r} não existe em {caminho}; disponíveis: {', '.join(todos)}")
     exp = dict(todos[nome])
     exp["nome"] = nome
+    exp["perguntas"] = exp.get("perguntas", CAMINHO_PERGUNTAS_PADRAO)
+    if not os.path.exists(exp["perguntas"]):
+        raise ValueError(f"{nome}: arquivo de perguntas não encontrado: {exp['perguntas']}")
     if exp.get("nivel") not in ("recuperacao", "pipeline"):
         raise ValueError(f"{nome}: nivel deve ser 'recuperacao' ou 'pipeline'")
     nomes = [c["nome"] for c in exp["configuracoes"]]
@@ -367,6 +376,10 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
                 for passo in PASSOS:
                     if passo in r["tempos"]:
                         m[f"tempo_{passo}"] = r["tempos"][passo]
+                # Relevância do contexto: só existe quando houve trechos do glossário a julgar.
+                relevancia = r["validacao"]["relevancia_contexto"]
+                if relevancia["score"] is not None:
+                    m["relevancia_contexto"] = relevancia["score"]
                 if p["sql_referencia"]:
                     estrito, adaptado = calcular_ex(r_sql, p, nomes)
                     m.update(ex_estrito=float(estrito), ex_adaptado=float(adaptado))
@@ -382,6 +395,7 @@ def rodar_pipeline(exp: dict, perguntas: list[dict], rodadas: int) -> dict:
                     # Para a pontuação da RAGAS (ragas_avaliacao.py): o texto que o LLM escreveu, o contexto que ele
                     # recebeu e o resultado do SQL (até 30 linhas).
                     "texto_resposta": r["texto_resposta"], "contexto": r["contexto"], "trechos_ids": [t["id"] for t in r["trechos"]],
+                    "relevancia_contexto": relevancia,
                     "resultado_sql": {"colunas": r_sql["colunas"], "linhas": [list(l) for l in r_sql["linhas"][:30]]} if r_sql and r_sql["status"] == "ok" else None,
                 })
     return {"resultados": resultados, "respostas": respostas}
@@ -453,7 +467,7 @@ def iniciar_ficha(exp: dict, perguntas: list[dict], comando: str, ids: list[str]
     from modelos_embedding import MODELOS
 
     modelos = sorted({c["modelo_embedding"] for c in exp["configs"].values()})
-    arquivos = ["configuracao.json", "experimentos.json", CAMINHO_PERGUNTAS, "embeddings/esquema.json", CAMINHO_DIVISOES,
+    arquivos = ["configuracao.json", "experimentos.json", exp["perguntas"], "embeddings/esquema.json", CAMINHO_DIVISOES,
                 "embeddings/index_esquema.json", "embeddings/index_glossario.json",
                 "embeddings/index_bm25_esquema.json", "embeddings/index_bm25_glossario.json"]
     for modelo in modelos:
@@ -523,7 +537,7 @@ def linhas_longas(exp: dict, por_config: dict, execucao: str) -> list[dict]:
                     escala, _ = escala_e_sentido(chave)
                     linhas.append({
                         "experimento": exp["nome"], "execucao": execucao, "configuracao": nome, **contexto,
-                        "conjunto": os.path.splitext(os.path.basename(CAMINHO_PERGUNTAS))[0],
+                        "conjunto": os.path.splitext(os.path.basename(exp["perguntas"]))[0],
                         "id_pergunta": r["id"], "tipo": r["tipo"], "metrica": chave, "escala": escala,
                         "valor": r["m"][chave], "rodada": rodada,
                     })
@@ -598,7 +612,7 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `{comando}`.",
         linha_execucao(ficha),
         f"- {exp.get('descricao', '')}",
-        f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas ({', '.join(f'{sum(1 for p in perguntas if p['tipo'] == tp)} {PLURAL[tp]}' for tp in TIPOS)})." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
+        f"- Conjunto: `{exp['perguntas']}`, {len(perguntas)} perguntas ({', '.join(f'{sum(1 for p in perguntas if p['tipo'] == tp)} {PLURAL[tp]}' for tp in TIPOS)})." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
         f"- Os índices têm {saida['n_tabelas']} tabelas e {saida['n_trechos']} trechos.",
         f"- Métricas calculadas com a biblioteca ranx {version('ranx')}: Precision@k, Recall@k, nDCG@k e MRR, com relevância binária. Nas tabelas, a tabela `companhias` fica fora do ranking e dos itens esperados (o sistema a acrescenta por regra a todas as listas), então as k tabelas medidas são as k mais parecidas com a pergunta.",
         "- Nas perguntas híbridas, as tabelas são buscadas com a pergunta inteira e os trechos com a parte conceitual quando o divisor está ligado (configuração `divisor.ativo`); as divisões ficam em `metricas/divisoes_hibridas.json`.",
@@ -637,7 +651,7 @@ def relatorio_recuperacao(exp: dict, perguntas: list[dict], saida: dict, comando
         t += tabela_md(["Modelo", "Idioma", "Dimensões", "Limite de tokens", "Índices (MB)"], corpo)
         t += ["O tempo de indexação é impresso por `rodar_offline.py`; o tempo de cada configuração aparece na tabela de configurações.", ""]
         n_secao += 1
-    return "\n".join(t + secao_metricas_e_ressalvas(exp, n_secao, comando, "recuperacao"))
+    return "\n".join(t + secao_metricas_e_ressalvas(exp, n_secao, comando, "recuperacao", perguntas))
 
 
 # Monta o relatório do nível pipeline.
@@ -664,7 +678,7 @@ def relatorio_pipeline(exp: dict, perguntas: list[dict], saida: dict, rodadas: i
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `{comando}`.",
         linha_execucao(ficha),
         f"- {exp.get('descricao', '')}",
-        f"- Conjunto: `{CAMINHO_PERGUNTAS}`, {len(perguntas)} perguntas; {rodadas} rodada(s)." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
+        f"- Conjunto: `{exp['perguntas']}`, {len(perguntas)} perguntas; {rodadas} rodada(s)." + (" **Rascunho (teste ou só alguns ids): não use como resultado.**" if parcial else ""),
         "- O cache de SQL vale entre as configurações da mesma rodada e é refeito a cada rodada." + (" A passada de tabelas ideais gera o SQL só com as tabelas de `tabelas_esperadas`." if exp.get("tabelas_ideais") else ""),
         "",
     ]
@@ -711,16 +725,33 @@ def relatorio_pipeline(exp: dict, perguntas: list[dict], saida: dict, rodadas: i
     n_secao += 1
     if rodadas > 1:
         t += ["Com mais de uma rodada, as células mostram a média das rodadas e, entre colchetes, o mínimo e o máximo.", ""]
-    return "\n".join(t + secao_metricas_e_ressalvas(exp, n_secao, comando, "pipeline"))
+    return "\n".join(t + secao_metricas_e_ressalvas(exp, n_secao, comando, "pipeline", perguntas))
+
+
+# Frase sobre o valor de cada pergunta, calculada pelo número de perguntas de cada tipo.
+def frase_amostra(perguntas: list[dict]) -> str:
+    contagens = {tp: sum(1 for p in perguntas if p["tipo"] == tp) for tp in TIPOS}
+    contagens = {tp: n for tp, n in contagens.items() if n}
+
+    def pontos(n: int) -> str:
+        return f"{100 / n:.1f}".replace(".", ",").removesuffix(",0")
+
+    if len(set(contagens.values())) == 1:
+        n = next(iter(contagens.values()))
+        valor = f"com {n} {'pergunta' if n == 1 else 'perguntas'} por tipo, cada pergunta vale {pontos(n)} pontos percentuais"
+    else:
+        partes = [f"{pontos(n)} nas {n} {PLURAL[tp]}" for tp, n in contagens.items()]
+        valor = f"cada pergunta vale, em pontos percentuais, {', '.join(partes)}"
+    return f"- Amostra pequena: {valor}. Os números comparam as configurações nesta amostra, sem teste estatístico, e não permitem afirmar superioridade estatística de uma sobre outra."
 
 
 # Seção fixa de métricas e escalas, ressalvas e comandos.
-def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str) -> list[str]:
+def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str, perguntas: list[dict]) -> list[str]:
     t = [f"## {n}. Métricas e escalas", "", "| Métrica | Escala | O que mede |", "|---|---|---|"]
     t += [f"| {nome} | {escala} | {texto} |" for nome, escala, texto in DESCRICAO_METRICAS]
     t += ["", f"## {n + 1}. Ressalvas", ""]
     t += [
-        "- Amostra pequena: com 20 perguntas por tipo, cada pergunta vale 5 pontos percentuais. Os números comparam as configurações nesta amostra, sem teste estatístico, e não permitem afirmar superioridade estatística de uma sobre outra.",
+        frase_amostra(perguntas),
         "- O critério de relevância dos trechos é a evidência literal; um trecho útil sem essa frase conta como erro.",
         "- Nas tabelas, a regra de pontuação (melhor registro de resumo ou entidades) é a mesma em todos os métodos e a tabela `companhias` fica fora da medição; o RRF nas tabelas é uma extensão exploratória do que o MimirRAG faz com trechos.",
         "- Com uma única evidência por pergunta, a Precision@k dos trechos tem máximo 1/k (por exemplo, 0,2 com k = 5). O nDCG vem da ranx, com o desconto 1/log2(i+1), diferente do de Järvelin da fundamentação.",
@@ -728,6 +759,7 @@ def secao_metricas_e_ressalvas(exp: dict, n: int, comando: str, nivel: str) -> l
     if nivel == "pipeline":
         t += [
             "- O gerador de SQL e a síntese usam o LLM e não dão exatamente o mesmo resultado a cada execução; com uma rodada só, diferenças pequenas não são interpretáveis.",
+            "- A relevância do contexto vem do mesmo LLM de 7B que escreve as respostas, com o critério \"contribui, mesmo que parcialmente\"; mede se os trechos recuperados ajudam a responder, e não se a resposta está certa.",
             "- A fidelidade e a relevância da resposta (RAGAS) não estão neste relatório: saem de `ragas_avaliacao.py`, que lê o `respostas.json` desta pasta e grava `ragas.csv` e `ragas.md`.",
         ]
     t += ["", f"## {n + 2}. Comandos", "", "```", comando, "```", ""]
@@ -758,7 +790,7 @@ def main():
 
     exp = carregar_experimento(args.experimentos, args.experimento)
     ids = [i.strip() for i in args.ids.split(",")] if args.ids else None
-    perguntas = carregar_perguntas(ids)
+    perguntas = carregar_perguntas(exp["perguntas"], ids)
     rascunho = bool(ids) or bool(exp.get("rascunho"))
     rodadas = (args.rodadas or exp.get("rodadas", 1)) if exp["nivel"] == "pipeline" else 1
     comando = COMANDO_PADRAO.format(nome=exp["nome"]) + (f" --ids {args.ids}" if ids else "") + (f" --rodadas {args.rodadas}" if args.rodadas else "")
