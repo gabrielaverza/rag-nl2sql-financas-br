@@ -10,7 +10,8 @@ Descrição geral do funcionamento:
   busca (usado para medir o gerador com tabelas ideais).
 - Nas perguntas híbridas divididas pelo divisor, o LLM recebe só a parte de dados (parâmetro pergunta_sql):
   a parte conceitual o levava a responder a explicação com colunas a mais e a escolher a conta errada. As
-  tabelas continuam sendo buscadas com a pergunta inteira.
+  tabelas também são buscadas com a parte de dados, porque as palavras do conceito ("fluxo de caixa")
+  traziam para o contexto tabelas que a pergunta de dados não usa.
 - O contexto traz só essas tabelas (colunas, tipos, valores possíveis, plano de contas e
   junções), lido do esquema.json. O esquema completo não vai ao LLM.
 - Cada conta do plano de contas aparece com a descrição oficial e o filtro CD_CONTA pronto.
@@ -23,6 +24,9 @@ Descrição geral do funcionamento:
 - Também antes de executar, o código confere se cada CD_CONTA existe no plano da tabela em que é
   usado (se não existe nela mas existe em outra tabela do contexto, o LLM recebe o aviso com a
   tabela certa) e recusa SQL que usa VL_CONTA sem ESCALA_MOEDA, pedindo a conversão para reais.
+- Recusa também SQL com SUM que junta mais de uma companhia: quando o nome do LIKE (ou os nomes
+  exatos que o substituíram) casa com mais de uma companhia, ou quando o SQL não filtra nenhuma
+  companhia. O LLM recebe o problema e deve devolver uma linha por companhia, sem SUM.
 - Se der erro, o resultado vier vazio ou só com valores nulos (NULL, como o de SUM sobre nenhuma
   linha), o LLM recebe o problema e gera outro SQL, até o limite de tentativas.
 - Opcionalmente, um dicionário de cache (parâmetro cache) guarda o SQL por (pergunta, tabelas do
@@ -35,8 +39,8 @@ Dependências:
 
 Parâmetros: nenhum argumento. É um módulo importado pelos demais passos do estágio online.
 
-Resultado: fornece gerar_sql(), executar_sql(), validar_sql(), conferir_companhias(), conferir_contas() e
-conferir_escala().
+Resultado: fornece gerar_sql(), executar_sql(), validar_sql(), conferir_companhias(), conferir_contas(),
+conferir_escala() e conferir_soma().
 """
 
 import copy
@@ -77,6 +81,11 @@ TABELA_E_ALIAS = re.compile(
     re.IGNORECASE)
 # Condição sobre o código da conta, com ou sem o nome ou alias da tabela: CD_CONTA = '3.01' ou CD_CONTA IN ('3.01', '3.02').
 CONDICAO_CONTA = re.compile(r"(?:(\w+)\.)?CD_CONTA\s*(?:=\s*'([^']+)'|IN\s*\(([^)]*)\))", re.IGNORECASE)
+# SUM como função de agregação.
+SOMA = re.compile(r"\bSUM\s*\(", re.IGNORECASE)
+# Filtro sobre a companhia: DENOM_CIA comparado com um valor ou CD_CVM comparado com uma subconsulta. A junção
+# ON x.CD_CVM = y.CD_CVM não conta, porque não escolhe nenhuma companhia.
+FILTRO_COMPANHIA = re.compile(r"\bDENOM_CIA\s*(?:=|<>|!=|IN\b|LIKE\b)|\bCD_CVM\s*(?:=|IN)\s*[(']", re.IGNORECASE)
 # Acima disso o termo é genérico demais para trocar o LIKE pelos nomes exatos.
 MAX_NOMES_NA_REESCRITA = 5
 # Semelhança mínima (difflib) entre uma palavra do termo e uma palavra de nome, para sugerir o nome.
@@ -308,15 +317,43 @@ def conferir_escala(sql: str) -> str | None:
     return None
 
 
-# Gera o SQL da pergunta e o executa. As tabelas do contexto são sempre buscadas com a pergunta; o texto que o
-# LLM recebe para escrever o SQL é pergunta_sql, quando dado (a parte de dados de uma pergunta híbrida dividida),
-# ou a própria pergunta. Com um dicionário em cache, o SQL de um par (texto, lista de tabelas do contexto) já
-# gerado nele é reaproveitado, sem nova chamada ao LLM; o executor de experimentos usa isso para comparar
-# configurações que recuperam as mesmas tabelas.
+# Recusa o SQL que usa SUM para juntar companhias, o que esconde que o resultado mistura valores de companhias
+# diferentes. Dois casos: (1) um nome do LIKE em DENOM_CIA casa com mais de uma companhia do banco, ou foi trocado
+# por mais de um nome exato (reescritas, de conferir_companhias); (2) o SQL não filtra nenhuma companhia, e a
+# soma cobre todas. SUM sobre uma única companhia não é recusado. Devolve o problema ou None.
+def conferir_soma(sql: str, reescritas: list[dict] | None = None) -> str | None:
+    if not SOMA.search(sql):
+        return None
+    conn = sqlite3.connect(f"file:{CAMINHO_DB}?mode=ro", uri=True)
+    try:
+        casadas = []
+        for _, padrao in LIKE_COMPANHIA.findall(sql):
+            padrao = padrao.replace("''", "'")
+            nomes = [linha[0] for linha in conn.execute("SELECT DENOM_CIA FROM companhias WHERE DENOM_CIA LIKE ?", (padrao,))]
+            if len(nomes) > 1:
+                casadas.append((padrao.strip("%"), nomes))
+    finally:
+        conn.close()
+    casadas += [(r["padrao"].strip("%"), r["nomes"]) for r in (reescritas or []) if len(r["nomes"]) > 1]
+    if casadas:
+        termo, nomes = casadas[0]
+        return (f"a consulta usa SUM, mas o nome '{termo}' casa com {len(nomes)} companhias (por exemplo "
+                f"{', '.join(nomes[:3])}) e a soma misturaria os valores delas. Não use SUM para reunir companhias: "
+                "devolva uma linha por companhia, com companhias.DENOM_CIA na primeira coluna")
+    if not FILTRO_COMPANHIA.search(sql):
+        return ("a consulta usa SUM sem filtrar nenhuma companhia, e a soma cobriria todas. Filtre a companhia da "
+                "pergunta com companhias.DENOM_CIA LIKE e uma parte do nome que aparece na pergunta")
+    return None
+
+
+# Gera o SQL da pergunta e o executa. As tabelas do contexto são buscadas com o texto que o LLM recebe para escrever
+# o SQL: pergunta_sql, quando dado (a parte de dados de uma pergunta híbrida dividida), ou a própria pergunta. Com um
+# dicionário em cache, o SQL de um par (texto, lista de tabelas do contexto) já gerado nele é reaproveitado, sem nova
+# chamada ao LLM; o executor de experimentos usa isso para comparar configurações que recuperam as mesmas tabelas.
 def gerar_sql(pergunta: str, k: int | None = None, tabelas: list[str] | None = None, tipo: str | None = None,
               cache: dict | None = None, pergunta_sql: str | None = None) -> dict:
-    entradas = selecionar_contexto(pergunta, k, tabelas, tipo)
     texto = pergunta_sql or pergunta
+    entradas = selecionar_contexto(texto, k, tabelas, tipo)
     chave = (texto, tuple(e["tabela"] for e in entradas))
     if cache is not None and chave in cache:
         return copy.deepcopy(cache[chave])
@@ -353,7 +390,8 @@ def _gerar_e_executar(pergunta: str, entradas: list[dict]) -> dict:
             sql = json.loads(conteudo)["sql"]
             tentativa["sql"] = sql
             sql_executado, problema, reescritas = conferir_companhias(sql)
-            problemas = [p for p in (problema, conferir_contas(sql_executado, plano), conferir_escala(sql_executado)) if p]
+            problemas = [p for p in (problema, conferir_contas(sql_executado, plano), conferir_escala(sql_executado),
+                                     conferir_soma(sql_executado, reescritas)) if p]
             if problemas:
                 raise ValueError("; ".join(problemas))
             if reescritas:

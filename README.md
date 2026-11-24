@@ -266,7 +266,7 @@ tratada como híbrida.
 **Divisor.** Só nas perguntas híbridas e com `divisor.ativo`. O LLM separa a pergunta em parte de dados
 e parte conceitual (5 exemplos no prompt); a parte conceitual não pode ter pronome ("nesse valor"), e,
 se tiver, o LLM é chamado de novo. Se a divisão falhar, as duas partes viram a pergunta inteira. As
-tabelas continuam sendo buscadas com a pergunta inteira, os trechos são buscados com a parte conceitual e o
+tabelas são buscadas com a parte de dados, os trechos são buscados com a parte conceitual e o
 gerador de SQL recebe só a parte de dados.
 
 **Gerador de SQL.** Para as perguntas quantitativas e híbridas. O contexto do LLM traz só as tabelas
@@ -289,11 +289,14 @@ o SQL devolve uma linha por companhia, com `DENOM_CIA` na primeira coluna. O có
   fica em `sql_original`; se nada casa, o LLM recebe um aviso com nomes parecidos;
 - confere se cada `CD_CONTA` existe no plano da tabela em que é usado (o aviso só sai se o código existe
   no plano de outra tabela do contexto, pois o plano guarda só as contas fixas);
-- recusa `VL_CONTA` sem `ESCALA_MOEDA`, pedindo a conversão para reais.
+- recusa `VL_CONTA` sem `ESCALA_MOEDA`, pedindo a conversão para reais;
+- recusa `SUM` que junta mais de uma companhia: quando o nome do `LIKE` (ou os nomes exatos que o
+  substituíram) casa com mais de uma companhia, ou quando o SQL não filtra nenhuma. O LLM deve devolver uma
+  linha por companhia, sem `SUM`.
 
 Erro de execução, resultado vazio e resultado só com valores nulos (como o `SUM` sobre nenhuma linha)
 voltam ao LLM com o problema, por até 3 tentativas. `gerar_sql` aceita também a lista de tabelas, sem usar
-a busca, o texto que o LLM recebe (`pergunta_sql`; as tabelas são sempre buscadas com a pergunta) e um
+a busca, o texto que o LLM recebe (`pergunta_sql`, com o qual as tabelas também são buscadas) e um
 dicionário de cache que reaproveita o SQL de um mesmo par (texto, tabelas do contexto).
 
 **Síntese.** O LLM responde só com o que recebe. Conceitual: os trechos mais parecidos; quantitativa: o
@@ -303,7 +306,8 @@ documentos disponíveis (na híbrida, a parte de dados é respondida mesmo assim
 de tokens, e a função devolve também o contexto mostrado ao LLM, que a validação usa.
 
 **Validação.** Duas verificações com o mesmo LLM, em temperatura 0: a *relevância do contexto* (fração
-dos trechos relevantes para a pergunta) e a *fidelidade* (a resposta é decomposta em afirmações e cada
+dos trechos relevantes para a consulta que os buscou: a parte conceitual, nas híbridas divididas, e a
+pergunta, nos demais casos) e a *fidelidade* (a resposta é decomposta em afirmações e cada
 uma é verificada contra o contexto). A resposta é aprovada se a fidelidade for pelo menos 0,8. Ela mede
 a sustentação pelo contexto, não a correção do dado.
 
