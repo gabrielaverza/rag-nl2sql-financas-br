@@ -17,14 +17,12 @@ rag-nl2sql-financas-br/
 ├── requirements.txt                    # dependências Python
 ├── dados/
 │   ├── dfp_cia_aberta_2025/            # CSVs oficiais da CVM (lote anual de 2025)
-│   ├── meta_dfp_cia_aberta_txt/        # dicionário de dados oficial da CVM
 │   ├── normativos/
 │   │   ├── cvm/resol080consolid.pdf    # Resolução CVM 80/2022 consolidada
 │   │   └── cpc/                        # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
 │   ├── dfp.db                          # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
 │   ├── perguntas_validacao.json        # as 60 perguntas oficiais de avaliação
-│   ├── perguntas_final.json            # as 60 oficiais mais 43 novas (103 perguntas), usadas na execução final
-│   └── perguntas_validacao_ficha.md    # ficha de conferência das 60 perguntas
+│   └── perguntas_final.json            # as 60 oficiais mais 43 novas (103 perguntas), usadas na execução final
 ├── embeddings/
 │   ├── esquema.json                    # documentação do esquema, uma entrada por tabela
 │   ├── corpus_esquema.json             # registros de busca do esquema (id, fonte, conteudo), sem vetores
@@ -176,9 +174,8 @@ adicionado) e CPC 26 (R1, apresentação das demonstrações), em `dados/normati
 `q20`, `c01` a `c20`, `h01` a `h20`), `pergunta`, `tipo`, `tabelas_esperadas`, `sql_referencia` (nas
 quantitativas e híbridas), `evidencia` (frase literal do normativo, nas conceituais e híbridas) e os
 campos de base: `base_dados` (companhia, código CVM, tabela e conta) e `base_normativo` (arquivo,
-página, trechos do índice e dispositivo). `perguntas_validacao_ficha.md` registra a conferência de
-cada pergunta contra os dados e os normativos, e `pipeline/avaliacao/validar_perguntas.py --base` repete as conferências
-automáticas.
+página, trechos do índice e dispositivo). `pipeline/avaliacao/validar_perguntas.py --base` confere
+automaticamente cada pergunta contra os dados e os normativos.
 
 **Conjunto ampliado (`dados/perguntas_final.json`).** As 60 perguntas acima, sem alteração, mais 43
 perguntas novas (15 quantitativas, `qn01` a `qn15`; 16 híbridas, `hn01` a `hn16`; e 12 conceituais, `cn01` a `cn12`),
