@@ -17,13 +17,12 @@ rag-nl2sql-financas-br/
 ├── requirements.txt                    # dependências Python
 ├── dados/
 │   ├── dfp_cia_aberta_2025/            # CSVs oficiais da CVM (lote anual de 2025)
-│   ├── meta_dfp_cia_aberta_txt/        # dicionário de dados oficial da CVM
 │   ├── normativos/
 │   │   ├── cvm/resol080consolid.pdf    # Resolução CVM 80/2022 consolidada
 │   │   └── cpc/                        # CPC 03 (R2), CPC 09 (R1), CPC 26 (R1)
 │   ├── dfp.db                          # SQLite gerado por carregar_dfp.py (fora do git, 121 MB)
 │   ├── perguntas_validacao.json        # as 60 perguntas oficiais de avaliação
-│   └── perguntas_validacao_ficha.md    # ficha de conferência das 60 perguntas
+│   └── perguntas_final.json            # as 60 oficiais mais 43 novas (103 perguntas), usadas na execução final
 ├── embeddings/
 │   ├── esquema.json                    # documentação do esquema, uma entrada por tabela
 │   ├── corpus_esquema.json             # registros de busca do esquema (id, fonte, conteudo), sem vetores
@@ -175,9 +174,16 @@ adicionado) e CPC 26 (R1, apresentação das demonstrações), em `dados/normati
 `q20`, `c01` a `c20`, `h01` a `h20`), `pergunta`, `tipo`, `tabelas_esperadas`, `sql_referencia` (nas
 quantitativas e híbridas), `evidencia` (frase literal do normativo, nas conceituais e híbridas) e os
 campos de base: `base_dados` (companhia, código CVM, tabela e conta) e `base_normativo` (arquivo,
-página, trechos do índice e dispositivo). `perguntas_validacao_ficha.md` registra a conferência de
-cada pergunta contra os dados e os normativos, e `pipeline/avaliacao/validar_perguntas.py --base` repete as conferências
-automáticas.
+página, trechos do índice e dispositivo). `pipeline/avaliacao/validar_perguntas.py --base` confere
+automaticamente cada pergunta contra os dados e os normativos.
+
+**Conjunto ampliado (`dados/perguntas_final.json`).** As 60 perguntas acima, sem alteração, mais 43
+perguntas novas (15 quantitativas, `qn01` a `qn15`; 16 híbridas, `hn01` a `hn16`; e 12 conceituais, `cn01` a `cn12`),
+com 103 no total (35 quantitativas, 36 híbridas e 32 conceituais). Têm o mesmo formato e usam outras companhias, outros trechos dos normativos e mais
+demonstrações individuais. Foram escritas sem acesso aos resultados anteriores e não serviram para ajustar o código. Só os
+experimentos que apontam para esse arquivo pela chave `perguntas` o usam (a execução final do pipeline);
+nos demais, o conjunto continua o das 60. Nas novas com normativo, o campo `dispositivo` de `base_normativo`
+traz o artigo ou o item onde está a evidência.
 
 ---
 
@@ -330,10 +336,11 @@ deles.
 | `medir_tempo_busca.py` | Tempo de partida e por pergunta de cada busca |
 
 Todos usam o conjunto oficial (`dados/perguntas_validacao.json`) e rodam de dentro de
-`rag-nl2sql-financas-br/`.
+`rag-nl2sql-financas-br/`; o executor de experimentos usa o arquivo indicado em cada experimento.
 
 **Executor de experimentos.** `experimentos.json` descreve cada experimento: nível, configurações
-nomeadas. Cada configuração é uma lista de trocas `chave=valor` sobre o
+nomeadas e, opcionalmente, o arquivo de perguntas (chave `perguntas`; sem ela, vale
+`dados/perguntas_validacao.json`). Cada configuração é uma lista de trocas `chave=valor` sobre o
 `configuracao.json`, como o `--set`, então qualquer escolha pode variar (modelo, método por índice e
 por tipo, `k`, divisor, pronomes, stemmer).
 
@@ -344,7 +351,8 @@ por tipo, `k`, divisor, pronomes, stemmer).
   médias por tipo, e as híbridas têm tabelas e trechos em separado. As divisões das híbridas ficam em
   `metricas/divisoes_hibridas.json`, para todas as configurações usarem as mesmas.
 - **Nível `pipeline`** (com LLM): roda `main.py` em cada pergunta, por rodada e configuração, e mede
-  classe, EX adaptado, EX estrito e tempo por passo (o EX adaptado também
+  classe, EX adaptado, EX estrito, relevância do contexto (nota do validador do sistema nos trechos do
+  glossário, só nas conceituais e híbridas) e tempo por passo (o EX adaptado também
   aceita a coluna `DENOM_CIA` e linhas de companhias cujo nome tem a palavra que identifica a companhia
   da pergunta); o relatório traz também a matriz de confusão do classificador (tipo
   real contra tipo previsto, uma por configuração). Com `"tabelas_ideais": true`, uma passada extra

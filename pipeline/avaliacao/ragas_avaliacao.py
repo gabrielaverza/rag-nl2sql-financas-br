@@ -11,8 +11,9 @@ Descrição geral do funcionamento:
 - Fidelidade (faithfulness): fração das afirmações da resposta que podem ser deduzidas do contexto.
   Relevância da resposta (answer relevancy): o LLM gera perguntas a partir da resposta, e a nota é a
   similaridade média delas com a pergunta original, pelo cosseno dos embeddings. As duas seguem as
-  definições do artigo da RAGAS (es2025). A relevância do contexto não é usada: a recuperação já é
-  medida com gabarito pelas quatro métricas de recuperação.
+  definições do artigo da RAGAS (es2025). A relevância do contexto não é calculada aqui: ela vem do
+  validador do sistema e está no relatório do executor (a recuperação, por sua vez, é medida com
+  gabarito pelas quatro métricas de recuperação).
 - O juiz é o Qwen local (o mesmo modelo que escreve as respostas) pelo endereço do Ollama compatível com
   a OpenAI; os embeddings são os do E5 local, com o prefixo de pergunta nos dois lados da comparação.
 - Adaptações e limites a declarar: o artigo usa o gpt-3.5-turbo e a biblioteca usa o juiz que se
@@ -166,7 +167,7 @@ def montar_relatorio(experimento: str, pasta: str, linhas: list[dict], comando: 
         f"- Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} por `{comando}`.",
         f"- Execução do experimento: `{execucao}`. Pasta: `{pasta}`.",
         f"- Juiz: `{MODELO_JUIZ}` (Ollama); embeddings: E5 local (`modelos_embedding`, prefixo de pergunta). Bibliotecas: ragas {version('ragas')}, openai {version('openai')}.",
-        "- Fidelidade e relevância da resposta seguem as definições do artigo da RAGAS (es2025), calculadas pela biblioteca ragas com um juiz local; a relevância do contexto não é usada. A ragas 0.4.3 só importa com um contorno (módulo falso do Vertex AI), declarado em `contornar_vertexai`.",
+        "- Fidelidade e relevância da resposta seguem as definições do artigo da RAGAS (es2025), calculadas pela biblioteca ragas com um juiz local; a relevância do contexto não é calculada aqui (vem do validador do sistema e está no `relatorio.md` do executor). A ragas 0.4.3 só importa com um contorno (módulo falso do Vertex AI), declarado em `contornar_vertexai`.",
         "- A nota mede sustentação pelo contexto, e não a correção do dado, e o juiz é o mesmo modelo que escreve as respostas. Convém medir a concordância dele com a autora na amostra de 20 respostas.",
         "- A conferência dos números é feita por código: fração dos valores numéricos do resultado do SQL (até 30 linhas) que aparecem no texto da resposta, comparando só os dígitos. Não é métrica de artigo.",
         "",
