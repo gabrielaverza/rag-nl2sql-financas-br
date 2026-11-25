@@ -291,8 +291,9 @@ o SQL devolve uma linha por companhia, com `DENOM_CIA` na primeira coluna. O có
   no plano de outra tabela do contexto, pois o plano guarda só as contas fixas);
 - recusa `VL_CONTA` sem `ESCALA_MOEDA`, pedindo a conversão para reais;
 - recusa `SUM` que junta mais de uma companhia: quando o nome do `LIKE` (ou os nomes exatos que o
-  substituíram) casa com mais de uma companhia, ou quando o SQL não filtra nenhuma. O LLM deve devolver uma
-  linha por companhia, sem `SUM`.
+  substituíram) casa com mais de uma companhia, ou quando o SQL não filtra nenhuma. O `SUM` com `GROUP BY`
+  por `DENOM_CIA` ou `CD_CVM` é aceito, porque devolve uma linha por companhia. O LLM deve devolver uma
+  linha por companhia.
 
 Erro de execução, resultado vazio e resultado só com valores nulos (como o `SUM` sobre nenhuma linha)
 voltam ao LLM com o problema, por até 3 tentativas. `gerar_sql` aceita também a lista de tabelas, sem usar

@@ -26,7 +26,8 @@ Descrição geral do funcionamento:
   tabela certa) e recusa SQL que usa VL_CONTA sem ESCALA_MOEDA, pedindo a conversão para reais.
 - Recusa também SQL com SUM que junta mais de uma companhia: quando o nome do LIKE (ou os nomes
   exatos que o substituíram) casa com mais de uma companhia, ou quando o SQL não filtra nenhuma
-  companhia. O LLM recebe o problema e deve devolver uma linha por companhia, sem SUM.
+  companhia. SUM com GROUP BY por DENOM_CIA ou CD_CVM é aceito, porque devolve uma linha por
+  companhia. O LLM recebe o problema e deve devolver uma linha por companhia.
 - Se der erro, o resultado vier vazio ou só com valores nulos (NULL, como o de SUM sobre nenhuma
   linha), o LLM recebe o problema e gera outro SQL, até o limite de tentativas.
 - Opcionalmente, um dicionário de cache (parâmetro cache) guarda o SQL por (pergunta, tabelas do
@@ -86,6 +87,10 @@ SOMA = re.compile(r"\bSUM\s*\(", re.IGNORECASE)
 # Filtro sobre a companhia: DENOM_CIA comparado com um valor ou CD_CVM comparado com uma subconsulta. A junção
 # ON x.CD_CVM = y.CD_CVM não conta, porque não escolhe nenhuma companhia.
 FILTRO_COMPANHIA = re.compile(r"\bDENOM_CIA\s*(?:=|<>|!=|IN\b|LIKE\b)|\bCD_CVM\s*(?:=|IN)\s*[(']", re.IGNORECASE)
+# Lista de colunas do GROUP BY, até HAVING, ORDER, LIMIT, parêntese de fechamento ou fim do SQL.
+GRUPO_POR = re.compile(r"\bGROUP\s+BY\s+(.+?)(?=\bHAVING\b|\bORDER\b|\bLIMIT\b|\)|;|$)", re.IGNORECASE | re.DOTALL)
+# Coluna que identifica a companhia.
+COLUNA_COMPANHIA = re.compile(r"\b(?:DENOM_CIA|CD_CVM)\b", re.IGNORECASE)
 # Acima disso o termo é genérico demais para trocar o LIKE pelos nomes exatos.
 MAX_NOMES_NA_REESCRITA = 5
 # Semelhança mínima (difflib) entre uma palavra do termo e uma palavra de nome, para sugerir o nome.
@@ -320,9 +325,12 @@ def conferir_escala(sql: str) -> str | None:
 # Recusa o SQL que usa SUM para juntar companhias, o que esconde que o resultado mistura valores de companhias
 # diferentes. Dois casos: (1) um nome do LIKE em DENOM_CIA casa com mais de uma companhia do banco, ou foi trocado
 # por mais de um nome exato (reescritas, de conferir_companhias); (2) o SQL não filtra nenhuma companhia, e a
-# soma cobre todas. SUM sobre uma única companhia não é recusado. Devolve o problema ou None.
+# soma cobre todas. SUM sobre uma única companhia não é recusado, nem SUM com GROUP BY por DENOM_CIA ou CD_CVM,
+# que devolve uma linha por companhia sem misturar valores. Devolve o problema ou None.
 def conferir_soma(sql: str, reescritas: list[dict] | None = None) -> str | None:
     if not SOMA.search(sql):
+        return None
+    if any(COLUNA_COMPANHIA.search(grupo) for grupo in GRUPO_POR.findall(sql)):
         return None
     conn = sqlite3.connect(f"file:{CAMINHO_DB}?mode=ro", uri=True)
     try:
@@ -339,7 +347,8 @@ def conferir_soma(sql: str, reescritas: list[dict] | None = None) -> str | None:
         termo, nomes = casadas[0]
         return (f"a consulta usa SUM, mas o nome '{termo}' casa com {len(nomes)} companhias (por exemplo "
                 f"{', '.join(nomes[:3])}) e a soma misturaria os valores delas. Não use SUM para reunir companhias: "
-                "devolva uma linha por companhia, com companhias.DENOM_CIA na primeira coluna")
+                "devolva uma linha por companhia (se precisar de SUM, use GROUP BY companhias.DENOM_CIA), com "
+                "companhias.DENOM_CIA na primeira coluna")
     if not FILTRO_COMPANHIA.search(sql):
         return ("a consulta usa SUM sem filtrar nenhuma companhia, e a soma cobriria todas. Filtre a companhia da "
                 "pergunta com companhias.DENOM_CIA LIKE e uma parte do nome que aparece na pergunta")
