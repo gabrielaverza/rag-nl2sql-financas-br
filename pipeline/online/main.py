@@ -6,12 +6,14 @@ Função: orquestrador do estágio online, que liga todos os passos em um fluxo 
 Descrição geral do funcionamento:
 1. Classificador de intenção (classificador.py).
 2. Divisor da pergunta híbrida (divisor.py), só se divisor.ativo for true em configuracao.json:
-   separa a parte de dados e a parte conceitual. As tabelas continuam sendo buscadas com a
-   pergunta inteira; os trechos dos normativos são buscados com a parte conceitual.
+   separa a parte de dados e a parte conceitual. As tabelas são buscadas com a parte de dados e
+   os trechos dos normativos, com a parte conceitual.
 3. Caminho quantitativo ou híbrido: seleção de contexto e geração de SQL, com autocorreção
    (gerador_sql.py). Na híbrida dividida, o gerador recebe só a parte de dados.
 4. Síntese da resposta em linguagem natural (sintetizador.py).
-5. Validação: relevância do contexto e fidelidade da resposta (validador.py).
+5. Validação: relevância do contexto e fidelidade da resposta (validador.py). A relevância dos
+   trechos é julgada contra a mesma consulta usada para buscá-los (a parte conceitual, nas
+   híbridas divididas).
 6. Formatação final com proveniência (formatador.py).
 - A busca (modelo de embeddings, método por índice e por tipo, k_tabelas e k_trechos) segue
   configuracao.json, que pode ser sobrescrito por --set chave=valor ou por outro arquivo
@@ -99,8 +101,8 @@ def executar(pergunta: str, cache_sql: dict | None = None) -> dict:
     resultado_sql = None
     if classe in ("quantitativa", "hibrida"):
         inicio = time.time()
-        # O gerador de SQL recebe só a parte de dados da pergunta híbrida dividida; as tabelas são buscadas
-        # com a pergunta inteira.
+        # O gerador de SQL recebe só a parte de dados da pergunta híbrida dividida, e as tabelas também são
+        # buscadas com ela.
         pergunta_sql = divisao["parte_dados"] if divisao and divisao["dividida"] else None
         resultado_sql = gerar_sql(pergunta, tipo=classe, cache=cache_sql, pergunta_sql=pergunta_sql)
         tempos["sql"] = time.time() - inicio
@@ -123,7 +125,9 @@ def executar(pergunta: str, cache_sql: dict | None = None) -> dict:
     if resposta["resposta"] == FALHA_NO_SQL:
         validacao = VALIDACAO_NEUTRA
     else:
-        validacao = validar(pergunta, resposta["resposta"], resposta["contexto"], resposta["trechos"])
+        # Os trechos foram buscados com consulta_trechos (a parte conceitual, nas híbridas divididas), então a
+        # relevância é julgada contra ela; com a pergunta inteira, o juiz cobrava dos trechos também a parte de dados.
+        validacao = validar(consulta_trechos or pergunta, resposta["resposta"], resposta["contexto"], resposta["trechos"])
     tempos["validacao"] = time.time() - inicio
 
     resposta_final = formatar(pergunta, classe, resposta, resultado_para_resposta, validacao)

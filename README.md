@@ -34,6 +34,7 @@ rag-nl2sql-financas-br/
 │   └── modelos/<chave>/                # índices vetoriais dos outros modelos (gerados, fora do git)
 ├── metricas/                           # resultados dos experimentos
 │   ├── <experimento>/                  # uma pasta por experimento: relatorio.md, resultados.csv, resumo.csv, execucao.json
+│   │                                   # (no nível pipeline, também respostas.json, ragas.csv e ragas.md)
 │   ├── rascunhos/                      # execuções de teste e relatórios de apoio (fora do git)
 │   └── divisoes_hibridas.json          # divisões das perguntas híbridas, reaproveitadas por todas as configurações
 └── pipeline/
@@ -78,8 +79,17 @@ pip install -r requirements.txt
 python -m nltk.downloader stopwords      # lista de palavras vazias usada pelo BM25
 ```
 
-Requer um servidor Ollama rodando localmente, com um modelo de geração de texto compatível com
-formato JSON estruturado (ex.: `qwen2.5-coder:7b`) baixado.
+Requer um servidor Ollama rodando localmente, com o modelo de geração de texto `qwen2.5-coder:7b`
+baixado (cerca de 4,7 GB). O código usa esse nome exato, e o modelo precisa aceitar saída em JSON
+estruturado:
+
+```bash
+ollama pull qwen2.5-coder:7b
+```
+
+Os resultados registrados em `metricas/` foram gerados em Windows 11, com Python 3.13.7, Ollama 0.40.17
+e o modelo rodando na GPU. Os embeddings rodam na CPU (PyTorch só para CPU) e só o Ollama usa a GPU. As
+versões das bibliotecas estão em `requirements.txt` e, por execução, no `execucao.json` do experimento.
 
 **Modelos de embeddings.** O modelo padrão é o `intfloat/multilingual-e5-base` (cerca de 1,1 GB). Os
 scripts só carregam modelos do cache local e nunca baixam nada sozinhos. O download é feito pelos
@@ -122,13 +132,18 @@ python pipeline/online/main.py "pergunta" --set divisor.ativo=false   # troca um
 ```bash
 python pipeline/avaliacao/validar_perguntas.py dados/perguntas_validacao.json --base   # confere o conjunto
 python pipeline/avaliacao/executar_experimentos.py --listar                            # experimentos disponíveis
-python pipeline/avaliacao/executar_experimentos.py metodos                             # embeddings, BM25 e RRF
-python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio               # pipeline completo, dois cenários de busca
-python pipeline/avaliacao/ragas_avaliacao.py pipeline_exploratorio                     # RAGAS sobre o respostas.json do experimento
+python pipeline/avaliacao/executar_experimentos.py metodos                             # recuperação: embeddings, BM25 e RRF
+python pipeline/avaliacao/executar_experimentos.py modelos                             # recuperação: modelos de embeddings
+python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio               # pipeline completo, 60 perguntas, dois cenários de busca
+python pipeline/avaliacao/executar_experimentos.py pipeline_final                      # pipeline completo, 103 perguntas, 3 rodadas
+python pipeline/avaliacao/ragas_avaliacao.py pipeline_final                            # RAGAS sobre o respostas.json do experimento
 python pipeline/avaliacao/verificacoes.py todas                                        # testes de sanidade (usam o LLM)
 ```
 
-Os demais scripts de avaliação estão descritos na seção "Avaliação e experimentos".
+Os experimentos `modelos` e `pipeline_final` pedem que os índices estejam gerados (a configuração
+padrão usa o `e5-base`, já no repositório; o `modelos` usa os cinco modelos do registro). A seção
+"Reproduzir os experimentos" traz, para cada experimento, a configuração, o comando e a duração
+observada. Os demais scripts de avaliação estão descritos na seção "Avaliação e experimentos".
 
 ---
 
@@ -152,6 +167,54 @@ configuração efetiva.
 | `bm25.radicalizar` | `true` | O BM25 usa o radicalizador (stemmer) |
 
 `experimentos.json` descreve os experimentos de avaliação (ver "Avaliação e experimentos").
+
+O padrão do `configuracao.json` (embeddings nos dois índices) não é a configuração da execução final:
+no `pipeline_final`, o glossário usa o RRF sem radicalizador (`busca.glossario.metodo=rrf` e
+`bm25.radicalizar=false`). Para responder uma pergunta com a configuração final:
+
+```bash
+python pipeline/online/main.py "pergunta" --set busca.glossario.metodo=rrf --set bm25.radicalizar=false
+```
+
+---
+
+## Reproduzir os experimentos
+
+Cada experimento é uma entrada de `experimentos.json`; cada configuração é uma lista de trocas
+`chave=valor` sobre o `configuracao.json` (as mesmas do `--set`). Todos os comandos rodam de dentro de
+`rag-nl2sql-financas-br/`, com o ambiente ativo, o `dados/dfp.db` gerado e, nos de nível `pipeline`, o
+Ollama no ar. Antes de uma execução oficial, a árvore do git deve estar limpa: o `execucao.json` registra
+o commit e avisa se havia alterações não commitadas.
+
+| Experimento | Nível | Perguntas | Configurações (trocas sobre o padrão) | Comando | Duração observada |
+|---|---|---|---|---|---|
+| `metodos` | `recuperacao` | 60 | `Embeddings`: `busca.*.metodo=embeddings`. `BM25 com stemmer` e `BM25 sem stemmer`: `busca.*.metodo=bm25`, com `bm25.radicalizar=true` ou `false`. `RRF com stemmer` e `RRF sem stemmer`: `busca.*.metodo=rrf`, com `bm25.radicalizar=true` ou `false`. Em todas: `divisor.ativo=true`, `divisor.bloquear_pronomes=true` | `python pipeline/avaliacao/executar_experimentos.py metodos` | 0,5 min |
+| `modelos` | `recuperacao` | 60 | Um modelo por configuração (`modelo_embedding=minilm`, `e5-small`, `e5-base`, `bge-m3` ou `e5-base-v2`), com `busca.*.metodo=embeddings` e o divisor ligado | `python pipeline/offline/rodar_offline.py --todos-os-modelos --baixar-modelos` (uma vez, gera os índices dos outros modelos) e depois `python pipeline/avaliacao/executar_experimentos.py modelos` | 1,3 min, com os índices prontos |
+| `pipeline_exploratorio` | `pipeline` | 60 | Cenário 1: embeddings nos dois índices. Cenário 2: embeddings no esquema e `busca.glossario.metodo=rrf` com `bm25.radicalizar=false`. Com a passada de tabelas ideais, 1 rodada | `python pipeline/avaliacao/executar_experimentos.py pipeline_exploratorio` e `python pipeline/avaliacao/ragas_avaliacao.py pipeline_exploratorio` | 57,6 min a execução |
+| `pipeline_final` | `pipeline` | 103 | Uma só: embeddings no esquema e `busca.glossario.metodo=rrf` com `bm25.radicalizar=false`, E5-base, divisor e bloqueio de pronomes ligados; 3 rodadas, sem a passada de tabelas ideais | `python pipeline/avaliacao/executar_experimentos.py pipeline_final` e `python pipeline/avaliacao/ragas_avaliacao.py pipeline_final` | 151,8 min a execução e cerca de 55 min a RAGAS |
+| `teste_equivalencia` e `teste_pipeline` | os dois | poucas | Rascunhos para conferir que uma mudança no código não alterou as métricas, ou para testar o executor em poucas perguntas (`--ids`) | `python pipeline/avaliacao/executar_experimentos.py teste_pipeline --ids q01,c01,h01 --rodadas 1` | segundos a minutos |
+
+Para variar uma escolha que não está nos experimentos acima (por exemplo, `k_tabelas=5`, `divisor.ativo=false`
+ou `modelo_embedding=bge-m3`), acrescente uma entrada em `experimentos.json` com a lista de trocas, ou
+passe a troca em `main.py --set`. Os modelos que não são o padrão precisam do índice gerado antes
+(`rodar_offline.py --modelos <chave> --baixar-modelos`).
+
+**O que se espera ao repetir.** Os experimentos de recuperação não usam o LLM, exceto o divisor, e as
+divisões das híbridas ficam gravadas em `metricas/divisoes_hibridas.json`, então repetir deve dar as
+mesmas métricas (o `teste_equivalencia` serve para conferir). Nos de nível `pipeline`, o LLM não dá
+exatamente o mesmo resultado a cada execução (na `pipeline_final`, o texto do SQL diferiu entre rodadas
+em 10 das 103 perguntas, sem mudar o número de acertos): repetir dá valores próximos, e não idênticos, e
+diferenças de poucas perguntas não são interpretáveis. A versão de código de cada resultado guardado está
+no `execucao.json`; para reexecutar com ela, use um clone separado no commit indicado e copie para ele o
+`dados/dfp.db`, que não vai ao git:
+
+```bash
+git show pipeline_final-v3:metricas/pipeline_final/execucao.json   # campo git.commit
+git checkout 39eea48
+```
+
+Depois de uma execução oficial, o executor imprime os comandos de commit e de tag (ver "Resultados e
+versão").
 
 ---
 
@@ -180,10 +243,12 @@ automaticamente cada pergunta contra os dados e os normativos.
 **Conjunto ampliado (`dados/perguntas_final.json`).** As 60 perguntas acima, sem alteração, mais 43
 perguntas novas (15 quantitativas, `qn01` a `qn15`; 16 híbridas, `hn01` a `hn16`; e 12 conceituais, `cn01` a `cn12`),
 com 103 no total (35 quantitativas, 36 híbridas e 32 conceituais). Têm o mesmo formato e usam outras companhias, outros trechos dos normativos e mais
-demonstrações individuais. Foram escritas sem acesso aos resultados anteriores e não serviram para ajustar o código. Só os
-experimentos que apontam para esse arquivo pela chave `perguntas` o usam (a execução final do pipeline);
+demonstrações individuais. Foram escritas sem acesso aos resultados anteriores e não serviram para ajustar o código antes da
+primeira execução final. Só os experimentos que apontam para esse arquivo pela chave `perguntas` o usam (a execução final do pipeline);
 nos demais, o conjunto continua o das 60. Nas novas com normativo, o campo `dispositivo` de `base_normativo`
-traz o artigo ou o item onde está a evidência.
+traz o artigo ou o item onde está a evidência. As correções do gerador de SQL e da validação feitas depois
+da primeira execução final partiram da análise dos erros nas 103 perguntas, então os resultados finais
+são otimistas: o mesmo conjunto serviu para desenhar essas correções e para avaliá-las.
 
 ---
 
@@ -266,7 +331,7 @@ tratada como híbrida.
 **Divisor.** Só nas perguntas híbridas e com `divisor.ativo`. O LLM separa a pergunta em parte de dados
 e parte conceitual (5 exemplos no prompt); a parte conceitual não pode ter pronome ("nesse valor"), e,
 se tiver, o LLM é chamado de novo. Se a divisão falhar, as duas partes viram a pergunta inteira. As
-tabelas continuam sendo buscadas com a pergunta inteira, os trechos são buscados com a parte conceitual e o
+tabelas são buscadas com a parte de dados, os trechos são buscados com a parte conceitual e o
 gerador de SQL recebe só a parte de dados.
 
 **Gerador de SQL.** Para as perguntas quantitativas e híbridas. O contexto do LLM traz só as tabelas
@@ -289,11 +354,15 @@ o SQL devolve uma linha por companhia, com `DENOM_CIA` na primeira coluna. O có
   fica em `sql_original`; se nada casa, o LLM recebe um aviso com nomes parecidos;
 - confere se cada `CD_CONTA` existe no plano da tabela em que é usado (o aviso só sai se o código existe
   no plano de outra tabela do contexto, pois o plano guarda só as contas fixas);
-- recusa `VL_CONTA` sem `ESCALA_MOEDA`, pedindo a conversão para reais.
+- recusa `VL_CONTA` sem `ESCALA_MOEDA`, pedindo a conversão para reais;
+- recusa `SUM` que junta mais de uma companhia: quando o nome do `LIKE` (ou os nomes exatos que o
+  substituíram) casa com mais de uma companhia, ou quando o SQL não filtra nenhuma. O `SUM` com `GROUP BY`
+  por `DENOM_CIA` ou `CD_CVM` é aceito, porque devolve uma linha por companhia. O LLM deve devolver uma
+  linha por companhia.
 
 Erro de execução, resultado vazio e resultado só com valores nulos (como o `SUM` sobre nenhuma linha)
 voltam ao LLM com o problema, por até 3 tentativas. `gerar_sql` aceita também a lista de tabelas, sem usar
-a busca, o texto que o LLM recebe (`pergunta_sql`; as tabelas são sempre buscadas com a pergunta) e um
+a busca, o texto que o LLM recebe (`pergunta_sql`, com o qual as tabelas também são buscadas) e um
 dicionário de cache que reaproveita o SQL de um mesmo par (texto, tabelas do contexto).
 
 **Síntese.** O LLM responde só com o que recebe. Conceitual: os trechos mais parecidos; quantitativa: o
@@ -303,7 +372,8 @@ documentos disponíveis (na híbrida, a parte de dados é respondida mesmo assim
 de tokens, e a função devolve também o contexto mostrado ao LLM, que a validação usa.
 
 **Validação.** Duas verificações com o mesmo LLM, em temperatura 0: a *relevância do contexto* (fração
-dos trechos relevantes para a pergunta) e a *fidelidade* (a resposta é decomposta em afirmações e cada
+dos trechos relevantes para a consulta que os buscou: a parte conceitual, nas híbridas divididas, e a
+pergunta, nos demais casos) e a *fidelidade* (a resposta é decomposta em afirmações e cada
 uma é verificada contra o contexto). A resposta é aprovada se a fidelidade for pelo menos 0,8. Ela mede
 a sustentação pelo contexto, não a correção do dado.
 
@@ -395,8 +465,9 @@ dele nessa mesma pasta.
 | `metodos` | `recuperacao` | embeddings, BM25 e RRF, o BM25 e o RRF com e sem radicalizador | `metodos-v1` |
 | `modelos` | `recuperacao` | cinco modelos de embeddings (`minilm`, `e5-small`, `e5-base`, `bge-m3` e `e5-base-v2`) | `modelos-v1` |
 | `pipeline_exploratorio` | `pipeline` | dois cenários de busca (embeddings nos dois índices; embeddings no esquema e RRF sem radicalizador no glossário), com a passada de tabelas ideais | `pipeline_exploratorio-v1` a `-v3` |
+| `pipeline_final` | `pipeline` | execução final do pipeline: 103 perguntas, 3 rodadas, uma configuração (embeddings no esquema e RRF sem radicalizador no glossário). **Vale a v3** | `pipeline_final-v1` a `-v3` |
 
-**Resultados dos experimentos.** Conjunto oficial de 60 perguntas, com as médias sobre as 40 perguntas
+**Resultados dos experimentos.** Os três primeiros experimentos usam o conjunto oficial de 60 perguntas, com as médias sobre as 40 perguntas
 de cada índice (tabelas: 20 quantitativas e 20 híbridas; trechos: 20 conceituais e 20 híbridas), uma
 rodada por execução e sem teste estatístico: com 20 perguntas por tipo, cada pergunta vale 0,05, então
 diferenças de uma pergunta não são interpretáveis. As ressalvas completas estão na última seção do
@@ -457,6 +528,72 @@ acessível com `git show <tag>:metricas/pipeline_exploratorio/relatorio.md`):
 | `pipeline_exploratorio-v1` | `b3b4016` | 52/60 | 9/40 | 4/40 | 9/40 |
 | `pipeline_exploratorio-v2` | `f6f496f` | 60/60 | 9/40 | 4/40 | 9/40 |
 | `pipeline_exploratorio-v3` | `4800659` | 60/60 | 24/40 | 10/40 | 22/40 |
+
+*`pipeline_final`: execução final do pipeline* (103 perguntas, das quais 71 têm SQL de referência: 35
+quantitativas, 32 conceituais e 36 híbridas; uma configuração, com o E5-base, embeddings no esquema e RRF
+sem radicalizador no glossário, divisor e bloqueio de pronomes ligados, 3 tabelas e 3 trechos; 3 rodadas,
+sem a passada de tabelas ideais). **Valem os resultados da v3**: execução `20261125-115934`, código no
+commit `39eea48`, tag `pipeline_final-v3`; fonte: `metricas/pipeline_final/relatorio.md`, `resumo.csv`,
+`ragas.md` e `ragas.csv`. Nas três rodadas o número de acertos foi o mesmo em todas as medidas de acerto.
+
+| Tipo | Classe certa | EX adaptado | EX estrito | Relevância do contexto | Tempo por pergunta (s) |
+|---|---|---|---|---|---|
+| Quantitativas (35) | 35/35 | 24/35 (0,69) | 14/35 (0,40) | não se aplica | 34,0 |
+| Conceituais (32) | 32/32 | não se aplica | não se aplica | 0,50 | 16,0 |
+| Híbridas (36) | 36/36 | 22/36 (0,61) | 9/36 (0,25) | 0,56 | 37,1 |
+| Todas (103) | 103/103 | 46/71 (0,65) | 23/71 (0,32) | 0,53 | 29,5 |
+
+Tempo médio por passo, em segundos: classificador 5,6, divisor 2,5, SQL 18,8, síntese 7,1, validação 2,9.
+
+| Resposta em texto (RAGAS e conferência por código) | Conceituais | Híbridas | Quantitativas |
+|---|---|---|---|
+| Fidelidade (RAGAS) | 0,66 | 0,16 | não se aplica |
+| Relevância da resposta (RAGAS) | 0,72 | 0,38 | não se aplica |
+| Números do resultado no texto (por código) | não se aplica | 0,92 | 0,94 |
+
+A relevância do contexto vem do validador do sistema (o LLM julga cada trecho recuperado contra a consulta
+que o buscou). A nota da RAGAS mede se o texto é sustentado pelo contexto que o sistema recebeu, e não se o
+dado está certo; o juiz é o mesmo modelo que escreve as respostas.
+
+As três execuções do `pipeline_final` guardadas em tags (o `relatorio.md` de cada uma fica acessível com
+`git show <tag>:metricas/pipeline_final/relatorio.md`):
+
+| | `pipeline_final-v1` | `pipeline_final-v2` | `pipeline_final-v3` (vale) |
+|---|---|---|---|
+| Commit do código | `30c3252` | `840ebe1` | `39eea48` |
+| Mudança desde a anterior | primeira execução | relevância do contexto julgada contra a consulta que buscou os trechos; tabelas das híbridas divididas buscadas com a parte de dados; recusa de `SUM` que junta companhias | `SUM` com `GROUP BY` por companhia passa a ser aceito (a regra anterior o recusava) |
+| Classe certa | 103/103 | 103/103 | 103/103 |
+| EX adaptado (todas) | 42,7/71 (42, 43 e 43) | 45/71 | **46/71** |
+| EX adaptado (quantitativas; híbridas) | 22,7/35; 20/36 | 23/35; 22/36 | 24/35; 22/36 |
+| EX estrito | 22/71 | 23/71 | 23/71 |
+| Relevância do contexto (todas; híbridas) | 0,36; 0,24 | 0,53; 0,56 | 0,53; 0,56 |
+| RAGAS, híbridas (fidelidade; relevância da resposta) | 0,19; 0,39 | 0,16; 0,38 | 0,16; 0,38 |
+| Números no texto (híbridas; quantitativas) | 0,96; 0,99 | 0,92; 0,93 | 0,92; 0,94 |
+| Tempo por pergunta (s) | 29,5 | 28,8 | 29,5 |
+
+A relevância do contexto da v1 não é comparável à das outras: nela o juiz cobrava dos trechos também a
+parte de dados da pergunta, e a correção mudou o que a nota mede, e não a busca. A v2 reúne três mudanças
+em um só pacote, então o ganho dela não se atribui a uma delas. As conceituais ficaram iguais nas três
+(fidelidade 0,66 e relevância da resposta 0,72).
+
+**Erros que restam na v3.** Das 71 perguntas com SQL, 25 erram o EX adaptado em cada rodada (os ids abaixo
+são os da primeira rodada): 9 têm a tabela certa fora do contexto da busca
+(q05, q07, h05, h11, h15, h17, qn13, hn03, hn07); 5 têm a tabela certa no contexto, mas o modelo usa outra
+(q16, h04, h07, h08, qn07); e 11 usam a tabela certa com a conta ou a forma errada (q04, q09, q11, q18, q20,
+h10, h13, h19, h20, qn14, hn14). Testes exploratórios feitos depois da v3, fora do repositório e não
+adotados, indicam que a busca de tabelas não é o único limite: com as tabelas certas dadas ao gerador, o
+EX líquido ficou em cerca de 48/71 (10 erros passam a acertar e 8 acertos passam a errar); com `k_tabelas=2`,
+ficou em 34/71.
+
+**Ressalvas.** (1) As correções das versões 2 e 3 foram desenhadas olhando os erros das mesmas 103
+perguntas que as avaliam, então os números tendem a ser otimistas. (2) Sem teste estatístico: com 35, 32 e
+36 perguntas por tipo, cada pergunta vale de 2,8 a 3,1 pontos percentuais, e uma diferença de uma ou duas
+perguntas não é interpretável. (3) O gerador de SQL não é determinístico: o texto do SQL diferiu entre
+rodadas em 10 das 103 perguntas, sem mudar o número de acertos. (4) O modelo de 7B ignora parte das regras
+do prompt e erra a escolha da tabela e da conta; um modelo maior não foi testado. (5) Os SQLs de
+referência foram conferidos contra os CSV da CVM, mas não por alguém da área. (6) A proveniência lê o SQL
+por expressões regulares e não reconhece `DENOM_CIA IN (...)`: quando o código reescreveu o filtro da
+companhia e o resultado não traz `DENOM_CIA`, a empresa aparece como "não identificada" (h15 e hn10).
 
 O experimento `teste_equivalencia` serve para conferir que uma mudança no código não alterou as
 métricas de recuperação: rode-o antes e depois, e compare os `resultados.csv` (a coluna `execucao` é a

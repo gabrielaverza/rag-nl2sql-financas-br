@@ -1,26 +1,26 @@
 {
-  "execucao": "20261123-170411",
+  "execucao": "20261125-115934",
   "experimento": "pipeline_final",
   "nivel": "pipeline",
   "descricao": "Execução final do pipeline completo, com a configuração escolhida: modelo E5-base, divisor das perguntas híbridas ligado com o bloqueio de pronomes, embeddings no índice de esquema e RRF sem stemmer no índice do glossário (a parte conceitual das híbridas também usa o RRF). Conjunto de 103 perguntas (as 60 oficiais e 43 novas), sem a passada de tabelas ideais. Três rodadas.",
   "comando": "python pipeline/avaliacao/executar_experimentos.py pipeline_final",
-  "inicio": "2026-11-23T17:04:11",
+  "inicio": "2026-11-25T11:59:34",
   "rascunho": false,
   "ids": null,
   "n_perguntas": 103,
   "rodadas": 3,
   "tabelas_ideais": false,
   "git": {
-    "commit": "30c325245dc054b3638c48f6324961df87423534",
-    "commit_curto": "30c3252",
-    "ramo": "experimento-final",
+    "commit": "39eea48b04a878c30e6437600990184c7c2c2b98",
+    "commit_curto": "39eea48",
+    "ramo": "revisao/correcoes-pipeline-final",
     "alteracoes_nao_commitadas": false,
     "arquivos_alterados": []
   },
   "arquivos_sha256": {
     "configuracao.json": "124e4c561c783a175c384ad20cc949327f0e0c24d09bcede613bdf820491943f",
     "experimentos.json": "a71c5a174a6745febc48777e5c73cc4d071f888dbde8f3a1efa64bce21a039ae",
-    "dados/perguntas_final.json": "6e4df4590d68f4e98fbe125ac4137f94852cafcdc20aa6b85c6acd9a2a3161b9",
+    "dados/perguntas_final.json": "d629320827e45a96595f774ff576a0f6487b8158924084f1274d673c410bda79",
     "embeddings/esquema.json": "b29683ce2ba3d351081dd244399fc57110ffd50ed5bd8873b08a0715551738dd",
     "metricas/divisoes_hibridas.json": "d001212b4fd6bfe7d4bd7eb6f128b3bf4cd57c5812e03cb97a37800383e67459",
     "embeddings/index_esquema.json": "f02d3545b907a302d0cea7883eba177711369030ab6672e0843a5643594ab3dd",
@@ -71,6 +71,6 @@
       }
     }
   },
-  "fim": "2026-11-23T19:36:02",
-  "duracao_s": 9109.8
+  "fim": "2026-11-25T14:31:24",
+  "duracao_s": 9110.1
 }

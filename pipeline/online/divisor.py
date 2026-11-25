@@ -18,8 +18,8 @@ Descrição geral do funcionamento:
 - Se a resposta continuar inválida em TENTATIVAS chamadas, a divisão é descartada e as duas partes
   viram a pergunta inteira (dividida = False), como o classificador que cai na classe padrão.
 - O orquestrador (main.py) chama este módulo depois do classificador, só nas perguntas híbridas e
-  só se divisor.ativo for true em configuracao.json. A parte de dados não muda a busca das tabelas
-  (que usa a pergunta inteira); a parte conceitual busca os trechos. O parâmetro bloquear_pronomes
+  só se divisor.ativo for true em configuracao.json. A parte de dados busca as tabelas e é o texto
+  que o gerador de SQL recebe; a parte conceitual busca os trechos. O parâmetro bloquear_pronomes
   (divisor.bloquear_pronomes) liga ou desliga a recusa de pronomes, para medir a influência dela.
 
 Dependências:
