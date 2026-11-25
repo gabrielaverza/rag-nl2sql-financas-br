@@ -1,7 +1,7 @@
 # Experimento pipeline_final: pipeline completo
 
-- Gerado em 25/11/2026 00:11 por `python pipeline/avaliacao/executar_experimentos.py pipeline_final`.
-- Execução `20261124-214319`, commit `840ebe1`. A ficha completa está em `execucao.json`.
+- Gerado em 25/11/2026 14:31 por `python pipeline/avaliacao/executar_experimentos.py pipeline_final`.
+- Execução `20261125-115934`, commit `39eea48`. A ficha completa está em `execucao.json`.
 - Execução final do pipeline completo, com a configuração escolhida: modelo E5-base, divisor das perguntas híbridas ligado com o bloqueio de pronomes, embeddings no índice de esquema e RRF sem stemmer no índice do glossário (a parte conceitual das híbridas também usa o RRF). Conjunto de 103 perguntas (as 60 oficiais e 43 novas), sem a passada de tabelas ideais. Três rodadas.
 - Conjunto: `dados/perguntas_final.json`, 103 perguntas; 3 rodada(s).
 - O cache de SQL vale entre as configurações da mesma rodada e é refeito a cada rodada.
@@ -10,25 +10,25 @@
 
 | Configuração | Classe certa | EX adaptado | EX estrito | Relevância do contexto | Tempo total por pergunta (s) |
 |---|---|---|---|---|---|
-| Embeddings (esquema) + RRF (glossário) | 103.0/103 [103 a 103] | 45.0/71 [45 a 45] | 23.0/71 [23 a 23] | 0,53 [0,53 a 0,53] | 28,84 [28,35 a 29,42] |
+| Embeddings (esquema) + RRF (glossário) | 103.0/103 [103 a 103] | 46.0/71 [46 a 46] | 23.0/71 [23 a 23] | 0,53 [0,53 a 0,53] | 29,48 [29,20 a 29,83] |
 
 ## 2. Perguntas quantitativas
 
 | Configuração | Classe certa | EX adaptado | EX estrito | Tempo total por pergunta (s) |
 |---|---|---|---|---|
-| Embeddings (esquema) + RRF (glossário) | 35.0/35 [35 a 35] | 23.0/35 [23 a 23] | 14.0/35 [14 a 14] | 32,92 [31,84 a 34,60] |
+| Embeddings (esquema) + RRF (glossário) | 35.0/35 [35 a 35] | 24.0/35 [24 a 24] | 14.0/35 [14 a 14] | 33,96 [33,15 a 35,51] |
 
 ## 3. Perguntas conceituais
 
 | Configuração | Classe certa | Relevância do contexto | Tempo total por pergunta (s) |
 |---|---|---|---|
-| Embeddings (esquema) + RRF (glossário) | 32.0/32 [32 a 32] | 0,50 [0,50 a 0,50] | 15,81 [15,76 a 15,86] |
+| Embeddings (esquema) + RRF (glossário) | 32.0/32 [32 a 32] | 0,50 [0,50 a 0,50] | 16,05 [15,90 a 16,18] |
 
 ## 4. Perguntas híbridas
 
 | Configuração | Classe certa | EX adaptado | EX estrito | Relevância do contexto | Tempo total por pergunta (s) |
 |---|---|---|---|---|---|
-| Embeddings (esquema) + RRF (glossário) | 36.0/36 [36 a 36] | 22.0/36 [22 a 22] | 9.0/36 [9 a 9] | 0,56 [0,56 a 0,56] | 36,45 [36,14 a 36,73] |
+| Embeddings (esquema) + RRF (glossário) | 36.0/36 [36 a 36] | 22.0/36 [22 a 22] | 9.0/36 [9 a 9] | 0,56 [0,56 a 0,56] | 37,06 [36,68 a 37,46] |
 
 ## 5. Matriz de confusão do classificador
 
@@ -46,7 +46,7 @@ Cada linha é o tipo real da pergunta e cada coluna, o tipo que o classificador 
 
 | Configuração | classificador | divisor | sql | sintese | validacao |
 |---|---|---|---|---|---|
-| Embeddings (esquema) + RRF (glossário) | 5,46 | 2,48 | 18,64 | 6,78 | 2,87 |
+| Embeddings (esquema) + RRF (glossário) | 5,58 | 2,48 | 18,75 | 7,14 | 2,94 |
 
 Com mais de uma rodada, as células mostram a média das rodadas e, entre colchetes, o mínimo e o máximo.
 

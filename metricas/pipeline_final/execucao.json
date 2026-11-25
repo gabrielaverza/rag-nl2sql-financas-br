@@ -1,18 +1,18 @@
 {
-  "execucao": "20261124-214319",
+  "execucao": "20261125-115934",
   "experimento": "pipeline_final",
   "nivel": "pipeline",
   "descricao": "Execução final do pipeline completo, com a configuração escolhida: modelo E5-base, divisor das perguntas híbridas ligado com o bloqueio de pronomes, embeddings no índice de esquema e RRF sem stemmer no índice do glossário (a parte conceitual das híbridas também usa o RRF). Conjunto de 103 perguntas (as 60 oficiais e 43 novas), sem a passada de tabelas ideais. Três rodadas.",
   "comando": "python pipeline/avaliacao/executar_experimentos.py pipeline_final",
-  "inicio": "2026-11-24T21:43:19",
+  "inicio": "2026-11-25T11:59:34",
   "rascunho": false,
   "ids": null,
   "n_perguntas": 103,
   "rodadas": 3,
   "tabelas_ideais": false,
   "git": {
-    "commit": "840ebe1c66221922d5ffc885ae00aa5cd936a734",
-    "commit_curto": "840ebe1",
+    "commit": "39eea48b04a878c30e6437600990184c7c2c2b98",
+    "commit_curto": "39eea48",
     "ramo": "revisao/correcoes-pipeline-final",
     "alteracoes_nao_commitadas": false,
     "arquivos_alterados": []
@@ -71,6 +71,6 @@
       }
     }
   },
-  "fim": "2026-11-25T00:11:53",
-  "duracao_s": 8913.1
+  "fim": "2026-11-25T14:31:24",
+  "duracao_s": 9110.1
 }

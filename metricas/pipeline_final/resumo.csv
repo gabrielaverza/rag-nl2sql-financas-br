@@ -1,35 +1,35 @@
 experimento,execucao,configuracao,tipo,metrica,escala,n_perguntas,rodadas,soma_media,media,minimo,maximo
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,classe_certa,0 ou 1,35,3,35.0000,1.000000,1.000000,1.000000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,classe_certa,0 ou 1,103,3,103.0000,1.000000,1.000000,1.000000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,ex_adaptado,0 ou 1,35,3,23.0000,0.657143,0.657143,0.657143
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,ex_adaptado,0 ou 1,71,3,45.0000,0.633803,0.633803,0.633803
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,ex_estrito,0 ou 1,35,3,14.0000,0.400000,0.400000,0.400000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,ex_estrito,0 ou 1,71,3,23.0000,0.323944,0.323944,0.323944
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_classificador,segundos,35,3,192.6248,5.503566,5.332775,5.819451
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,tempo_classificador,segundos,103,3,561.9355,5.455684,5.380844,5.570101
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_sintese,segundos,35,3,209.1552,5.975863,5.671944,6.395649
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,tempo_sintese,segundos,103,3,698.2443,6.779071,6.597123,6.881673
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_sql,segundos,35,3,671.2915,19.179756,18.586460,20.110305
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,tempo_sql,segundos,71,3,1323.2640,18.637521,18.313240,19.155585
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_total,segundos,35,3,1152.1376,32.918216,31.840580,34.600095
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,tempo_total,segundos,103,3,2970.2737,28.837609,28.347567,29.421269
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_validacao,segundos,35,3,78.4741,2.242118,2.233310,2.255867
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,tempo_validacao,segundos,103,3,296.0569,2.874339,2.865331,2.882705
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),conceitual,classe_certa,0 ou 1,32,3,32.0000,1.000000,1.000000,1.000000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),conceitual,relevancia_contexto,0 a 1,32,3,16.0000,0.500000,0.500000,0.500000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,relevancia_contexto,0 a 1,68,3,36.3333,0.534314,0.534314,0.534314
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),conceitual,tempo_classificador,segundos,32,3,173.9993,5.437478,5.408298,5.452091
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),conceitual,tempo_sintese,segundos,32,3,213.2319,6.663498,6.642912,6.694196
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),conceitual,tempo_total,segundos,32,3,506.0584,15.814325,15.756578,15.860257
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),conceitual,tempo_validacao,segundos,32,3,118.8260,3.713312,3.705335,3.720620
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,classe_certa,0 ou 1,36,3,36.0000,1.000000,1.000000,1.000000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,ex_adaptado,0 ou 1,36,3,22.0000,0.611111,0.611111,0.611111
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,ex_estrito,0 ou 1,36,3,9.0000,0.250000,0.250000,0.250000
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,relevancia_contexto,0 a 1,36,3,20.3333,0.564815,0.564815,0.564815
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,tempo_classificador,segundos,36,3,195.3113,5.425315,5.403174,5.440197
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,tempo_divisor,segundos,36,3,89.3336,2.481488,2.480544,2.483312
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),todos,tempo_divisor,segundos,36,3,89.3336,2.481488,2.480544,2.483312
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,tempo_sintese,segundos,36,3,275.8572,7.662699,7.455900,7.975079
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,tempo_sql,segundos,36,3,651.9726,18.110349,18.047610,18.227385
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,tempo_total,segundos,36,3,1312.0777,36.446604,36.143572,36.725384
-pipeline_final,20261124-214319,Embeddings (esquema) + RRF (glossário),hibrida,tempo_validacao,segundos,36,3,98.7568,2.743245,2.733127,2.749288
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,classe_certa,0 ou 1,35,3,35.0000,1.000000,1.000000,1.000000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,classe_certa,0 ou 1,103,3,103.0000,1.000000,1.000000,1.000000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,ex_adaptado,0 ou 1,35,3,24.0000,0.685714,0.685714,0.685714
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,ex_adaptado,0 ou 1,71,3,46.0000,0.647887,0.647887,0.647887
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,ex_estrito,0 ou 1,35,3,14.0000,0.400000,0.400000,0.400000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,ex_estrito,0 ou 1,71,3,23.0000,0.323944,0.323944,0.323944
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_classificador,segundos,35,3,196.1781,5.605088,5.415738,5.932754
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,tempo_classificador,segundos,103,3,575.0027,5.582551,5.525790,5.632752
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_sintese,segundos,35,3,232.7763,6.650751,6.588125,6.739061
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,tempo_sintese,segundos,103,3,735.9099,7.144757,7.106683,7.169031
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_sql,segundos,35,3,674.2275,19.263643,18.685298,20.408803
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,tempo_sql,segundos,71,3,1331.5594,18.754358,18.424005,19.262139
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_total,segundos,35,3,1188.4540,33.955828,33.152651,35.509328
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,tempo_total,segundos,103,3,3035.9302,29.475050,29.196171,29.826708
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),quantitativa,tempo_validacao,segundos,35,3,84.5478,2.415653,2.395602,2.444275
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,tempo_validacao,segundos,103,3,302.6022,2.937886,2.927341,2.956686
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),conceitual,classe_certa,0 ou 1,32,3,32.0000,1.000000,1.000000,1.000000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),conceitual,relevancia_contexto,0 a 1,32,3,16.0000,0.500000,0.500000,0.500000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,relevancia_contexto,0 a 1,68,3,36.3333,0.534314,0.534314,0.534314
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),conceitual,tempo_classificador,segundos,32,3,178.5055,5.578298,5.468497,5.675166
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),conceitual,tempo_sintese,segundos,32,3,215.9172,6.747414,6.721444,6.776265
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),conceitual,tempo_total,segundos,32,3,513.4668,16.045836,15.899363,16.175741
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),conceitual,tempo_validacao,segundos,32,3,119.0429,3.720092,3.709387,3.726612
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,classe_certa,0 ou 1,36,3,36.0000,1.000000,1.000000,1.000000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,ex_adaptado,0 ou 1,36,3,22.0000,0.611111,0.611111,0.611111
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,ex_estrito,0 ou 1,36,3,9.0000,0.250000,0.250000,0.250000
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,relevancia_contexto,0 a 1,36,3,20.3333,0.564815,0.564815,0.564815
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,tempo_classificador,segundos,36,3,200.3191,5.564420,5.487089,5.631552
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,tempo_divisor,segundos,36,3,89.2472,2.479088,2.476810,2.480261
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),todos,tempo_divisor,segundos,36,3,89.2472,2.479088,2.476810,2.480261
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,tempo_sintese,segundos,36,3,287.2164,7.978233,7.806526,8.082927
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,tempo_sql,segundos,36,3,657.3319,18.259220,18.147327,18.471573
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,tempo_total,segundos,36,3,1334.0095,37.055818,36.681801,37.461601
+pipeline_final,20261125-115934,Embeddings (esquema) + RRF (glossário),hibrida,tempo_validacao,segundos,36,3,99.0115,2.750319,2.737998,2.772563

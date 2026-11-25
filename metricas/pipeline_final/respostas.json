@@ -154,9 +154,9 @@
       "BPA_ind",
       "companhias"
     ],
-    "resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "texto_resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "contexto": "",
+    "resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a TIM no ano de 2025 nas demonstrações individuais.\n\nProveniência:\n- Empresa: não identificada no SQL (consulta sobre várias companhias)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, individual (DMPL_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO); 01/12/2025 a 31/12/2025 (ÚLTIMO); 21/01/2025 a 31/12/2025 (ÚLTIMO); 10/04/2025 a 31/12/2025 (ÚLTIMO); 20/05/2025 a 31/12/2025 (ÚLTIMO); 20/01/2025 a 31/12/2025 (ÚLTIMO); 19/05/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Patrimonio_Liquido FROM DMPL_ind JOIN companhias ON DMPL_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%TIM%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '5.13' GROUP BY companhias.DENOM_CIA\n\nAviso: a fidelidade da resposta ao contexto ficou em 0.20 (abaixo do esperado). Confira os dados antes de usar.",
+    "texto_resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a TIM no ano de 2025 nas demonstrações individuais.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Patrimonio_Liquido FROM DMPL_ind JOIN companhias ON DMPL_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%TIM%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '5.13' GROUP BY companhias.DENOM_CIA\nResultado: a consulta não retornou nenhuma linha.",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -172,16 +172,16 @@
     "classe": "quantitativa",
     "pergunta": "Quanto a Multiplan teve de despesas financeiras em 2025, no consolidado?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con INNER JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'",
     "tabelas_contexto": [
       "DMPL_con",
       "DRE_con",
       "BPA_con",
       "companhias"
     ],
-    "resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.\n\nDados:\nDESPESAS_FINANCEIRAS\n-705.909.000,00\n\nProveniência:\n- Empresa: MULTIPLAN - EMPREEND IMOBILIARIOS S.A. (código CVM 020982)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'",
+    "resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.\n\nDados:\nDESPESAS_FINANCEIRAS\n-705.909.000,00\n\nProveniência:\n- Empresa: MULTIPLAN - EMPREEND IMOBILIARIOS S.A. (código CVM 020982)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con INNER JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'",
     "texto_resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'\nResultado (valores monetários em reais):\n- DESPESAS_FINANCEIRAS: -705.909.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con INNER JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'\nResultado (valores monetários em reais):\n- DESPESAS_FINANCEIRAS: -705.909.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -206,16 +206,16 @@
     "classe": "quantitativa",
     "pergunta": "Qual o valor do imobilizado consolidado da Rumo no fim de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
     "tabelas_contexto": [
       "DMPL_con",
       "DRE_con",
       "DFC_MI_con",
       "companhias"
     ],
-    "resposta": "O valor do imobilizado consolidado da Rumo no fim de 2025 é R$14.048.438.000,00.\n\nDados:\nDENOM_CIA | Valor_Imobilizado\nRUMO S.A. | 12.579.726.000,00\nRUMO S.A. | 126.971.000,00\nRUMO S.A. | 1.164.214.000,00\nRUMO S.A. | 0,00\nRUMO S.A. | -28.272.000,00\nRUMO S.A. | 13.842.639.000,00\nRUMO S.A. | 205.799.000,00\nRUMO S.A. | 14.048.438.000,00\n\nProveniência:\n- Empresa: RUMO S.A. (código CVM 017450)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, consolidada (DMPL_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "texto_resposta": "O valor do imobilizado consolidado da Rumo no fim de 2025 é R$14.048.438.000,00.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 12.579.726.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 126.971.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 1.164.214.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 0,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: -28.272.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 13.842.639.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 205.799.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 14.048.438.000,00\n",
+    "resposta": "O valor do imobilizado consolidado da Rumo S.A. no fim de 2025 é R$ 41.939.515.000,00.\n\nDados:\nDENOM_CIA | Valor_Imobilizado\nRUMO S.A. | 41.939.515.000,00\n\nProveniência:\n- Empresa: RUMO S.A. (código CVM 017450)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, consolidada (DMPL_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "texto_resposta": "O valor do imobilizado consolidado da Rumo S.A. no fim de 2025 é R$ 41.939.515.000,00.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 41.939.515.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -229,35 +229,7 @@
       "linhas": [
         [
           "RUMO S.A.",
-          12579726000.0
-        ],
-        [
-          "RUMO S.A.",
-          126971000.0
-        ],
-        [
-          "RUMO S.A.",
-          1164214000.0
-        ],
-        [
-          "RUMO S.A.",
-          0.0
-        ],
-        [
-          "RUMO S.A.",
-          -28272000.0
-        ],
-        [
-          "RUMO S.A.",
-          13842639000.0
-        ],
-        [
-          "RUMO S.A.",
-          205799000.0
-        ],
-        [
-          "RUMO S.A.",
-          14048438000.0
+          41939515000.0
         ]
       ]
     }
@@ -2840,16 +2812,16 @@
       "parte_conceitual": "O que o método direto divulga?",
       "dividida": true
     },
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Atividades_Operacionais FROM DFC_MI_con JOIN companhias ON DFC_MI_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AZZAS%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '6.01.01.01'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Atividades_Operacionais FROM DFC_MI_con JOIN companhias ON DFC_MI_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Azzas%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '6.01.01.01'",
     "tabelas_contexto": [
       "DFC_MI_con",
       "DFC_MI_ind",
       "DVA_con",
       "companhias"
     ],
-    "resposta": "**Caixa_Atividades_Operacionais:** R$ 911.249.000,00\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.\n\nDados:\nCaixa_Atividades_Operacionais\n911.249.000,00\n\nProveniência:\n- Empresa: AZZAS 2154 S.A. (código CVM 022349)\n- Demonstração financeira: Demonstração do Fluxo de Caixa (método indireto), consolidada (DFC_MI_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Atividades_Operacionais FROM DFC_MI_con JOIN companhias ON DFC_MI_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AZZAS%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '6.01.01.01'\n- Documentos consultados: nenhum documento relevante encontrado",
+    "resposta": "**Caixa_Atividades_Operacionais:** R$ 911.249.000,00\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.\n\nDados:\nCaixa_Atividades_Operacionais\n911.249.000,00\n\nProveniência:\n- Empresa: AZZAS 2154 S.A. (código CVM 022349)\n- Demonstração financeira: Demonstração do Fluxo de Caixa (método indireto), consolidada (DFC_MI_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Atividades_Operacionais FROM DFC_MI_con JOIN companhias ON DFC_MI_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Azzas%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '6.01.01.01'\n- Documentos consultados: nenhum documento relevante encontrado",
     "texto_resposta": "**Caixa_Atividades_Operacionais:** R$ 911.249.000,00\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Atividades_Operacionais FROM DFC_MI_con JOIN companhias ON DFC_MI_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AZZAS%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '6.01.01.01'\nResultado (valores monetários em reais):\n- Caixa_Atividades_Operacionais: 911.249.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n. 19. Pelo método direto, as informações sobre as principais classes de recebimentos brutos e de pagamentos brutos podem ser obtidas alternativamente: (a) dos registros contábeis da entidade; ou (b) pelo ajuste das vendas, dos custos dos produtos, mercadorias ou serviços vendidos (no\n\n[2] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\nindireto na apresentação da Demonstração dos Fluxos de Caixa. O IASB menciona, nesse item, sua preferência pelo método direto e o incentiva. NE3. O item 20A não existe na versão do IASB; assim, essa exigência existe no Brasil, mas não\n\nnecessariamente em outras jurisdições. NE4. O item 34A não existe na versão do IASB; assim, essa exigência existe no Brasil, mas não\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. Dado que cada método de apresentação tem seu mérito conforme as características de diferentes tipos de entidade, este Pronunciamento Técnico estabelece que cabe à administração eleger o método de apresentação mais relevante e confiável, atendidas as exigências legais. Entretanto, dado que a informação sobre a natureza das despesas é útil ao prever os futuros fluxos de caixa, é exigida divulgação adicional quando for usada a classificação com base no método da função das despesas",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Atividades_Operacionais FROM DFC_MI_con JOIN companhias ON DFC_MI_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Azzas%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '6.01.01.01'\nResultado (valores monetários em reais):\n- Caixa_Atividades_Operacionais: 911.249.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n. 19. Pelo método direto, as informações sobre as principais classes de recebimentos brutos e de pagamentos brutos podem ser obtidas alternativamente: (a) dos registros contábeis da entidade; ou (b) pelo ajuste das vendas, dos custos dos produtos, mercadorias ou serviços vendidos (no\n\n[2] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\nindireto na apresentação da Demonstração dos Fluxos de Caixa. O IASB menciona, nesse item, sua preferência pelo método direto e o incentiva. NE3. O item 20A não existe na versão do IASB; assim, essa exigência existe no Brasil, mas não\n\nnecessariamente em outras jurisdições. NE4. O item 34A não existe na versão do IASB; assim, essa exigência existe no Brasil, mas não\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. Dado que cada método de apresentação tem seu mérito conforme as características de diferentes tipos de entidade, este Pronunciamento Técnico estabelece que cabe à administração eleger o método de apresentação mais relevante e confiável, atendidas as exigências legais. Entretanto, dado que a informação sobre a natureza das despesas é útil ao prever os futuros fluxos de caixa, é exigida divulgação adicional quando for usada a classificação com base no método da função das despesas",
     "trechos_ids": [
       "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_047",
       "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_154",
@@ -3165,22 +3137,41 @@
     "classe": "quantitativa",
     "pergunta": "Qual o valor das participações em controladas que a CPFL Energia tinha no balanço individual de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind INNER JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
     "tabelas_contexto": [
       "DMPL_con",
       "BPA_ind",
       "DFC_MI_con",
       "companhias"
     ],
-    "resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "texto_resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "contexto": "",
+    "resposta": "A CPFL Energia S.A. tinha R$22.675.914.000,00 de participações em controladas no balanço individual de 2025.\n\nDados:\nDENOM_CIA | valor_participacoes_controladas\nCPFL ENERGIA S.A. | 22.675.914.000,00\nCPFL ENERGIAS RENOVÁVEIS S.A. | 5.638.828.000,00\nCPFL TRANSMISSÃO S.A. | 1.443.238.000,00\n\nProveniência:\n- Empresa: CPFL ENERGIA S.A. (código CVM 018660); CPFL ENERGIAS RENOVÁVEIS S.A. (código CVM 020540); CPFL TRANSMISSÃO S.A. (código CVM 003204)\n- Demonstração financeira: Balanço Patrimonial Ativo, individual (BPA_ind)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "texto_resposta": "A CPFL Energia S.A. tinha R$22.675.914.000,00 de participações em controladas no balanço individual de 2025.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: CPFL ENERGIA S.A.; valor_participacoes_controladas: 22.675.914.000,00\n- DENOM_CIA: CPFL ENERGIAS RENOVÁVEIS S.A.; valor_participacoes_controladas: 5.638.828.000,00\n- DENOM_CIA: CPFL TRANSMISSÃO S.A.; valor_participacoes_controladas: 1.443.238.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
       "por_trecho": []
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DENOM_CIA",
+        "valor_participacoes_controladas"
+      ],
+      "linhas": [
+        [
+          "CPFL ENERGIA S.A.",
+          22675914000.0
+        ],
+        [
+          "CPFL ENERGIAS RENOVÁVEIS S.A.",
+          5638828000.0
+        ],
+        [
+          "CPFL TRANSMISSÃO S.A.",
+          1443238000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 1,
@@ -3319,16 +3310,16 @@
     "classe": "quantitativa",
     "pergunta": "De acordo com o fluxo de caixa individual da B3, qual foi o caixa gerado nas atividades operacionais em 2025?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind INNER JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
       "DFC_MI_ind",
       "BPA_ind",
       "BPP_ind",
       "companhias"
     ],
-    "resposta": "Não disponível.\n\nDados:\nCaixa_Gerado_Nas_Atividades_Operacionais\n14.339.206.000,00\n\nProveniência:\n- Empresa: AMBEV S.A. (código CVM 023264)\n- Demonstração financeira: Demonstração do Fluxo de Caixa (método indireto), individual (DFC_MI_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "resposta": "Não disponível.\n\nDados:\nCaixa_Gerado_Nas_Atividades_Operacionais\n14.339.206.000,00\n\nProveniência:\n- Empresa: AMBEV S.A. (código CVM 023264)\n- Demonstração financeira: Demonstração do Fluxo de Caixa (método indireto), individual (DFC_MI_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind INNER JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "texto_resposta": "Não disponível.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Caixa_Gerado_Nas_Atividades_Operacionais: 14.339.206.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind INNER JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Caixa_Gerado_Nas_Atividades_Operacionais: 14.339.206.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -3998,9 +3989,9 @@
       "BPA_con",
       "companhias"
     ],
-    "resposta": "Não encontrei essa informação nos documentos disponíveis.\n\nProveniência:\n- Documentos consultados: nenhum documento relevante encontrado\n\nAviso: não foi possível obter os dados do banco para esta pergunta, então a resposta usa apenas os documentos normativos.",
-    "texto_resposta": "Não encontrei essa informação nos documentos disponíveis.",
-    "contexto": "TRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n52. A divulgação dos fluxos de caixa por segmento de negócios permite aos usuários obter melhor entendimento da relação entre os fluxos de caixa do negócio como um todo e os de suas partes componentes, e a disponibilidade e variabilidade dos fluxos de caixa por segmento de negócios. 52A. As demonstrações contábeis não devem divulgar o valor dos fluxos de caixa por ação. Nem o fluxo de caixa líquido nem quaisquer de seus componentes substituem o lucro líquido como indicador de desempenho da entidade, como a divulgação do fluxo de caixa por ação poderia sugerir\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\ndemonstrações contábeis foram autorizadas para serem emitidas e não reconhecido como uma distribuição aos proprietários durante o período abrangido pelas demonstrações contábeis, bem como o respectivo valor por ação ou equivalente; (b) a quantia de qualquer dividendo preferencial cumulativo não reconhecido. 138. A entidade deve divulgar, caso não for divulgado em outro local entre as informações publicadas com as demonstrações contábeis, as seguintes informações: (a) o domicílio e a forma jurídica da entidade, o seu país de registro e o endereço da sede\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n09, se exigido legalmente ou por algum órgão regulador ou mesmo se apresentada voluntariamente. (Alterada pela Revisão CPC 03) A entidade pode usar outros títulos nas demonstrações em vez daqueles usados neste Pronunciamento Técnico, desde que não contrarie a legislação societária brasileira vigente. 10A. A entidade pode, se permitido legalmente, apresentar uma única demonstração do resultado do período e outros resultados abrangentes, com a demonstração do resultado e outros resultados abrangentes apresentados em duas seções",
+    "resposta": "**Dados:**  \nO saldo inicial de caixa da Prio em 2025 foi R$2.212.322.000,00 para a Prio Forte S.A. e R$3.398.291.000,00 para a Prio S.A.\n\n**Explicação:**  \nNão encontrei essa informação nos documentos disponíveis.\n\nDados:\nDENOM_CIA | saldo_inicial_caixa\nPRIO FORTE S.A. | 2.212.322.000,00\nPRIO S.A. | 3.398.291.000,00\n\nProveniência:\n- Empresa: PRIO FORTE S.A. (código CVM 027740); PRIO S.A. (código CVM 022187)\n- Demonstração financeira: Balanço Patrimonial Ativo, consolidada (BPA_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS saldo_inicial_caixa FROM BPA_con INNER JOIN companhias ON BPA_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Prio%' AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\n- Documentos consultados: nenhum documento relevante encontrado",
+    "texto_resposta": "**Dados:**  \nO saldo inicial de caixa da Prio em 2025 foi R$2.212.322.000,00 para a Prio Forte S.A. e R$3.398.291.000,00 para a Prio S.A.\n\n**Explicação:**  \nNão encontrei essa informação nos documentos disponíveis.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS saldo_inicial_caixa FROM BPA_con INNER JOIN companhias ON BPA_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Prio%' AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: PRIO FORTE S.A.; saldo_inicial_caixa: 2.212.322.000,00\n- DENOM_CIA: PRIO S.A.; saldo_inicial_caixa: 3.398.291.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n52. A divulgação dos fluxos de caixa por segmento de negócios permite aos usuários obter melhor entendimento da relação entre os fluxos de caixa do negócio como um todo e os de suas partes componentes, e a disponibilidade e variabilidade dos fluxos de caixa por segmento de negócios. 52A. As demonstrações contábeis não devem divulgar o valor dos fluxos de caixa por ação. Nem o fluxo de caixa líquido nem quaisquer de seus componentes substituem o lucro líquido como indicador de desempenho da entidade, como a divulgação do fluxo de caixa por ação poderia sugerir\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\ndemonstrações contábeis foram autorizadas para serem emitidas e não reconhecido como uma distribuição aos proprietários durante o período abrangido pelas demonstrações contábeis, bem como o respectivo valor por ação ou equivalente; (b) a quantia de qualquer dividendo preferencial cumulativo não reconhecido. 138. A entidade deve divulgar, caso não for divulgado em outro local entre as informações publicadas com as demonstrações contábeis, as seguintes informações: (a) o domicílio e a forma jurídica da entidade, o seu país de registro e o endereço da sede\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n09, se exigido legalmente ou por algum órgão regulador ou mesmo se apresentada voluntariamente. (Alterada pela Revisão CPC 03) A entidade pode usar outros títulos nas demonstrações em vez daqueles usados neste Pronunciamento Técnico, desde que não contrarie a legislação societária brasileira vigente. 10A. A entidade pode, se permitido legalmente, apresentar uma única demonstração do resultado do período e outros resultados abrangentes, com a demonstração do resultado e outros resultados abrangentes apresentados em duas seções",
     "trechos_ids": [
       "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_113",
       "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_294",
@@ -4026,7 +4017,22 @@
         }
       ]
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DENOM_CIA",
+        "saldo_inicial_caixa"
+      ],
+      "linhas": [
+        [
+          "PRIO FORTE S.A.",
+          2212322000.0
+        ],
+        [
+          "PRIO S.A.",
+          3398291000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 1,
@@ -4804,16 +4810,16 @@
     "classe": "quantitativa",
     "pergunta": "Qual foi a receita líquida consolidada da Marcopolo em 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MARCOPOLO%' AND DRE_con.CD_CONTA = '3.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MARCOPOLO S.A.%' AND DRE_con.CD_CONTA = '3.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
       "DMPL_con",
       "DMPL_ind",
       "DRE_con",
       "companhias"
     ],
-    "resposta": "A receita líquida consolidada da Marcopolo em 2025 foi R$ 9.057.548.000,00.\n\nDados:\nDENOM_CIA | RECEITA_LIQUIDA\nMARCOPOLO S.A. | 9.057.548.000,00\n\nProveniência:\n- Empresa: MARCOPOLO S.A. (código CVM 008451)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MARCOPOLO%' AND DRE_con.CD_CONTA = '3.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'",
+    "resposta": "A receita líquida consolidada da Marcopolo em 2025 foi R$ 9.057.548.000,00.\n\nDados:\nDENOM_CIA | RECEITA_LIQUIDA\nMARCOPOLO S.A. | 9.057.548.000,00\n\nProveniência:\n- Empresa: MARCOPOLO S.A. (código CVM 008451)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MARCOPOLO S.A.%' AND DRE_con.CD_CONTA = '3.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'",
     "texto_resposta": "A receita líquida consolidada da Marcopolo em 2025 foi R$ 9.057.548.000,00.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MARCOPOLO%' AND DRE_con.CD_CONTA = '3.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DENOM_CIA: MARCOPOLO S.A.; RECEITA_LIQUIDA: 9.057.548.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MARCOPOLO S.A.%' AND DRE_con.CD_CONTA = '3.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DENOM_CIA: MARCOPOLO S.A.; RECEITA_LIQUIDA: 9.057.548.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -4951,9 +4957,9 @@
       "BPA_ind",
       "companhias"
     ],
-    "resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "texto_resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "contexto": "",
+    "resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a TIM no ano de 2025 nas demonstrações individuais.\n\nProveniência:\n- Empresa: não identificada no SQL (consulta sobre várias companhias)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, individual (DMPL_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO); 01/12/2025 a 31/12/2025 (ÚLTIMO); 21/01/2025 a 31/12/2025 (ÚLTIMO); 10/04/2025 a 31/12/2025 (ÚLTIMO); 20/05/2025 a 31/12/2025 (ÚLTIMO); 20/01/2025 a 31/12/2025 (ÚLTIMO); 19/05/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Patrimonio_Liquido FROM DMPL_ind JOIN companhias ON DMPL_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%TIM%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '5.13' GROUP BY companhias.DENOM_CIA\n\nAviso: a fidelidade da resposta ao contexto ficou em 0.20 (abaixo do esperado). Confira os dados antes de usar.",
+    "texto_resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a TIM no ano de 2025 nas demonstrações individuais.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Patrimonio_Liquido FROM DMPL_ind JOIN companhias ON DMPL_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%TIM%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '5.13' GROUP BY companhias.DENOM_CIA\nResultado: a consulta não retornou nenhuma linha.",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -4969,16 +4975,16 @@
     "classe": "quantitativa",
     "pergunta": "Quanto a Multiplan teve de despesas financeiras em 2025, no consolidado?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'",
     "tabelas_contexto": [
       "DMPL_con",
       "DRE_con",
       "BPA_con",
       "companhias"
     ],
-    "resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.\n\nDados:\nDESPESAS_FINANCEIRAS\n-705.909.000,00\n\nProveniência:\n- Empresa: MULTIPLAN - EMPREEND IMOBILIARIOS S.A. (código CVM 020982)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'",
+    "resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.\n\nDados:\nDESPESAS_FINANCEIRAS\n-705.909.000,00\n\nProveniência:\n- Empresa: MULTIPLAN - EMPREEND IMOBILIARIOS S.A. (código CVM 020982)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'",
     "texto_resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'\nResultado (valores monetários em reais):\n- DESPESAS_FINANCEIRAS: -705.909.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'\nResultado (valores monetários em reais):\n- DESPESAS_FINANCEIRAS: -705.909.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -5003,16 +5009,16 @@
     "classe": "quantitativa",
     "pergunta": "Qual o valor do imobilizado consolidado da Rumo no fim de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
     "tabelas_contexto": [
       "DMPL_con",
       "DRE_con",
       "DFC_MI_con",
       "companhias"
     ],
-    "resposta": "O valor do imobilizado consolidado da Rumo no fim de 2025 é R$14.048.438.000,00.\n\nDados:\nDENOM_CIA | Valor_Imobilizado\nRUMO S.A. | 12.579.726.000,00\nRUMO S.A. | 126.971.000,00\nRUMO S.A. | 1.164.214.000,00\nRUMO S.A. | 0,00\nRUMO S.A. | -28.272.000,00\nRUMO S.A. | 13.842.639.000,00\nRUMO S.A. | 205.799.000,00\nRUMO S.A. | 14.048.438.000,00\n\nProveniência:\n- Empresa: RUMO S.A. (código CVM 017450)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, consolidada (DMPL_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "texto_resposta": "O valor do imobilizado consolidado da Rumo no fim de 2025 é R$14.048.438.000,00.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 12.579.726.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 126.971.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 1.164.214.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 0,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: -28.272.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 13.842.639.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 205.799.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 14.048.438.000,00\n",
+    "resposta": "O valor do imobilizado consolidado da Rumo S.A. no fim de 2025 é R$ 41.939.515.000,00.\n\nDados:\nDENOM_CIA | Valor_Imobilizado\nRUMO S.A. | 41.939.515.000,00\n\nProveniência:\n- Empresa: RUMO S.A. (código CVM 017450)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, consolidada (DMPL_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "texto_resposta": "O valor do imobilizado consolidado da Rumo S.A. no fim de 2025 é R$ 41.939.515.000,00.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 41.939.515.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -5026,35 +5032,7 @@
       "linhas": [
         [
           "RUMO S.A.",
-          12579726000.0
-        ],
-        [
-          "RUMO S.A.",
-          126971000.0
-        ],
-        [
-          "RUMO S.A.",
-          1164214000.0
-        ],
-        [
-          "RUMO S.A.",
-          0.0
-        ],
-        [
-          "RUMO S.A.",
-          -28272000.0
-        ],
-        [
-          "RUMO S.A.",
-          13842639000.0
-        ],
-        [
-          "RUMO S.A.",
-          205799000.0
-        ],
-        [
-          "RUMO S.A.",
-          14048438000.0
+          41939515000.0
         ]
       ]
     }
@@ -5409,16 +5387,16 @@
     "classe": "quantitativa",
     "pergunta": "Qual era o passivo circulante consolidado da Cury ao fim de 2025?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con AS T1 JOIN companhias AS T2 ON T1.CD_CVM = T2.CD_CVM WHERE T2.DENOM_CIA LIKE '%Cury%' AND T1.CD_CONTA = '2.01' AND T1.ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
       "BPP_con",
       "BPP_ind",
       "BPA_con",
       "companhias"
     ],
-    "resposta": "O passivo circulante consolidado da Cury ao fim de 2025 era de R$1.743.700.000,00.\n\nDados:\nPassivo_Circulante\n1.743.700.000,00\n\nProveniência:\n- Empresa: CURY CONSTRUTORA E INCORPORADORA S.A. (código CVM 025100)\n- Demonstração financeira: Balanço Patrimonial Passivo, consolidada (BPP_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "resposta": "O passivo circulante consolidado da Cury ao fim de 2025 era de R$1.743.700.000,00.\n\nDados:\nPassivo_Circulante\n1.743.700.000,00\n\nProveniência:\n- Empresa: CURY CONSTRUTORA E INCORPORADORA S.A. (código CVM 025100)\n- Demonstração financeira: Balanço Patrimonial Passivo, consolidada (BPP_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con AS T1 JOIN companhias AS T2 ON T1.CD_CVM = T2.CD_CVM WHERE T2.DENOM_CIA LIKE '%Cury%' AND T1.CD_CONTA = '2.01' AND T1.ORDEM_EXERC = 'ÚLTIMO'",
     "texto_resposta": "O passivo circulante consolidado da Cury ao fim de 2025 era de R$1.743.700.000,00.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Passivo_Circulante: 1.743.700.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con AS T1 JOIN companhias AS T2 ON T1.CD_CVM = T2.CD_CVM WHERE T2.DENOM_CIA LIKE '%Cury%' AND T1.CD_CONTA = '2.01' AND T1.ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Passivo_Circulante: 1.743.700.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -7060,16 +7038,16 @@
       "parte_conceitual": "De que depende a escolha entre apresentar despesas por função ou por natureza?",
       "dividida": true
     },
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_COM_VENDAS FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%COGNA%') AND CD_CONTA = '3.04.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_COM_VENDAS FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%COGNA%') AND CD_CONTA = '7.02.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
       "DVA_con",
       "BPA_con",
       "DRE_con",
       "companhias"
     ],
-    "resposta": "**Dados:** A consulta não retornou nenhuma linha.\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.\n\nProveniência:\n- Empresa: COGNA EDUCAÇÃO S.A. (código CVM 017973)\n- Demonstração financeira: Demonstração do Valor Adicionado, consolidada (DVA_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_COM_VENDAS FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%COGNA%') AND CD_CONTA = '3.04.01' AND ORDEM_EXERC = 'ÚLTIMO'\n- Documentos consultados: nenhum documento relevante encontrado",
-    "texto_resposta": "**Dados:** A consulta não retornou nenhuma linha.\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_COM_VENDAS FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%COGNA%') AND CD_CONTA = '3.04.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado: a consulta não retornou nenhuma linha.\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. 105. A escolha entre o método da função das despesas e o método da natureza das despesas depende de fatores históricos e setoriais e da natureza da entidade. Ambos os métodos proporcionam uma indicação das despesas que podem variar, direta ou indiretamente, com o nível de vendas ou de produção da entidade\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\nReceitas X Custo dos produtos e serviços vendidos (X) Lucro bruto X Outras receitas X Despesas de vendas (X) Despesas administrativas (X) Outras despesas (X) Resultado antes dos tributos X 104. As entidades que classificarem os gastos por função devem divulgar informação adicional sobre a natureza das despesas, incluindo as despesas de depreciação e de amortização e as despesas com benefícios aos empregados. 105\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. Dado que cada método de apresentação tem seu mérito conforme as características de diferentes tipos de entidade, este Pronunciamento Técnico estabelece que cabe à administração eleger o método de apresentação mais relevante e confiável, atendidas as exigências legais. Entretanto, dado que a informação sobre a natureza das despesas é útil ao prever os futuros fluxos de caixa, é exigida divulgação adicional quando for usada a classificação com base no método da função das despesas",
+    "resposta": "**Dados:** Cogna registrou R$ -487.048.000,00 de despesas com vendas em 2025.\n\n**Explicação:** A escolha entre apresentar despesas por função ou por natureza depende de fatores históricos e setoriais e da natureza da entidade.\n\nDados:\nDESPESAS_COM_VENDAS\n-487.048.000,00\n\nProveniência:\n- Empresa: COGNA EDUCAÇÃO S.A. (código CVM 017973)\n- Demonstração financeira: Demonstração do Valor Adicionado, consolidada (DVA_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_COM_VENDAS FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%COGNA%') AND CD_CONTA = '7.02.01' AND ORDEM_EXERC = 'ÚLTIMO'\n- Documentos consultados: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf\n\nAviso: a fidelidade da resposta ao contexto ficou em 0.00 (abaixo do esperado). Confira os dados antes de usar.",
+    "texto_resposta": "**Dados:** Cogna registrou R$ -487.048.000,00 de despesas com vendas em 2025.\n\n**Explicação:** A escolha entre apresentar despesas por função ou por natureza depende de fatores históricos e setoriais e da natureza da entidade.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_COM_VENDAS FROM DVA_con WHERE CD_CVM = (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%COGNA%') AND CD_CONTA = '7.02.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DESPESAS_COM_VENDAS: -487.048.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. 105. A escolha entre o método da função das despesas e o método da natureza das despesas depende de fatores históricos e setoriais e da natureza da entidade. Ambos os métodos proporcionam uma indicação das despesas que podem variar, direta ou indiretamente, com o nível de vendas ou de produção da entidade\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\nReceitas X Custo dos produtos e serviços vendidos (X) Lucro bruto X Outras receitas X Despesas de vendas (X) Despesas administrativas (X) Outras despesas (X) Resultado antes dos tributos X 104. As entidades que classificarem os gastos por função devem divulgar informação adicional sobre a natureza das despesas, incluindo as despesas de depreciação e de amortização e as despesas com benefícios aos empregados. 105\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. Dado que cada método de apresentação tem seu mérito conforme as características de diferentes tipos de entidade, este Pronunciamento Técnico estabelece que cabe à administração eleger o método de apresentação mais relevante e confiável, atendidas as exigências legais. Entretanto, dado que a informação sobre a natureza das despesas é útil ao prever os futuros fluxos de caixa, é exigida divulgação adicional quando for usada a classificação com base no método da função das despesas",
     "trechos_ids": [
       "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_234",
       "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_233",
@@ -7095,7 +7073,16 @@
         }
       ]
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DESPESAS_COM_VENDAS"
+      ],
+      "linhas": [
+        [
+          -487048000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 2,
@@ -7962,22 +7949,37 @@
     "classe": "quantitativa",
     "pergunta": "Qual o valor das participações em controladas que a CPFL Energia tinha no balanço individual de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL Energia%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
     "tabelas_contexto": [
       "DMPL_con",
       "BPA_ind",
       "DFC_MI_con",
       "companhias"
     ],
-    "resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "texto_resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "contexto": "",
+    "resposta": "A CPFL Energia S.A. tinha R$22.675.914.000,00 de participações em controladas no balanço individual de 2025.\n\nDados:\nDENOM_CIA | valor_participacoes_controladas\nCPFL ENERGIA S.A. | 22.675.914.000,00\nCPFL ENERGIAS RENOVÁVEIS S.A. | 5.638.828.000,00\n\nProveniência:\n- Empresa: CPFL ENERGIA S.A. (código CVM 018660); CPFL ENERGIAS RENOVÁVEIS S.A. (código CVM 020540)\n- Demonstração financeira: Balanço Patrimonial Ativo, individual (BPA_ind)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL Energia%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "texto_resposta": "A CPFL Energia S.A. tinha R$22.675.914.000,00 de participações em controladas no balanço individual de 2025.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL Energia%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: CPFL ENERGIA S.A.; valor_participacoes_controladas: 22.675.914.000,00\n- DENOM_CIA: CPFL ENERGIAS RENOVÁVEIS S.A.; valor_participacoes_controladas: 5.638.828.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
       "por_trecho": []
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DENOM_CIA",
+        "valor_participacoes_controladas"
+      ],
+      "linhas": [
+        [
+          "CPFL ENERGIA S.A.",
+          22675914000.0
+        ],
+        [
+          "CPFL ENERGIAS RENOVÁVEIS S.A.",
+          5638828000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 2,
@@ -8091,16 +8093,16 @@
     "classe": "quantitativa",
     "pergunta": "Segundo a DRE individual da Whirlpool, qual foi a receita líquida de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%WHIRLPOOL%' AND DRE_con.CD_CONTA = '3.01.04.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN DMPL_ind.ESCALA_MOEDA = 'MIL' THEN DMPL_ind.VL_CONTA * 1000 ELSE DMPL_ind.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DMPL_ind ON companhias.CD_CVM = DMPL_ind.CD_CVM WHERE companhias.DENOM_CIA LIKE '%WHIRLPOOL%' AND DMPL_ind.CD_CONTA = '3.01.01' AND DMPL_ind.ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
       "DMPL_con",
       "DMPL_ind",
       "DRE_con",
       "companhias"
     ],
-    "resposta": "A consulta não retornou nenhuma linha.\n\nProveniência:\n- Empresa: não identificada no SQL (consulta sobre várias companhias)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO); 01/12/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%WHIRLPOOL%' AND DRE_con.CD_CONTA = '3.01.04.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'",
-    "texto_resposta": "A consulta não retornou nenhuma linha.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN DRE_con.ESCALA_MOEDA = 'MIL' THEN DRE_con.VL_CONTA * 1000 ELSE DRE_con.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DRE_con ON companhias.CD_CVM = DRE_con.CD_CVM WHERE companhias.DENOM_CIA LIKE '%WHIRLPOOL%' AND DRE_con.CD_CONTA = '3.01.04.01' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO'\nResultado: a consulta não retornou nenhuma linha.",
+    "resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a receita líquida da Whirlpool em 2025 na tabela DMPL_ind.\n\nProveniência:\n- Empresa: não identificada no SQL (consulta sobre várias companhias)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, individual (DMPL_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO); 01/12/2025 a 31/12/2025 (ÚLTIMO); 21/01/2025 a 31/12/2025 (ÚLTIMO); 10/04/2025 a 31/12/2025 (ÚLTIMO); 20/05/2025 a 31/12/2025 (ÚLTIMO); 20/01/2025 a 31/12/2025 (ÚLTIMO); 19/05/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN DMPL_ind.ESCALA_MOEDA = 'MIL' THEN DMPL_ind.VL_CONTA * 1000 ELSE DMPL_ind.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DMPL_ind ON companhias.CD_CVM = DMPL_ind.CD_CVM WHERE companhias.DENOM_CIA LIKE '%WHIRLPOOL%' AND DMPL_ind.CD_CONTA = '3.01.01' AND DMPL_ind.ORDEM_EXERC = 'ÚLTIMO'\n\nAviso: a fidelidade da resposta ao contexto ficou em 0.20 (abaixo do esperado). Confira os dados antes de usar.",
+    "texto_resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a receita líquida da Whirlpool em 2025 na tabela DMPL_ind.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN DMPL_ind.ESCALA_MOEDA = 'MIL' THEN DMPL_ind.VL_CONTA * 1000 ELSE DMPL_ind.VL_CONTA END AS RECEITA_LIQUIDA FROM companhias JOIN DMPL_ind ON companhias.CD_CVM = DMPL_ind.CD_CVM WHERE companhias.DENOM_CIA LIKE '%WHIRLPOOL%' AND DMPL_ind.CD_CONTA = '3.01.01' AND DMPL_ind.ORDEM_EXERC = 'ÚLTIMO'\nResultado: a consulta não retornou nenhuma linha.",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -8795,9 +8797,9 @@
       "BPA_con",
       "companhias"
     ],
-    "resposta": "Não encontrei essa informação nos documentos disponíveis.\n\nProveniência:\n- Documentos consultados: nenhum documento relevante encontrado\n\nAviso: não foi possível obter os dados do banco para esta pergunta, então a resposta usa apenas os documentos normativos.",
-    "texto_resposta": "Não encontrei essa informação nos documentos disponíveis.",
-    "contexto": "TRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n52. A divulgação dos fluxos de caixa por segmento de negócios permite aos usuários obter melhor entendimento da relação entre os fluxos de caixa do negócio como um todo e os de suas partes componentes, e a disponibilidade e variabilidade dos fluxos de caixa por segmento de negócios. 52A. As demonstrações contábeis não devem divulgar o valor dos fluxos de caixa por ação. Nem o fluxo de caixa líquido nem quaisquer de seus componentes substituem o lucro líquido como indicador de desempenho da entidade, como a divulgação do fluxo de caixa por ação poderia sugerir\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\ndemonstrações contábeis foram autorizadas para serem emitidas e não reconhecido como uma distribuição aos proprietários durante o período abrangido pelas demonstrações contábeis, bem como o respectivo valor por ação ou equivalente; (b) a quantia de qualquer dividendo preferencial cumulativo não reconhecido. 138. A entidade deve divulgar, caso não for divulgado em outro local entre as informações publicadas com as demonstrações contábeis, as seguintes informações: (a) o domicílio e a forma jurídica da entidade, o seu país de registro e o endereço da sede\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n09, se exigido legalmente ou por algum órgão regulador ou mesmo se apresentada voluntariamente. (Alterada pela Revisão CPC 03) A entidade pode usar outros títulos nas demonstrações em vez daqueles usados neste Pronunciamento Técnico, desde que não contrarie a legislação societária brasileira vigente. 10A. A entidade pode, se permitido legalmente, apresentar uma única demonstração do resultado do período e outros resultados abrangentes, com a demonstração do resultado e outros resultados abrangentes apresentados em duas seções",
+    "resposta": "**Dados:**  \nO saldo inicial de caixa da Prio em 2025 foi R$2.212.322.000,00 para a Prio Forte S.A. e R$3.398.291.000,00 para a Prio S.A.\n\n**Explicação:**  \nNão encontrei essa informação nos documentos disponíveis.\n\nDados:\nDENOM_CIA | saldo_inicial_caixa\nPRIO FORTE S.A. | 2.212.322.000,00\nPRIO S.A. | 3.398.291.000,00\n\nProveniência:\n- Empresa: PRIO FORTE S.A. (código CVM 027740); PRIO S.A. (código CVM 022187)\n- Demonstração financeira: Balanço Patrimonial Ativo, consolidada (BPA_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS saldo_inicial_caixa FROM BPA_con JOIN companhias ON BPA_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Prio%' AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\n- Documentos consultados: nenhum documento relevante encontrado",
+    "texto_resposta": "**Dados:**  \nO saldo inicial de caixa da Prio em 2025 foi R$2.212.322.000,00 para a Prio Forte S.A. e R$3.398.291.000,00 para a Prio S.A.\n\n**Explicação:**  \nNão encontrei essa informação nos documentos disponíveis.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS saldo_inicial_caixa FROM BPA_con JOIN companhias ON BPA_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Prio%' AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: PRIO FORTE S.A.; saldo_inicial_caixa: 2.212.322.000,00\n- DENOM_CIA: PRIO S.A.; saldo_inicial_caixa: 3.398.291.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n52. A divulgação dos fluxos de caixa por segmento de negócios permite aos usuários obter melhor entendimento da relação entre os fluxos de caixa do negócio como um todo e os de suas partes componentes, e a disponibilidade e variabilidade dos fluxos de caixa por segmento de negócios. 52A. As demonstrações contábeis não devem divulgar o valor dos fluxos de caixa por ação. Nem o fluxo de caixa líquido nem quaisquer de seus componentes substituem o lucro líquido como indicador de desempenho da entidade, como a divulgação do fluxo de caixa por ação poderia sugerir\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\ndemonstrações contábeis foram autorizadas para serem emitidas e não reconhecido como uma distribuição aos proprietários durante o período abrangido pelas demonstrações contábeis, bem como o respectivo valor por ação ou equivalente; (b) a quantia de qualquer dividendo preferencial cumulativo não reconhecido. 138. A entidade deve divulgar, caso não for divulgado em outro local entre as informações publicadas com as demonstrações contábeis, as seguintes informações: (a) o domicílio e a forma jurídica da entidade, o seu país de registro e o endereço da sede\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n09, se exigido legalmente ou por algum órgão regulador ou mesmo se apresentada voluntariamente. (Alterada pela Revisão CPC 03) A entidade pode usar outros títulos nas demonstrações em vez daqueles usados neste Pronunciamento Técnico, desde que não contrarie a legislação societária brasileira vigente. 10A. A entidade pode, se permitido legalmente, apresentar uma única demonstração do resultado do período e outros resultados abrangentes, com a demonstração do resultado e outros resultados abrangentes apresentados em duas seções",
     "trechos_ids": [
       "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_113",
       "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_294",
@@ -8823,7 +8825,22 @@
         }
       ]
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DENOM_CIA",
+        "saldo_inicial_caixa"
+      ],
+      "linhas": [
+        [
+          "PRIO FORTE S.A.",
+          2212322000.0
+        ],
+        [
+          "PRIO S.A.",
+          3398291000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 2,
@@ -9423,49 +9440,49 @@
     "classe": "hibrida",
     "pergunta": "Qual era o ativo não circulante da Sanepar no balanço individual de 2025, e qual duração se presume para o ciclo operacional quando ele não é claramente identificável?",
     "divisao": {
-      "parte_dados": "Qual era o ativo não circulante da Sanepar no balanço individual de 2025?",
-      "parte_conceitual": "Qual duração se presume para o ciclo operacional quando não é claramente identificável?",
-      "dividida": true
+      "parte_dados": "Qual era o ativo não circulante da Sanepar no balanço individual de 2025, e qual duração se presume para o ciclo operacional quando ele não é claramente identificável?",
+      "parte_conceitual": "Qual era o ativo não circulante da Sanepar no balanço individual de 2025, e qual duração se presume para o ciclo operacional quando ele não é claramente identificável?",
+      "dividida": false
     },
-    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN BPA_ind.ESCALA_MOEDA = 'MIL' THEN BPA_ind.VL_CONTA * 1000 ELSE BPA_ind.VL_CONTA END AS ATIVO_NAO_CIRCULANTE FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE BPA_ind.CD_CONTA = '1.02.01.10.01' AND BPA_ind.ORDEM_EXERC = 'ÚLTIMO' AND companhias.DENOM_CIA LIKE '%SANEPAR%'",
+    "sql": "SELECT c.DENOM_CIA, b.VL_CONTA * CASE WHEN b.ESCALA_MOEDA = 'MIL' THEN 1000 ELSE 1 END AS Ativo_Não_Circulante FROM companhias c JOIN BPA_ind b ON c.CD_CVM = b.CD_CVM WHERE c.DENOM_CIA LIKE '%SANEPAR%' AND b.CD_CONTA = '1.01.08.01' AND b.ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
-      "BPP_con",
-      "BPA_con",
       "BPA_ind",
+      "BPP_con",
+      "BPP_ind",
       "companhias"
     ],
-    "resposta": "**Ativo não circulante da Sanepar no balanço individual de 2025:** R$0,00\n\n**Duração presumida para o ciclo operacional quando ele não é claramente identificável:** 12 meses\n\nDados:\nDENOM_CIA | ATIVO_NAO_CIRCULANTE\nCIA SANEAMENTO DO PARANA - SANEPAR | 0,00\n\nProveniência:\n- Empresa: CIA SANEAMENTO DO PARANA - SANEPAR (código CVM 018627)\n- Demonstração financeira: Balanço Patrimonial Ativo, individual (BPA_ind)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN BPA_ind.ESCALA_MOEDA = 'MIL' THEN BPA_ind.VL_CONTA * 1000 ELSE BPA_ind.VL_CONTA END AS ATIVO_NAO_CIRCULANTE FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE BPA_ind.CD_CONTA = '1.02.01.10.01' AND BPA_ind.ORDEM_EXERC = 'ÚLTIMO' AND companhias.DENOM_CIA LIKE '%SANEPAR%'\n- Documentos consultados: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
-    "texto_resposta": "**Ativo não circulante da Sanepar no balanço individual de 2025:** R$0,00\n\n**Duração presumida para o ciclo operacional quando ele não é claramente identificável:** 12 meses",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN BPA_ind.ESCALA_MOEDA = 'MIL' THEN BPA_ind.VL_CONTA * 1000 ELSE BPA_ind.VL_CONTA END AS ATIVO_NAO_CIRCULANTE FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE BPA_ind.CD_CONTA = '1.02.01.10.01' AND BPA_ind.ORDEM_EXERC = 'ÚLTIMO' AND companhias.DENOM_CIA LIKE '%SANEPAR%'\nResultado (valores monetários em reais):\n- DENOM_CIA: CIA SANEAMENTO DO PARANA - SANEPAR; ATIVO_NAO_CIRCULANTE: 0,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. Quando o ciclo operacional normal da entidade não for claramente identificável, pressupõe-se que a sua duração seja de doze meses. Mantido essencialmente para a finalidade de ser negociado (item 69(b)) ou liquidado no\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n68. O ciclo operacional da entidade é o tempo entre a aquisição de ativos para processamento e sua realização em caixa ou seus equivalentes. Quando o ciclo operacional normal da entidade não for claramente identificável, pressupõe-se que sua duração seja de doze meses. Os ativos circulantes incluem ativos (tais como estoque e contas a receber comerciais) que são vendidos, consumidos ou realizados como parte do ciclo operacional normal, mesmo quando não se espera que sejam realizados no período de até doze meses após a data do balanço\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. 62. Quando a entidade fornece bens ou serviços dentro de um ciclo operacional claramente identificável, a classificação separada de ativos e passivos circulantes e não circulantes no balanço patrimonial proporciona informação útil ao distinguir os ativos líquidos que estejam continuamente em circulação como capital circulante dos que são utilizados nas operações de longo prazo da entidade. Essa classificação também deve destacar os ativos que se espera sejam realizados dentro do ciclo operacional corrente, bem como os passivos que devam ser liquidados dentro do mesmo período.",
+    "resposta": "**Ativo Não Circulante da Sanepar no balanço individual de 2025:** R$0,00\n\n**Duração presumida para o ciclo operacional quando ele não é claramente identificável:** 12 meses\n\nDados:\nDENOM_CIA | Ativo_Não_Circulante\nCIA SANEAMENTO DO PARANA - SANEPAR | 0,00\n\nProveniência:\n- Empresa: CIA SANEAMENTO DO PARANA - SANEPAR (código CVM 018627)\n- Demonstração financeira: Balanço Patrimonial Ativo, individual (BPA_ind)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT c.DENOM_CIA, b.VL_CONTA * CASE WHEN b.ESCALA_MOEDA = 'MIL' THEN 1000 ELSE 1 END AS Ativo_Não_Circulante FROM companhias c JOIN BPA_ind b ON c.CD_CVM = b.CD_CVM WHERE c.DENOM_CIA LIKE '%SANEPAR%' AND b.CD_CONTA = '1.01.08.01' AND b.ORDEM_EXERC = 'ÚLTIMO'\n- Documentos consultados: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf",
+    "texto_resposta": "**Ativo Não Circulante da Sanepar no balanço individual de 2025:** R$0,00\n\n**Duração presumida para o ciclo operacional quando ele não é claramente identificável:** 12 meses",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT c.DENOM_CIA, b.VL_CONTA * CASE WHEN b.ESCALA_MOEDA = 'MIL' THEN 1000 ELSE 1 END AS Ativo_Não_Circulante FROM companhias c JOIN BPA_ind b ON c.CD_CVM = b.CD_CVM WHERE c.DENOM_CIA LIKE '%SANEPAR%' AND b.CD_CONTA = '1.01.08.01' AND b.ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DENOM_CIA: CIA SANEAMENTO DO PARANA - SANEPAR; Ativo_Não_Circulante: 0,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. 62. Quando a entidade fornece bens ou serviços dentro de um ciclo operacional claramente identificável, a classificação separada de ativos e passivos circulantes e não circulantes no balanço patrimonial proporciona informação útil ao distinguir os ativos líquidos que estejam continuamente em circulação como capital circulante dos que são utilizados nas operações de longo prazo da entidade. Essa classificação também deve destacar os ativos que se espera sejam realizados dentro do ciclo operacional corrente, bem como os passivos que devam ser liquidados dentro do mesmo período.\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n. Quando o ciclo operacional normal da entidade não for claramente identificável, pressupõe-se que a sua duração seja de doze meses. Mantido essencialmente para a finalidade de ser negociado (item 69(b)) ou liquidado no\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n68. O ciclo operacional da entidade é o tempo entre a aquisição de ativos para processamento e sua realização em caixa ou seus equivalentes. Quando o ciclo operacional normal da entidade não for claramente identificável, pressupõe-se que sua duração seja de doze meses. Os ativos circulantes incluem ativos (tais como estoque e contas a receber comerciais) que são vendidos, consumidos ou realizados como parte do ciclo operacional normal, mesmo quando não se espera que sejam realizados no período de até doze meses após a data do balanço",
     "trechos_ids": [
+      "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_142",
       "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_156",
-      "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_151",
-      "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_142"
+      "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_151"
     ],
     "relevancia_contexto": {
       "score": 0.6666666666666666,
       "por_trecho": [
         {
           "numero": 1,
-          "id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_156",
+          "id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_142",
           "relevante": true
         },
         {
           "numero": 2,
-          "id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_151",
-          "relevante": true
+          "id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_156",
+          "relevante": false
         },
         {
           "numero": 3,
-          "id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_142",
-          "relevante": false
+          "id": "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_151",
+          "relevante": true
         }
       ]
     },
     "resultado_sql": {
       "colunas": [
         "DENOM_CIA",
-        "ATIVO_NAO_CIRCULANTE"
+        "Ativo_Não_Circulante"
       ],
       "linhas": [
         [
@@ -9748,9 +9765,9 @@
       "BPA_ind",
       "companhias"
     ],
-    "resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "texto_resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "contexto": "",
+    "resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a TIM no ano de 2025 nas demonstrações individuais.\n\nProveniência:\n- Empresa: não identificada no SQL (consulta sobre várias companhias)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, individual (DMPL_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO); 01/12/2025 a 31/12/2025 (ÚLTIMO); 21/01/2025 a 31/12/2025 (ÚLTIMO); 10/04/2025 a 31/12/2025 (ÚLTIMO); 20/05/2025 a 31/12/2025 (ÚLTIMO); 20/01/2025 a 31/12/2025 (ÚLTIMO); 19/05/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Patrimonio_Liquido FROM DMPL_ind JOIN companhias ON DMPL_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%TIM%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '5.13' GROUP BY companhias.DENOM_CIA\n\nAviso: a fidelidade da resposta ao contexto ficou em 0.20 (abaixo do esperado). Confira os dados antes de usar.",
+    "texto_resposta": "A consulta não retornou nenhuma linha, o que indica que não há dados disponíveis para a TIM no ano de 2025 nas demonstrações individuais.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Patrimonio_Liquido FROM DMPL_ind JOIN companhias ON DMPL_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%TIM%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '5.13' GROUP BY companhias.DENOM_CIA\nResultado: a consulta não retornou nenhuma linha.",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -9766,16 +9783,16 @@
     "classe": "quantitativa",
     "pergunta": "Quanto a Multiplan teve de despesas financeiras em 2025, no consolidado?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'",
     "tabelas_contexto": [
       "DMPL_con",
       "DRE_con",
       "BPA_con",
       "companhias"
     ],
-    "resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.\n\nDados:\nDESPESAS_FINANCEIRAS\n-705.909.000,00\n\nProveniência:\n- Empresa: MULTIPLAN - EMPREEND IMOBILIARIOS S.A. (código CVM 020982)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'",
+    "resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.\n\nDados:\nDESPESAS_FINANCEIRAS\n-705.909.000,00\n\nProveniência:\n- Empresa: MULTIPLAN - EMPREEND IMOBILIARIOS S.A. (código CVM 020982)\n- Demonstração financeira: Demonstração do Resultado do Exercício, consolidada (DRE_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'",
     "texto_resposta": "Multiplan teve despesas financeiras de R$ -705.909.000,00 em 2025, no consolidado.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND DRE_con.ORDEM_EXERC = 'ÚLTIMO' AND DRE_con.CD_CONTA = '3.06.02'\nResultado (valores monetários em reais):\n- DESPESAS_FINANCEIRAS: -705.909.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_FINANCEIRAS FROM DRE_con JOIN companhias ON DRE_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%MULTIPLAN%' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CONTA = '3.06.02'\nResultado (valores monetários em reais):\n- DESPESAS_FINANCEIRAS: -705.909.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -9800,16 +9817,16 @@
     "classe": "quantitativa",
     "pergunta": "Qual o valor do imobilizado consolidado da Rumo no fim de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
     "tabelas_contexto": [
       "DMPL_con",
       "DRE_con",
       "DFC_MI_con",
       "companhias"
     ],
-    "resposta": "O valor do imobilizado consolidado da Rumo no fim de 2025 é R$14.048.438.000,00.\n\nDados:\nDENOM_CIA | Valor_Imobilizado\nRUMO S.A. | 12.579.726.000,00\nRUMO S.A. | 126.971.000,00\nRUMO S.A. | 1.164.214.000,00\nRUMO S.A. | 0,00\nRUMO S.A. | -28.272.000,00\nRUMO S.A. | 13.842.639.000,00\nRUMO S.A. | 205.799.000,00\nRUMO S.A. | 14.048.438.000,00\n\nProveniência:\n- Empresa: RUMO S.A. (código CVM 017450)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, consolidada (DMPL_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'",
-    "texto_resposta": "O valor do imobilizado consolidado da Rumo no fim de 2025 é R$14.048.438.000,00.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 12.579.726.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 126.971.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 1.164.214.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 0,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: -28.272.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 13.842.639.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 205.799.000,00\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 14.048.438.000,00\n",
+    "resposta": "O valor do imobilizado consolidado da Rumo S.A. no fim de 2025 é R$ 41.939.515.000,00.\n\nDados:\nDENOM_CIA | Valor_Imobilizado\nRUMO S.A. | 41.939.515.000,00\n\nProveniência:\n- Empresa: RUMO S.A. (código CVM 017450)\n- Demonstração financeira: Demonstração das Mutações do Patrimônio Líquido, consolidada (DMPL_con)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "texto_resposta": "O valor do imobilizado consolidado da Rumo S.A. no fim de 2025 é R$ 41.939.515.000,00.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Valor_Imobilizado FROM DMPL_con JOIN companhias ON DMPL_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%RUMO%' AND CD_CONTA = '5.07' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: RUMO S.A.; Valor_Imobilizado: 41.939.515.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -9823,35 +9840,7 @@
       "linhas": [
         [
           "RUMO S.A.",
-          12579726000.0
-        ],
-        [
-          "RUMO S.A.",
-          126971000.0
-        ],
-        [
-          "RUMO S.A.",
-          1164214000.0
-        ],
-        [
-          "RUMO S.A.",
-          0.0
-        ],
-        [
-          "RUMO S.A.",
-          -28272000.0
-        ],
-        [
-          "RUMO S.A.",
-          13842639000.0
-        ],
-        [
-          "RUMO S.A.",
-          205799000.0
-        ],
-        [
-          "RUMO S.A.",
-          14048438000.0
+          41939515000.0
         ]
       ]
     }
@@ -10206,16 +10195,16 @@
     "classe": "quantitativa",
     "pergunta": "Qual era o passivo circulante consolidado da Cury ao fim de 2025?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con INNER JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "tabelas_contexto": [
       "BPP_con",
       "BPP_ind",
       "BPA_con",
       "companhias"
     ],
-    "resposta": "O passivo circulante consolidado da Cury ao fim de 2025 era de R$1.743.700.000,00.\n\nDados:\nPassivo_Circulante\n1.743.700.000,00\n\nProveniência:\n- Empresa: CURY CONSTRUTORA E INCORPORADORA S.A. (código CVM 025100)\n- Demonstração financeira: Balanço Patrimonial Passivo, consolidada (BPP_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "resposta": "O passivo circulante consolidado da Cury ao fim de 2025 era de R$1.743.700.000,00.\n\nDados:\nPassivo_Circulante\n1.743.700.000,00\n\nProveniência:\n- Empresa: CURY CONSTRUTORA E INCORPORADORA S.A. (código CVM 025100)\n- Demonstração financeira: Balanço Patrimonial Passivo, consolidada (BPP_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con INNER JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'",
     "texto_resposta": "O passivo circulante consolidado da Cury ao fim de 2025 era de R$1.743.700.000,00.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Passivo_Circulante: 1.743.700.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Passivo_Circulante FROM BPP_con INNER JOIN companhias ON BPP_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Cury%' AND CD_CONTA = '2.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Passivo_Circulante: 1.743.700.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -12759,22 +12748,41 @@
     "classe": "quantitativa",
     "pergunta": "Qual o valor das participações em controladas que a CPFL Energia tinha no balanço individual de 2025?",
     "divisao": null,
-    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL Energia%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "sql": "SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind INNER JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
     "tabelas_contexto": [
       "DMPL_con",
       "BPA_ind",
       "DFC_MI_con",
       "companhias"
     ],
-    "resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "texto_resposta": "Não consegui gerar uma consulta SQL válida para responder a essa pergunta com os dados disponíveis.",
-    "contexto": "",
+    "resposta": "A CPFL Energia S.A. tinha R$22.675.914.000,00 de participações em controladas no balanço individual de 2025.\n\nDados:\nDENOM_CIA | valor_participacoes_controladas\nCPFL ENERGIA S.A. | 22.675.914.000,00\nCPFL ENERGIAS RENOVÁVEIS S.A. | 5.638.828.000,00\nCPFL TRANSMISSÃO S.A. | 1.443.238.000,00\n\nProveniência:\n- Empresa: CPFL ENERGIA S.A. (código CVM 018660); CPFL ENERGIAS RENOVÁVEIS S.A. (código CVM 020540); CPFL TRANSMISSÃO S.A. (código CVM 003204)\n- Demonstração financeira: Balanço Patrimonial Ativo, individual (BPA_ind)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind INNER JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA",
+    "texto_resposta": "A CPFL Energia S.A. tinha R$22.675.914.000,00 de participações em controladas no balanço individual de 2025.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS valor_participacoes_controladas FROM BPA_ind INNER JOIN companhias ON BPA_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%CPFL%' AND CD_CONTA = '1.02.02.01.02' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: CPFL ENERGIA S.A.; valor_participacoes_controladas: 22.675.914.000,00\n- DENOM_CIA: CPFL ENERGIAS RENOVÁVEIS S.A.; valor_participacoes_controladas: 5.638.828.000,00\n- DENOM_CIA: CPFL TRANSMISSÃO S.A.; valor_participacoes_controladas: 1.443.238.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
       "por_trecho": []
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DENOM_CIA",
+        "valor_participacoes_controladas"
+      ],
+      "linhas": [
+        [
+          "CPFL ENERGIA S.A.",
+          22675914000.0
+        ],
+        [
+          "CPFL ENERGIAS RENOVÁVEIS S.A.",
+          5638828000.0
+        ],
+        [
+          "CPFL TRANSMISSÃO S.A.",
+          1443238000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 3,
@@ -12913,16 +12921,16 @@
     "classe": "quantitativa",
     "pergunta": "De acordo com o fluxo de caixa individual da B3, qual foi o caixa gerado nas atividades operacionais em 2025?",
     "divisao": null,
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO' AND companhias.DENOM_CIA LIKE '%AMBEV%'",
     "tabelas_contexto": [
       "DFC_MI_ind",
       "BPA_ind",
       "BPP_ind",
       "companhias"
     ],
-    "resposta": "Não disponível.\n\nDados:\nCaixa_Gerado_Nas_Atividades_Operacionais\n14.339.206.000,00\n\nProveniência:\n- Empresa: AMBEV S.A. (código CVM 023264)\n- Demonstração financeira: Demonstração do Fluxo de Caixa (método indireto), individual (DFC_MI_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'",
+    "resposta": "Não disponível.\n\nDados:\nCaixa_Gerado_Nas_Atividades_Operacionais\n14.339.206.000,00\n\nProveniência:\n- Empresa: AMBEV S.A. (código CVM 023264)\n- Demonstração financeira: Demonstração do Fluxo de Caixa (método indireto), individual (DFC_MI_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO' AND companhias.DENOM_CIA LIKE '%AMBEV%'",
     "texto_resposta": "Não disponível.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%AMBEV%' AND CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO'\nResultado (valores monetários em reais):\n- Caixa_Gerado_Nas_Atividades_Operacionais: 14.339.206.000,00\n",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS Caixa_Gerado_Nas_Atividades_Operacionais FROM DFC_MI_ind JOIN companhias ON DFC_MI_ind.CD_CVM = companhias.CD_CVM WHERE CD_CONTA = '6.01.01' AND ORDEM_EXERC = 'ÚLTIMO' AND companhias.DENOM_CIA LIKE '%AMBEV%'\nResultado (valores monetários em reais):\n- Caixa_Gerado_Nas_Atividades_Operacionais: 14.339.206.000,00\n",
     "trechos_ids": [],
     "relevancia_contexto": {
       "score": null,
@@ -13592,9 +13600,9 @@
       "BPA_con",
       "companhias"
     ],
-    "resposta": "Não encontrei essa informação nos documentos disponíveis.\n\nProveniência:\n- Documentos consultados: nenhum documento relevante encontrado\n\nAviso: não foi possível obter os dados do banco para esta pergunta, então a resposta usa apenas os documentos normativos.",
-    "texto_resposta": "Não encontrei essa informação nos documentos disponíveis.",
-    "contexto": "TRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n52. A divulgação dos fluxos de caixa por segmento de negócios permite aos usuários obter melhor entendimento da relação entre os fluxos de caixa do negócio como um todo e os de suas partes componentes, e a disponibilidade e variabilidade dos fluxos de caixa por segmento de negócios. 52A. As demonstrações contábeis não devem divulgar o valor dos fluxos de caixa por ação. Nem o fluxo de caixa líquido nem quaisquer de seus componentes substituem o lucro líquido como indicador de desempenho da entidade, como a divulgação do fluxo de caixa por ação poderia sugerir\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\ndemonstrações contábeis foram autorizadas para serem emitidas e não reconhecido como uma distribuição aos proprietários durante o período abrangido pelas demonstrações contábeis, bem como o respectivo valor por ação ou equivalente; (b) a quantia de qualquer dividendo preferencial cumulativo não reconhecido. 138. A entidade deve divulgar, caso não for divulgado em outro local entre as informações publicadas com as demonstrações contábeis, as seguintes informações: (a) o domicílio e a forma jurídica da entidade, o seu país de registro e o endereço da sede\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n09, se exigido legalmente ou por algum órgão regulador ou mesmo se apresentada voluntariamente. (Alterada pela Revisão CPC 03) A entidade pode usar outros títulos nas demonstrações em vez daqueles usados neste Pronunciamento Técnico, desde que não contrarie a legislação societária brasileira vigente. 10A. A entidade pode, se permitido legalmente, apresentar uma única demonstração do resultado do período e outros resultados abrangentes, com a demonstração do resultado e outros resultados abrangentes apresentados em duas seções",
+    "resposta": "**Dados:**  \nO saldo inicial de caixa da Prio em 2025 foi R$2.212.322.000,00 para a Prio Forte S.A. e R$3.398.291.000,00 para a Prio S.A.\n\n**Explicação:**  \nNão encontrei essa informação nos documentos disponíveis.\n\nDados:\nDENOM_CIA | saldo_inicial_caixa\nPRIO FORTE S.A. | 2.212.322.000,00\nPRIO S.A. | 3.398.291.000,00\n\nProveniência:\n- Empresa: PRIO FORTE S.A. (código CVM 027740); PRIO S.A. (código CVM 022187)\n- Demonstração financeira: Balanço Patrimonial Ativo, consolidada (BPA_con)\n- Exercício social: em 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS saldo_inicial_caixa FROM BPA_con JOIN companhias ON BPA_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Prio%' AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\n- Documentos consultados: nenhum documento relevante encontrado",
+    "texto_resposta": "**Dados:**  \nO saldo inicial de caixa da Prio em 2025 foi R$2.212.322.000,00 para a Prio Forte S.A. e R$3.398.291.000,00 para a Prio S.A.\n\n**Explicação:**  \nNão encontrei essa informação nos documentos disponíveis.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT companhias.DENOM_CIA, SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS saldo_inicial_caixa FROM BPA_con JOIN companhias ON BPA_con.CD_CVM = companhias.CD_CVM WHERE companhias.DENOM_CIA LIKE '%Prio%' AND CD_CONTA = '1.01.01' AND ORDEM_EXERC = 'ÚLTIMO' GROUP BY companhias.DENOM_CIA\nResultado (valores monetários em reais):\n- DENOM_CIA: PRIO FORTE S.A.; saldo_inicial_caixa: 2.212.322.000,00\n- DENOM_CIA: PRIO S.A.; saldo_inicial_caixa: 3.398.291.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: cpc_03_r2_demonstracao_fluxos_de_caixa.pdf)\n52. A divulgação dos fluxos de caixa por segmento de negócios permite aos usuários obter melhor entendimento da relação entre os fluxos de caixa do negócio como um todo e os de suas partes componentes, e a disponibilidade e variabilidade dos fluxos de caixa por segmento de negócios. 52A. As demonstrações contábeis não devem divulgar o valor dos fluxos de caixa por ação. Nem o fluxo de caixa líquido nem quaisquer de seus componentes substituem o lucro líquido como indicador de desempenho da entidade, como a divulgação do fluxo de caixa por ação poderia sugerir\n\n[2] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\ndemonstrações contábeis foram autorizadas para serem emitidas e não reconhecido como uma distribuição aos proprietários durante o período abrangido pelas demonstrações contábeis, bem como o respectivo valor por ação ou equivalente; (b) a quantia de qualquer dividendo preferencial cumulativo não reconhecido. 138. A entidade deve divulgar, caso não for divulgado em outro local entre as informações publicadas com as demonstrações contábeis, as seguintes informações: (a) o domicílio e a forma jurídica da entidade, o seu país de registro e o endereço da sede\n\n[3] (fonte: cpc_26_r1_apresentacao_demonstracoes_contabeis.pdf)\n09, se exigido legalmente ou por algum órgão regulador ou mesmo se apresentada voluntariamente. (Alterada pela Revisão CPC 03) A entidade pode usar outros títulos nas demonstrações em vez daqueles usados neste Pronunciamento Técnico, desde que não contrarie a legislação societária brasileira vigente. 10A. A entidade pode, se permitido legalmente, apresentar uma única demonstração do resultado do período e outros resultados abrangentes, com a demonstração do resultado e outros resultados abrangentes apresentados em duas seções",
     "trechos_ids": [
       "glossario_cpc_03_r2_demonstracao_fluxos_de_caixa_113",
       "glossario_cpc_26_r1_apresentacao_demonstracoes_contabeis_294",
@@ -13620,7 +13628,22 @@
         }
       ]
     },
-    "resultado_sql": null
+    "resultado_sql": {
+      "colunas": [
+        "DENOM_CIA",
+        "saldo_inicial_caixa"
+      ],
+      "linhas": [
+        [
+          "PRIO FORTE S.A.",
+          2212322000.0
+        ],
+        [
+          "PRIO S.A.",
+          3398291000.0
+        ]
+      ]
+    }
   },
   {
     "rodada": 3,
@@ -14046,16 +14069,16 @@
       "parte_conceitual": "Com que frequência máxima uma companhia que negocia dívidas com credores fora da Justiça precisa prestar contas ao regulador sobre o andamento do acordo?",
       "dividida": true
     },
-    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_GERAIS_ADMINISTRATIVAS FROM DRE_ind WHERE CD_CONTA = '3.04.02' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CVM IN (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%TRISUL%')",
+    "sql": "SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_GERAIS_ADMINISTRATIVAS FROM DRE_ind AS T1 JOIN companhias AS T2 ON T1.CD_CVM = T2.CD_CVM WHERE T1.CD_CONTA = '3.04.02' AND T1.ORDEM_EXERC = 'ÚLTIMO' AND T2.DENOM_CIA LIKE '%TRISUL%'",
     "tabelas_contexto": [
       "DRE_ind",
       "DRE_con",
       "DMPL_ind",
       "companhias"
     ],
-    "resposta": "**Dados:** Trisul gastou R$ -74.297.000,00 com despesas gerais e administrativas em 2025, conforme a consulta à DRE individual.\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.\n\nDados:\nDESPESAS_GERAIS_ADMINISTRATIVAS\n-74.297.000,00\n\nProveniência:\n- Empresa: TRISUL S.A. (código CVM 021130)\n- Demonstração financeira: Demonstração do Resultado do Exercício, individual (DRE_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_GERAIS_ADMINISTRATIVAS FROM DRE_ind WHERE CD_CONTA = '3.04.02' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CVM IN (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%TRISUL%')\n- Documentos consultados: nenhum documento relevante encontrado",
-    "texto_resposta": "**Dados:** Trisul gastou R$ -74.297.000,00 com despesas gerais e administrativas em 2025, conforme a consulta à DRE individual.\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.",
-    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_GERAIS_ADMINISTRATIVAS FROM DRE_ind WHERE CD_CONTA = '3.04.02' AND ORDEM_EXERC = 'ÚLTIMO' AND CD_CVM IN (SELECT CD_CVM FROM companhias WHERE DENOM_CIA LIKE '%TRISUL%')\nResultado (valores monetários em reais):\n- DESPESAS_GERAIS_ADMINISTRATIVAS: -74.297.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: resol080consolid.pdf)\nregulamentos e normas externas e internas”\n\niii. “a diretoria deve avaliar, pelo menos anualmente, a eficácia das políticas e dos sistemas\n\nde gerenciamento de riscos e de controles internos, bem como do programa de\n\nintegridade/conformidade (compliance) e prestar contas ao conselho de\n\nadministração sobre essa avaliação”\n\nb. no caso da não adoção das práticas recomendadas ou da sua adoção de forma parcial,\n\napresentar, em linha com as orientações do Código, a justificativa do emissor sobre o\n\nassunto 133\n\n[2] (fonte: resol080consolid.pdf)\njustificativa do emissor sobre o assunto, informando as eventuais práticas alternativas\n\nadotadas para evitar que a concentração de poderes de presidente do conselho e diretor-\n\npresidente prejudique o monitoramento da atuação da diretoria pelo conselho de\n\nadministração 110\n\n12. Em relação ao princípio 2.4: “O conselho de administração deve estabelecer mecanismos de\n\navaliação periódica de desempenho que contribuam para sua efetividade e para o\n\naperfeiçoamento da governança da companhia”\n\na. informar se o emissor segue a seguinte prática recomendada: “A companhia deve\n\n[3] (fonte: resol080consolid.pdf)\nII – quadro geral de credores elaborado pelo liquidante;\n\nIII – quadro geral de credores definitivo, no mesmo dia de sua ciência pelo emissor, no caso de\n\nliquidação de instituição financeira ou liquidação judicial;\n\nIV – relatório e balanço final da liquidação, com prestação de contas do liquidante;\n\nV – quaisquer outros relatórios, pareceres e informações contábeis elaborados sob a\n\nresponsabilidade do liquidante; e\n\nVI – ato de encerramento da liquidação, no mesmo dia da sua ciência pelo emissor ou de sua",
+    "resposta": "**Dados:** Trisul gastou R$ -74.297.000,00 com despesas gerais e administrativas em 2025, conforme a DRE individual.\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.\n\nDados:\nDESPESAS_GERAIS_ADMINISTRATIVAS\n-74.297.000,00\n\nProveniência:\n- Empresa: TRISUL S.A. (código CVM 021130)\n- Demonstração financeira: Demonstração do Resultado do Exercício, individual (DRE_ind)\n- Exercício social: 01/01/2025 a 31/12/2025 (ÚLTIMO)\n- Consulta SQL: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_GERAIS_ADMINISTRATIVAS FROM DRE_ind AS T1 JOIN companhias AS T2 ON T1.CD_CVM = T2.CD_CVM WHERE T1.CD_CONTA = '3.04.02' AND T1.ORDEM_EXERC = 'ÚLTIMO' AND T2.DENOM_CIA LIKE '%TRISUL%'\n- Documentos consultados: nenhum documento relevante encontrado",
+    "texto_resposta": "**Dados:** Trisul gastou R$ -74.297.000,00 com despesas gerais e administrativas em 2025, conforme a DRE individual.\n\n**Explicação:** Não encontrei essa informação nos documentos disponíveis.",
+    "contexto": "DADOS DO BANCO\nConsulta executada: SELECT SUM(CASE WHEN ESCALA_MOEDA = 'MIL' THEN VL_CONTA * 1000 ELSE VL_CONTA END) AS DESPESAS_GERAIS_ADMINISTRATIVAS FROM DRE_ind AS T1 JOIN companhias AS T2 ON T1.CD_CVM = T2.CD_CVM WHERE T1.CD_CONTA = '3.04.02' AND T1.ORDEM_EXERC = 'ÚLTIMO' AND T2.DENOM_CIA LIKE '%TRISUL%'\nResultado (valores monetários em reais):\n- DESPESAS_GERAIS_ADMINISTRATIVAS: -74.297.000,00\n\n\nTRECHOS DE DOCUMENTOS\n[1] (fonte: resol080consolid.pdf)\nregulamentos e normas externas e internas”\n\niii. “a diretoria deve avaliar, pelo menos anualmente, a eficácia das políticas e dos sistemas\n\nde gerenciamento de riscos e de controles internos, bem como do programa de\n\nintegridade/conformidade (compliance) e prestar contas ao conselho de\n\nadministração sobre essa avaliação”\n\nb. no caso da não adoção das práticas recomendadas ou da sua adoção de forma parcial,\n\napresentar, em linha com as orientações do Código, a justificativa do emissor sobre o\n\nassunto 133\n\n[2] (fonte: resol080consolid.pdf)\njustificativa do emissor sobre o assunto, informando as eventuais práticas alternativas\n\nadotadas para evitar que a concentração de poderes de presidente do conselho e diretor-\n\npresidente prejudique o monitoramento da atuação da diretoria pelo conselho de\n\nadministração 110\n\n12. Em relação ao princípio 2.4: “O conselho de administração deve estabelecer mecanismos de\n\navaliação periódica de desempenho que contribuam para sua efetividade e para o\n\naperfeiçoamento da governança da companhia”\n\na. informar se o emissor segue a seguinte prática recomendada: “A companhia deve\n\n[3] (fonte: resol080consolid.pdf)\nII – quadro geral de credores elaborado pelo liquidante;\n\nIII – quadro geral de credores definitivo, no mesmo dia de sua ciência pelo emissor, no caso de\n\nliquidação de instituição financeira ou liquidação judicial;\n\nIV – relatório e balanço final da liquidação, com prestação de contas do liquidante;\n\nV – quaisquer outros relatórios, pareceres e informações contábeis elaborados sob a\n\nresponsabilidade do liquidante; e\n\nVI – ato de encerramento da liquidação, no mesmo dia da sua ciência pelo emissor ou de sua",
     "trechos_ids": [
       "glossario_resol080consolid_477",
       "glossario_resol080consolid_426",
