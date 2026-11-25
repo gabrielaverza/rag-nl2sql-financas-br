@@ -1,7 +1,7 @@
 # Experimento pipeline_final: RAGAS adaptado e conferência dos números
 
-- Gerado em 23/11/2026 20:30 por `python pipeline/avaliacao/ragas_avaliacao.py pipeline_final`.
-- Execução do experimento: `20261123-170411`. Pasta: `metricas\pipeline_final`.
+- Gerado em 25/11/2026 03:06 por `python pipeline/avaliacao/ragas_avaliacao.py pipeline_final`.
+- Execução do experimento: `20261124-214319`. Pasta: `metricas\pipeline_final`.
 - Juiz: `qwen2.5-coder:7b` (Ollama); embeddings: E5 local (`modelos_embedding`, prefixo de pergunta). Bibliotecas: ragas 0.4.3, openai 1.109.1.
 - Fidelidade e relevância da resposta seguem as definições do artigo da RAGAS (es2025), calculadas pela biblioteca ragas com um juiz local; a relevância do contexto não é calculada aqui (vem do validador do sistema e está no `relatorio.md` do executor). A ragas 0.4.3 só importa com um contorno (módulo falso do Vertex AI), declarado em `contornar_vertexai`.
 - A nota mede sustentação pelo contexto, e não a correção do dado, e o juiz é o mesmo modelo que escreve as respostas. Convém medir a concordância dele com a autora na amostra de 20 respostas.
@@ -17,10 +17,10 @@
 
 | Configuração | Fidelidade (RAGAS) | Relevância da resposta (RAGAS) | Números do resultado no texto (por código) |
 |---|---|---|---|
-| Embeddings (esquema) + RRF (glossário) | 0,19 (n = 108) | 0,39 (n = 108) | 0,96 (n = 99) |
+| Embeddings (esquema) + RRF (glossário) | 0,16 (n = 108) | 0,38 (n = 108) | 0,92 (n = 96) |
 
 ## 3. Perguntas quantitativas
 
 | Configuração | Números do resultado no texto (por código) |
 |---|---|
-| Embeddings (esquema) + RRF (glossário) | 0,99 (n = 92) |
+| Embeddings (esquema) + RRF (glossário) | 0,93 (n = 90) |
