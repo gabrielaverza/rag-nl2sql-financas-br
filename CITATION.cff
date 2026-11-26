@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "Se você usar este software, cite-o com os dados abaixo."
+type: software
+title: "Arquitetura Híbrida RAG-to-SQL para Consulta em Linguagem Natural a Bancos de Dados Financeiros Estruturados"
+abstract: "Pipeline que permite consultar, em linguagem natural, as Demonstrações Financeiras Padronizadas (DFP) publicadas pela CVM. Combina recuperação semântica sobre a documentação do esquema e sobre normativos contábeis com geração de SQL, para responder perguntas quantitativas, conceituais e híbridas."
+authors:
+  - family-names: "Ribeiro"
+    given-names: "Gabriela Carregari Verza"
+    affiliation: "Universidade Federal de São Paulo (UNIFESP), Instituto de Ciência e Tecnologia"
+repository-code: "https://github.com/gabrielaverza/rag-nl2sql-financas-br"
+license: MIT
+keywords:
+  - RAG
+  - Text-to-SQL
+  - consulta em linguagem natural
+  - demonstrações financeiras
+  - CVM

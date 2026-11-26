@@ -252,6 +252,22 @@ são otimistas: o mesmo conjunto serviu para desenhar essas correções e para a
 
 ---
 
+## Licença e citação
+
+O código deste repositório é distribuído sob a licença MIT (arquivo `LICENSE`). A licença vale só para o
+código e para os resultados em `metricas/`; os dados de terceiros mantêm a licença de origem:
+
+- **Dados da CVM** (`dados/dfp_cia_aberta_2025/`): publicados pela CVM sob a licença ODbL
+  ([texto da licença](https://opendatacommons.org/licenses/odbl/); página do conjunto de dados:
+  <https://dados.cvm.gov.br/dataset/cia_aberta-doc-dfp>). Ao redistribuir o banco `dados/dfp.db`,
+  gerado a partir desses arquivos, confira as condições da ODbL para bases derivadas.
+- **Normativos** (`dados/normativos/`): textos da CVM e do CPC, que pertencem aos respectivos emissores.
+
+Para citar o software, use o arquivo `CITATION.cff` (o GitHub o mostra em "Cite this repository") ou o
+DOI da versão usada, disponível nas releases.
+
+---
+
 ## Estágio offline
 
 Prepara tudo o que a consulta usa: o banco, a documentação do esquema e os índices de busca.
